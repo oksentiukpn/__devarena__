@@ -16,6 +16,7 @@ services:
   web:
     build: .
     image: devarena-web
+    restart: always
     # ports:           <--- ЗАКОМЕНТУЙТЕ АБО ВИДАЛІТЬ ЦЮ СЕКЦІЮ
     #   - "5000:5000"  <--- Тепер доступ тільки всередині мережі Docker
     volumes:
@@ -28,6 +29,7 @@ services:
 
   nginx:
     image: nginx:alpine
+    restart: always
     ports:
       - "80:80"
       - "443:443"

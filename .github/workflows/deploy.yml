@@ -22,7 +22,7 @@ jobs:
             set -e
             
             # Navigate to the project directory
-            cd /home/ubuntu/apps/devarena
+            cd /home/ubuntu/apps/__devarena__
             
             # Pull the latest code
             git pull origin main
