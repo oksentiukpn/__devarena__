@@ -14,8 +14,12 @@ RUN apt-get update && apt-get install -y libpq-dev gcc \
 # Копіюємо весь код проєкту
 COPY . .
 
-# Відкриваємо порт 5000
+COPY entrypoint.sh .
+# Робимо його виконуваним (важливо для Linux)
+RUN chmod +x entrypoint.sh
+#
 EXPOSE 5000
-
-# Команда запуску
-CMD ["python", "run.py"]
+#
+# # Вказуємо цей скрипт як точку входу
+ENTRYPOINT ["./entrypoint.sh"]
+# # ------------------
