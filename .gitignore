@@ -7,4 +7,3 @@ instance/
 
 .env
 nginx/
-migrations/
