@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-card">
+  <h2>Створити акаунт</h2>
+  <form method="POST" action="">
+    <div class="form-group">
+      <label for="username">Нікнейм</label>
+      <input type="text" name="username" id="username" required placeholder="cyber_punk_2077">
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" required placeholder="name@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="password">Пароль</label>
+      <input type="password" name="password" id="password" required placeholder="••••••••">
+    </div>
+
+    <button type="submit" class="btn-submit">Зареєструватися</button>
+  </form>
+
+  <div class="auth-footer">
+    Вже є акаунт? <a href="{{ url_for('auth.login') }}">Увійти</a>
+  </div>
+</div>
+{% endblock %}
