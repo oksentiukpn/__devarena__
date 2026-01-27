@@ -13,13 +13,12 @@ RUN apt-get update && apt-get install -y libpq-dev gcc \
 
 # Копіюємо весь код проєкту
 COPY . .
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-COPY entrypoint.sh .
-# Робимо його виконуваним (важливо для Linux)
-RUN chmod +x entrypoint.sh
+# Даємо права і прибираємо можливі Windows-символи (\r), якщо ти писав код на Windows
+RUN chmod +x /usr/local/bin/entrypoint.sh && sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
 #
 EXPOSE 5000
 #
-# # Вказуємо цей скрипт як точку входу
-ENTRYPOINT ["./entrypoint.sh"]
-# # ------------------
+# # Запускаємо скрипт з системної папки
+ENTRYPOINT ["entrypoint.sh"]
