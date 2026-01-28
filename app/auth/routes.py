@@ -17,6 +17,10 @@ def register():
         password = request.form.get("password")
         # ///
         # Future data validation
+        for value in (username, email, request):
+            if not value or len(value) < 5:
+                return f"{value}: is invalid"
+
         # ///
         user = User(username=username, email=email)
         user.set_password(password)
