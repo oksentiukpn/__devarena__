@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+
 from app import db
 from app.models import User
-from app.auth.utils import login_required
 
 auth = Blueprint("auth", __name__)
 
@@ -28,7 +28,8 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash(f"Account with name <{username}> was successfully created!", "success")
+        flash(f"Account with name <{
+              username}> was successfully created!", "success")
         return redirect(url_for("auth.login"))
     # if not sending data, just give html
     return render_template("auth/register.html")
@@ -49,8 +50,8 @@ def login():
             flash("Successfull login!", "success")
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("main.home"))
-        else:
-            flash("Login failed: Invalid password or email", "danger")
+
+        flash("Login failed: Invalid password or email", "danger")
 
     # if not sending data, just give html
     return render_template("auth/login.html")
