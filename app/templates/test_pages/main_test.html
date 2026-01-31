@@ -1,350 +1,287 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site Status - OK</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+{% block title %}DevArena - Level Up Your Code{% endblock %}
 
-    body {
-      min-height: 100vh;
-      background: #0a0a0a;
-      font-family: system-ui, -apple-system, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fafafa;
-      position: relative;
-      /* Важливо для позиціонування меню */
-    }
+{% block nav_home_class %}px-4 py-2 rounded-lg bg-emerald-600/10 text-emerald-500 font-medium{% endblock %}
 
-    /* --- НОВІ СТИЛІ ДЛЯ МЕНЮ --- */
-    .top-nav {
-      position: absolute;
-      top: 0;
-      right: 0;
-      padding: 1.5rem 2rem;
-      display: flex;
-      gap: 1rem;
-      width: 100%;
-      justify-content: flex-end;
-      z-index: 10;
-    }
-
-    .btn {
-      text-decoration: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
-
-    /* Кнопка входу (прозора) */
-    .btn-ghost {
-      color: #a1a1aa;
-      background: transparent;
-      border: 1px solid transparent;
-    }
-
-    .btn-ghost:hover {
-      color: #fafafa;
-      border-color: #3f3f46;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Кнопка реєстрації (акцентна) */
-    .btn-primary {
-      background: #22c55e;
-      color: #052e16;
-    }
-
-    .btn-primary:hover {
-      background: #16a34a;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
-    }
-
-    /* --------------------------- */
-
-    .container {
-      text-align: center;
-      padding: 2rem;
-    }
-
-    /* Animated checkmark */
-    .status-icon {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 2rem;
-      position: relative;
-    }
-
-    .circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 4px solid #22c55e;
-      position: absolute;
-      animation: circleGrow 0.6s ease-out forwards;
-      transform: scale(0);
-    }
-
-    @keyframes circleGrow {
-      0% {
-        transform: scale(0);
-        opacity: 0;
-      }
-
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .checkmark {
-      width: 120px;
-      height: 120px;
-      position: absolute;
-    }
-
-    .checkmark-path {
-      stroke: #22c55e;
-      stroke-width: 4;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-      stroke-dasharray: 60;
-      stroke-dashoffset: 60;
-      animation: drawCheck 0.4s ease-out 0.5s forwards;
-    }
-
-    @keyframes drawCheck {
-      to {
-        stroke-dashoffset: 0;
-      }
-    }
-
-    /* Pulse ring */
-    .pulse-ring {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 2px solid #22c55e;
-      position: absolute;
-      animation: pulse 2s ease-out infinite 1s;
-      opacity: 0;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-        opacity: 0.6;
-      }
-
-      100% {
-        transform: scale(1.5);
-        opacity: 0;
-      }
-    }
-
-    .title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      animation: fadeUp 0.6s ease-out 0.3s both;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      margin-bottom: 1.5rem;
-      animation: fadeUp 0.6s ease-out 0.5s both;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: #22c55e;
-      border-radius: 50%;
-      animation: blink 1.5s ease-in-out infinite;
-    }
-
-    @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.4;
-      }
-    }
-
-    .status-text {
-      color: #22c55e;
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .subtitle {
-      color: #a1a1aa;
-      font-size: 1.125rem;
-      margin-bottom: 2.5rem;
-      animation: fadeUp 0.6s ease-out 0.7s both;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Status cards */
-    .status-grid {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      max-width: 600px;
-      margin: 0 auto;
-      animation: fadeUp 0.6s ease-out 0.9s both;
-    }
-
-    .status-card {
-      background: #171717;
-      border: 1px solid #262626;
-      border-radius: 12px;
-      padding: 1.25rem 1.5rem;
-      min-width: 170px;
-      text-align: left;
-      transition: border-color 0.2s ease;
-    }
-
-    .status-card:hover {
-      border-color: #404040;
-    }
-
-    .card-label {
-      color: #71717a;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
-    }
-
-    .card-value {
-      font-size: 1.25rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .card-value.ok {
-      color: #22c55e;
-    }
-
-    .card-value.info {
-      color: #fafafa;
-    }
-
-    .mini-dot {
-      width: 6px;
-      height: 6px;
-      background: #22c55e;
-      border-radius: 50%;
-    }
-
-    /* Timestamp */
-    .timestamp {
-      margin-top: 3rem;
-      color: #52525b;
-      font-size: 0.75rem;
-      animation: fadeUp 0.6s ease-out 1.1s both;
-    }
-
-    .timestamp span {
-      color: #71717a;
-    }
-  </style>
-</head>
-
-<body>
-  <nav class="top-nav">
-    {% if session.get('user_id') %}
-    <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost">Вийти</a>
-    {% else %}
-    <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Увійти</a>
-    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Реєстрація</a>
-    {% endif %}
-  </nav>
-
-  <div class="container">
-    <div class="status-icon">
-      <div class="pulse-ring"></div>
-      <div class="circle"></div>
-      <svg class="checkmark" viewBox="0 0 120 120">
-        <path class="checkmark-path" d="M35 60 L52 77 L85 44" />
-      </svg>
+{% block content %}
+<div class="flex flex-col">
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden">
+    <!-- Background Grid Pattern -->
+    <div class="absolute inset-0 opacity-[0.03]"
+      style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22none%22 width=%2260%22 height=%2260%22/><path d=%22M0 60L60 0%22 stroke=%22%2310b981%22 stroke-width=%220.5%22/></svg>');">
+    </div>
+    <!-- Gradient Glow -->
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none">
     </div>
 
-    <h1 class="title">All Systems Operational</h1>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <div class="text-center max-w-4xl mx-auto">
+        <!-- Badge -->
+        <div
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-600/10 border border-emerald-600/20 mb-8">
+          <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          <span class="text-sm text-emerald-400 font-medium">Join 10,000+ developers improving their code</span>
+        </div>
 
-    <div class="status-badge">
-      <div class="status-dot"></div>
-      <span class="status-text">Online</span>
-    </div>
+        <!-- Heading -->
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+          Level Up Your Code Through
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600"> Peer
+            Review</span>
+        </h1>
 
-    <p class="subtitle">The site is running and responding normally.</p>
+        <!-- Subheading -->
+        <p class="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          DevArena is the platform where developers grow together. Get your code reviewed, compete in coding battles,
+          and climb the leaderboard.
+        </p>
 
-    <div class="status-grid">
-      <div class="status-card">
-        <div class="card-label">Server</div>
-        <div class="card-value ok">
-          <span class="mini-dot"></span>
-          Running
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/register"
+            class="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-emerald-600/25 flex items-center justify-center gap-2">
+            Get Started Free
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+          <a href="/feed"
+            class="w-full sm:w-auto px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-xl transition-all border border-zinc-700 flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            Browse Projects
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold text-white">50K+</div>
+            <div class="text-sm text-zinc-500 mt-1">Code Reviews</div>
+          </div>
+          <div class="text-center border-x border-zinc-800">
+            <div class="text-2xl sm:text-3xl font-bold text-white">10K+</div>
+            <div class="text-sm text-zinc-500 mt-1">Developers</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold text-white">2K+</div>
+            <div class="text-sm text-zinc-500 mt-1">Battles</div>
+          </div>
         </div>
       </div>
-      <div class="status-card">
-        <div class="card-label">Response</div>
-        <div class="card-value ok">
-          <span class="mini-dot"></span>
-          OK (200)
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-24 bg-zinc-900/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">How It Works</h2>
+        <p class="text-zinc-400 text-lg max-w-2xl mx-auto">Three simple steps to start improving your code and helping
+          others grow.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="relative group">
+          <div
+            class="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity blur">
+          </div>
+          <div class="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-8 h-full">
+            <div class="w-12 h-12 bg-emerald-600/10 rounded-xl flex items-center justify-center mb-6">
+              <span class="text-emerald-500 font-bold text-xl">1</span>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">Share Your Code</h3>
+            <p class="text-zinc-400 leading-relaxed">Post your projects, algorithms, or code snippets. Add descriptions
+              and tags to help others find and understand your work.</p>
+            <div class="mt-6 flex items-center gap-2 text-sm text-zinc-500">
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Syntax highlighting for 50+ languages
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="relative group">
+          <div
+            class="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity blur">
+          </div>
+          <div class="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-8 h-full">
+            <div class="w-12 h-12 bg-emerald-600/10 rounded-xl flex items-center justify-center mb-6">
+              <span class="text-emerald-500 font-bold text-xl">2</span>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">Get Peer Reviews</h3>
+            <p class="text-zinc-400 leading-relaxed">Receive constructive feedback from the community. Learn best
+              practices, discover optimizations, and improve code quality.</p>
+            <div class="mt-6 flex items-center gap-2 text-sm text-zinc-500">
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Inline comments and suggestions
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="relative group">
+          <div
+            class="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity blur">
+          </div>
+          <div class="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-8 h-full">
+            <div class="w-12 h-12 bg-emerald-600/10 rounded-xl flex items-center justify-center mb-6">
+              <span class="text-emerald-500 font-bold text-xl">3</span>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">Compete & Grow</h3>
+            <p class="text-zinc-400 leading-relaxed">Join coding battles, earn reputation points, and climb the
+              leaderboard. Showcase your skills and learn from the best.</p>
+            <div class="mt-6 flex items-center gap-2 text-sm text-zinc-500">
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Weekly challenges and prizes
+            </div>
+          </div>
         </div>
       </div>
-      <div class="status-card">
-        <div class="card-label">Protocol</div>
-        <div class="card-value info">HTTPS</div>
-      </div>
     </div>
+  </section>
 
-    <p class="timestamp">Last checked: <span id="timestamp"></span></p>
-  </div>
+  <!-- Features Section -->
+  <section class="py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">Everything You Need to Grow as a Developer</h2>
+          <p class="text-zinc-400 text-lg mb-8 leading-relaxed">DevArena combines code review, gamification, and
+            community to create the ultimate learning environment for developers at any level.</p>
 
-  <script>
-    document.getElementById('timestamp').textContent = new Date().toLocaleString();
-  </script>
-</body>
+          <div class="space-y-6">
+            <div class="flex gap-4">
+              <div class="w-10 h-10 bg-emerald-600/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-white font-semibold mb-1">Reputation System</h4>
+                <p class="text-zinc-500 text-sm">Earn points for quality reviews and code contributions. Build your
+                  developer credibility.</p>
+              </div>
+            </div>
 
-</html>
+            <div class="flex gap-4">
+              <div class="w-10 h-10 bg-emerald-600/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-white font-semibold mb-1">Battle Mode</h4>
+                <p class="text-zinc-500 text-sm">Compete head-to-head on coding challenges. Community votes for clean
+                  code and performance.</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="w-10 h-10 bg-emerald-600/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-white font-semibold mb-1">Community Driven</h4>
+                <p class="text-zinc-500 text-sm">Connect with developers worldwide. Share knowledge and grow together.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Preview Card -->
+        <div class="relative">
+          <div class="absolute -inset-4 bg-gradient-to-r from-emerald-600/20 to-transparent rounded-3xl blur-2xl"></div>
+          <div class="relative bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+            <div class="flex items-center gap-2 px-4 py-3 bg-zinc-950 border-b border-zinc-800">
+              <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+              </div>
+              <span class="text-xs text-zinc-500 ml-2 font-mono">solution.py</span>
+            </div>
+            <div class="p-6 font-mono text-sm leading-relaxed">
+              <div class="text-zinc-500"># Optimized binary search</div>
+              <div><span class="text-purple-400">def</span> <span class="text-emerald-400">binary_search</span>(arr,
+                target):</div>
+              <div class="pl-4"><span class="text-purple-400">left</span>, <span class="text-purple-400">right</span> =
+                <span class="text-orange-400">0</span>, <span class="text-emerald-400">len</span>(arr) - <span
+                  class="text-orange-400">1</span></div>
+              <div class="pl-4"><span class="text-purple-400">while</span> left <= right:</div>
+                  <div class="pl-8">mid = (left + right) // <span class="text-orange-400">2</span></div>
+                  <div class="pl-8"><span class="text-purple-400">if</span> arr[mid] == target:</div>
+                  <div class="pl-12"><span class="text-purple-400">return</span> mid</div>
+                  <div class="pl-8"><span class="text-purple-400">elif</span> arr[mid] < target:</div>
+                      <div class="pl-12">left = mid + <span class="text-orange-400">1</span></div>
+                      <div class="pl-8"><span class="text-purple-400">else</span>:</div>
+                      <div class="pl-12">right = mid - <span class="text-orange-400">1</span></div>
+                      <div class="pl-4"><span class="text-purple-400">return</span> -<span
+                          class="text-orange-400">1</span></div>
+                  </div>
+                  <div class="px-6 py-4 border-t border-zinc-800 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                      <button class="flex items-center gap-1.5 text-zinc-400 hover:text-red-400 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span class="text-sm">124</span>
+                      </button>
+                      <button class="flex items-center gap-1.5 text-zinc-400 hover:text-emerald-400 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <span class="text-sm">18</span>
+                      </button>
+                    </div>
+                    <span class="text-xs text-emerald-500 font-medium px-2 py-1 bg-emerald-600/10 rounded-full">O(log
+                      n)</span>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-24 bg-gradient-to-b from-zinc-900/50 to-[#09090b]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">Ready to Improve Your Code?</h2>
+      <p class="text-zinc-400 text-lg mb-10 max-w-2xl mx-auto">Join thousands of developers who are leveling up their
+        skills through peer review and friendly competition.</p>
+      <a href="/register"
+        class="inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-emerald-600/25">
+        Create Free Account
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
+    </div>
+  </section>
+</div>
+{% endblock %}
