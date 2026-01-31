@@ -11,7 +11,7 @@ auth = Blueprint("auth", __name__)
 def google_login():
     redirect_uri = url_for("auth.google_callback", _external=True)
 
-    return oauth.google.authorize_redirect(redirect_uri)
+    return oauth.google.authorize_redirect(redirect_uri).replace("http://", "https://")
 
 
 @auth.route("/auth/google/callback")
