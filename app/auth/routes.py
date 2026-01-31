@@ -1,9 +1,54 @@
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from sqlalchemy.exc import IntegrityError
 
-from app import db
+from app import db, oauth
 from app.models import User
 
 auth = Blueprint("auth", __name__)
+
+
+@auth.route("/login/google")
+def google_login():
+    redirect_uri = url_for("auth.google_callback", _external=True)
+
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@auth.route("/auth/google/callback")
+def google_callback():
+    try:
+        token = oauth.google.authorize_access_token()
+        user_info = token.get("userinfo")
+
+        email = user_info["email"]
+        name = user_info.get("name", email.split("@")[0])
+
+        # Checking if he already exists
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            # Creating new
+            base_username = name.replace(" ", "_").lower()
+            username = base_username
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f"{base_username}_{counter}"
+                counter += 1
+            user = User(
+                username=username,
+                email=email,
+                image_file=user_info.get("picture", "default.jpg"),
+            )
+
+            db.session.add(user)
+            db.session.commit()
+
+        session["user_id"] = user.id
+        flash("Successfull login with Google.", "success")
+        return redirect(url_for("main.home"))
+    except Exception as e:
+        flash(f"Failed Authentification: {e}", "danger")
+        return redirect(url_for("auth.login"))
 
 
 @auth.route("/register", methods=["GET", "POST"])
