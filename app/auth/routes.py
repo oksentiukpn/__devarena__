@@ -28,8 +28,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash(f"Account with name <{
-              username}> was successfully created!", "success")
+        flash(f"Account with name <{username}> was successfully created!", "success")
         return redirect(url_for("auth.login"))
     # if not sending data, just give html
     return render_template("auth/register.html")
