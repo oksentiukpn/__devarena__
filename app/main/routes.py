@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, flash, render_template, request
 
 from app.auth.utils import login_required
+from app.main.utils import check_data
 
 main = Blueprint("main", __name__)
 
@@ -19,3 +20,13 @@ def privacy_policy():
 @login_required
 def feed_page():
     return render_template("feed.html")
+
+
+@main.route("/post", methods=["GET", "POST"])
+@login_required
+def post():
+    if request.method == "POST":
+        checked = check_data(request)
+        if not isinstance(checked, bool):
+            flash(checked)
+    return render_template("post.html")

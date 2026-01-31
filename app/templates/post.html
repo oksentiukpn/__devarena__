@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Post - DevArena{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<style>
+    .code-editor
+        tab-size: 4;
+        -moz-tab-size: 4;
+    }
+    .code-editor:focus {
+        outline: none;
+    }
+    .hljs {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+    .tag-input:focus {
+        outline: none;
+    }
+    .language-option:hover {
+        background-color: #27272a;
+    }
+    .language-option.selected {
+        background-color: #065f46;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">Create New Post</h1>
+        <p class="text-zinc-400">Share your code with the community and get valuable feedback</p>
+    </div>
+
+    <!-- Form -->
+    <form action="/post" method="POST" class="space-y-6">
+        <!-- Project Name -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label for="project-name" class="block text-sm font-medium text-zinc-300 mb-2">
+                Project Name <span class="text-red-400">*</span>
+            </label>
+            <input 
+                type="text" 
+                id="project-name" 
+                name="project_name" 
+                required
+                placeholder="e.g., Async Task Queue Implementation"
+                class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all"
+            >
+        </div>
+
+        <!-- Description -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label for="description" class="block text-sm font-medium text-zinc-300 mb-2">
+                Description <span class="text-red-400">*</span>
+            </label>
+            <textarea 
+                id="description" 
+                name="description" 
+                rows="4"
+                required
+                placeholder="Describe what your code does, the problem it solves, and any specific areas you'd like feedback on..."
+                class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all resize-none"
+            ></textarea>
+            <p class="mt-2 text-xs text-zinc-500">Supports Markdown formatting</p>
+        </div>
+
+        <!-- Language Selection -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-300 mb-3">
+                Programming Language <span class="text-red-400">*</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="python" class="sr-only peer" checked>
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">Python</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="javascript" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">JavaScript</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="typescript" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">TypeScript</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="rust" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">Rust</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="go" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">Go</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="java" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">Java</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="csharp" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">C#</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="cpp" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">C++</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="php" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">PHP</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="ruby" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">Ruby</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="swift" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">Swift</span>
+                </label>
+                <label class="language-option relative flex items-center gap-2 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="radio" name="language" value="kotlin" class="sr-only peer">
+                    <div class="w-4 h-4 rounded-full border-2 border-zinc-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
+                    </div>
+                    <span class="text-sm text-zinc-300 peer-checked:text-emerald-400">Kotlin</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Code Editor -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 bg-zinc-900 border-b border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                    </div>
+                    <span class="text-sm text-zinc-400 font-mono">code.py</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-zinc-500">
+                    <span>Tab = 4 spaces</span>
+                    <span class="text-zinc-700">|</span>
+                    <span>UTF-8</span>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="absolute left-0 top-0 bottom-0 w-12 bg-zinc-900/50 border-r border-zinc-800 flex flex-col items-end pr-3 pt-4 text-xs text-zinc-600 font-mono select-none">
+                    <span>1</span>
+                    <span>2</span>
+                    <span>3</span>
+                    <span>4</span>
+                    <span>5</span>
+                    <span>6</span>
+                    <span>7</span>
+                    <span>8</span>
+                    <span>9</span>
+                    <span>10</span>
+                    <span>11</span>
+                    <span>12</span>
+                    <span>13</span>
+                    <span>14</span>
+                    <span>15</span>
+                    <span>16</span>
+                    <span>17</span>
+                    <span>18</span>
+                    <span>19</span>
+                    <span>20</span>
+                </div>
+                <textarea 
+                    id="code-editor" 
+                    name="code" 
+                    required
+                    spellcheck="false"
+                    placeholder="// Paste or type your code here..."
+                    class="code-editor w-full min-h-[400px] bg-[#0d1117] text-zinc-100 font-mono text-sm p-4 pl-16 leading-6 resize-y focus:outline-none focus:ring-1 focus:ring-emerald-600/30 placeholder-zinc-600"
+                ></textarea>
+            </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label for="tags" class="block text-sm font-medium text-zinc-300 mb-2">
+                Tags
+            </label>
+            <input 
+                type="text" 
+                id="tags" 
+                name="tags" 
+                placeholder="#algorithm, #optimization, #async, #data-structures (comma separated)"
+                class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all"
+            >
+            <p class="mt-2 text-xs text-zinc-500">Add up to 5 tags to help others find your post</p>
+        </div>
+
+        <!-- Review Preferences -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-300 mb-3">
+                What kind of feedback are you looking for?
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="flex items-start gap-3 p-3 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="checkbox" name="feedback[]" value="code_quality" checked class="mt-0.5 w-4 h-4 rounded border-zinc-600 bg-zinc-900 text-emerald-600 focus:ring-emerald-600/50 focus:ring-offset-0">
+                    <div>
+                        <span class="text-sm font-medium text-zinc-200">Code Quality</span>
+                        <p class="text-xs text-zinc-500">Clean code, readability, naming conventions</p>
+                    </div>
+                </label>
+                <label class="flex items-start gap-3 p-3 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="checkbox" name="feedback[]" value="performance" class="mt-0.5 w-4 h-4 rounded border-zinc-600 bg-zinc-900 text-emerald-600 focus:ring-emerald-600/50 focus:ring-offset-0">
+                    <div>
+                        <span class="text-sm font-medium text-zinc-200">Performance</span>
+                        <p class="text-xs text-zinc-500">Time/space complexity, optimization</p>
+                    </div>
+                </label>
+                <label class="flex items-start gap-3 p-3 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="checkbox" name="feedback[]" value="architecture" class="mt-0.5 w-4 h-4 rounded border-zinc-600 bg-zinc-900 text-emerald-600 focus:ring-emerald-600/50 focus:ring-offset-0">
+                    <div>
+                        <span class="text-sm font-medium text-zinc-200">Architecture</span>
+                        <p class="text-xs text-zinc-500">Design patterns, structure, modularity</p>
+                    </div>
+                </label>
+                <label class="flex items-start gap-3 p-3 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors">
+                    <input type="checkbox" name="feedback[]" value="security" class="mt-0.5 w-4 h-4 rounded border-zinc-600 bg-zinc-900 text-emerald-600 focus:ring-emerald-600/50 focus:ring-offset-0">
+                    <div>
+                        <span class="text-sm font-medium text-zinc-200">Security</span>
+                        <p class="text-xs text-zinc-500">Vulnerabilities, best practices</p>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Visibility -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-300 mb-3">
+                Visibility
+            </label>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <label class="flex items-center gap-3 px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors flex-1">
+                    <input type="radio" name="visibility" value="public" checked class="w-4 h-4 border-zinc-600 bg-zinc-900 text-emerald-600 focus:ring-emerald-600/50 focus:ring-offset-0">
+                    <div>
+                        <span class="text-sm font-medium text-zinc-200">Public</span>
+                        <p class="text-xs text-zinc-500">Visible to everyone</p>
+                    </div>
+                </label>
+                <label class="flex items-center gap-3 px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-600 transition-colors flex-1">
+                    <input type="radio" name="visibility" value="unlisted" class="w-4 h-4 border-zinc-600 bg-zinc-900 text-emerald-600 focus:ring-emerald-600/50 focus:ring-offset-0">
+                    <div>
+                        <span class="text-sm font-medium text-zinc-200">Unlisted</span>
+                        <p class="text-xs text-zinc-500">Only accessible via direct link</p>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+            <a href="/feed" class="text-sm text-zinc-400 hover:text-white transition-colors">
+                Cancel and return to feed
+            </a>
+            <div class="flex items-center gap-3">
+                <button type="button" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-colors">
+                    Save as Draft
+                </button>
+                <button type="submit" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                    Publish Post
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
