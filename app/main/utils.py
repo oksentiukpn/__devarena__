@@ -46,11 +46,3 @@ def check_data(request) -> bool | str:
     if form["visibility"] not in ("public", "unlisted"):
         return f"Invalid visibility: {form['visibility']}"
     return True
-
-
-def score():
-    pass
-
-
-def get_feed():
-    user_languages = User.query.filter_by()

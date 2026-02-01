@@ -9,6 +9,21 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+class Reaction(db.Model):
+    __tablename__ = "reactions"
+    id = db.Column(db.Integer, primary_key=True)
+    emoji = db.Column(db.String(10), nullable=False)  # Сам символ емодзі
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
+
+    # Забезпечуємо, щоб один юзер не міг поставити два однакових емодзі на один пост
+    __table_args__ = (
+        db.UniqueConstraint(
+            "user_id", "post_id", "emoji", name="unique_user_post_emoji"
+        ),
+    )
+
+
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +60,19 @@ class Post(db.Model):
     # Foreign Key linking to User
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     author = db.relationship("User", backref="posts", lazy=True)
+    reactions = db.relationship(
+        "Reaction", backref="post", lazy="dynamic", cascade="all, delete-orphan"
+    )
+
+    @property
+    def reactions_summary(self):
+        summary = {}
+        for reaction in self.reactions:
+            if reaction.emoji not in summary:
+                summary[reaction.emoji] = {"count": 0, "user_ids": set()}
+            summary[reaction.emoji]["count"] += 1
+            summary[reaction.emoji]["user_ids"].add(reaction.user_id)
+        return summary
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.created_at}')"
