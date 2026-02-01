@@ -1,13 +1,20 @@
-from flask import (Blueprint, flash, redirect, render_template, request,
-                   session, url_for)
+from flask import (
+    Blueprint,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from sqlalchemy import case, desc
 from sqlalchemy.orm import joinedload
 
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
-from app.main.utils import check_data
-from app.models import Post
+from app.models import Post, Reaction
 
 main = Blueprint("main", __name__)
 
@@ -15,6 +22,12 @@ main = Blueprint("main", __name__)
 @main.route("/")
 def home():
     return render_template("test_pages/main_test.html")
+
+
+@main.route("/profile")
+@login_required
+def profile():
+    return "01101011 01101001 01101100 01101100 00100000 01111001 01101111 01110101 01110010 01110011 01100101 01101100 01100110"
 
 
 @main.route("/privacy")
@@ -76,3 +89,39 @@ def post():
             db.session.rollback()
             flash(f"An error occurred saving the post: {e}", "danger")
     return render_template("post.html")
+
+
+@main.route("/post/<int:post_id>/react", methods=["POST"])
+@login_required
+def toggle_reaction(post_id):
+    data = request.json
+    emoji = data.get("emoji")
+
+    if not emoji:
+        return jsonify({"error": "Emoji is required"}), 400
+
+    # Перевіряємо чи пост існує
+    post = Post.query.get_or_404(post_id)
+
+    # Шукаємо існуючу реакцію
+    existing_reaction = Reaction.query.filter_by(
+        user_id=session["user_id"], post_id=post_id, emoji=emoji
+    ).first()
+
+    status = ""
+    if existing_reaction:
+        db.session.delete(existing_reaction)
+        status = "removed"
+    else:
+        new_reaction = Reaction(
+            user_id=session["user_id"], post_id=post_id, emoji=emoji
+        )
+        db.session.add(new_reaction)
+        status = "added"
+
+    db.session.commit()
+
+    # Повертаємо актуальну кількість для цього емодзі
+    count = Reaction.query.filter_by(post_id=post_id, emoji=emoji).count()
+
+    return jsonify({"status": status, "emoji": emoji, "count": count})
