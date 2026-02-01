@@ -49,12 +49,10 @@
   {% block extra_styles %}{% endblock %}
 </head>
 
-<body class="bg-[#09090b] text-white min-h-screen flex flex-col">
-  <!-- Navbar -->
+<body class="bg-[#09090b] text-white min-h-screen flex flex-col relative">
   <nav class="sticky top-0 z-50 bg-[#09090b]/95 backdrop-blur-sm border-b border-zinc-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <!-- Left: Logo & Navigation -->
         <div class="flex items-center gap-8">
           <a href="/" class="flex items-center gap-2">
             <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
@@ -108,7 +106,6 @@
           </div>
         </div>
 
-        <!-- Center: Search Bar -->
         <div class="flex-1 max-w-xl mx-8 hidden md:block">
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -122,20 +119,18 @@
           </div>
         </div>
 
-        <!-- Right: Profile -->
         <div class="profile-container relative">
+          {% if session.get('user_id') %}
           <button class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-800/50 transition-colors" tabindex="0">
             <div
               class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-sm font-semibold ring-2 ring-zinc-800">
-              JD
+              U
             </div>
           </button>
-          <!-- Dropdown Menu -->
           <div
-            class="profile-dropdown absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden">
+            class="profile-dropdown absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden z-50">
             <div class="px-4 py-3 border-b border-zinc-800">
-              <p class="text-sm font-semibold text-white">John Doe</p>
-              <p class="text-xs text-zinc-500">@johndoe</p>
+              <p class="text-sm font-semibold text-white">My Account</p>
             </div>
             <div class="py-1">
               <a href="/profile"
@@ -168,17 +163,67 @@
               </a>
             </div>
           </div>
+          {% else %}
+          <div class="flex items-center gap-4">
+            <a href="/login" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</a>
+            <a href="/register"
+              class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors">
+              Sign Up
+            </a>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Main Content -->
+  <div id="flash-container" class="fixed top-20 right-4 z-[100] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {# Define colors based on category #}
+          {% if category == 'success' %}
+            {% set border_color = 'border-emerald-500' %}
+            {% set icon_color = 'text-emerald-500' %}
+            {% set icon_path = 'M5 13l4 4L19 7' %}
+          {% elif category == 'danger' or category == 'error' %}
+            {% set border_color = 'border-red-500' %}
+            {% set icon_color = 'text-red-500' %}
+            {% set icon_path = 'M6 18L18 6M6 6l12 12' %}
+          {% elif category == 'warning' %}
+            {% set border_color = 'border-yellow-500' %}
+            {% set icon_color = 'text-yellow-500' %}
+            {% set icon_path = 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' %}
+          {% else %}
+            {% set border_color = 'border-blue-500' %}
+            {% set icon_color = 'text-blue-500' %}
+            {% set icon_path = 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' %}
+          {% endif %}
+
+          <div class="flash-message pointer-events-auto bg-zinc-900 border-l-4 {{ border_color }} rounded-r-lg shadow-xl shadow-black/50 p-4 transform transition-all duration-300 ease-out translate-x-full opacity-0 flex items-start gap-3">
+            <div class="flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 {{ icon_color }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ icon_path }}" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-white">{{ message }}</p>
+            </div>
+            <button onclick="dismissFlash(this.parentElement)" class="flex-shrink-0 text-zinc-500 hover:text-zinc-300 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
   <main class="flex-1">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer -->
   <footer class="border-t border-zinc-800 bg-[#09090b]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -195,6 +240,37 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const messages = document.querySelectorAll('.flash-message');
+      
+      messages.forEach((msg, index) => {
+        // Animate in with slight stagger
+        setTimeout(() => {
+          msg.classList.remove('translate-x-full', 'opacity-0');
+        }, 100 + (index * 150));
+
+        // Auto dismiss after 5 seconds
+        setTimeout(() => {
+          dismissFlash(msg);
+        }, 5000 + (index * 500));
+      });
+    });
+
+    function dismissFlash(element) {
+      if (!element) return;
+      // Slide out animation
+      element.classList.add('translate-x-full', 'opacity-0');
+      
+      // Remove from DOM after animation completes
+      setTimeout(() => {
+        if(element.parentElement) {
+          element.remove();
+        }
+      }, 300);
+    }
+  </script>
 </body>
 
 </html>
