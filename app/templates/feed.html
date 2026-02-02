@@ -80,49 +80,83 @@
           </div>
         </div>
 
-        <div class="px-5 py-4 border-t border-zinc-800 flex items-center justify-between">
-          <div class="flex items-center gap-2 flex-wrap" id="reactions-container-{{ post.id }}">
-              
-              {% set summary = post.reactions_summary %}
-              
-              {% for emoji, data in summary.items() %}
-                  <button onclick="toggleReaction({{ post.id }}, '{{ emoji }}', this)" 
-                          class="reaction-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-colors
-                          {% if session['user_id'] in data.user_ids %}
-                              bg-emerald-600/10 border-emerald-600/30 text-emerald-400 hover:bg-emerald-600/20
-                          {% else %}
-                              bg-zinc-800/50 border-transparent text-zinc-400 hover:bg-zinc-800
-                          {% endif %}"
-                          data-emoji="{{ emoji }}">
-                      <span>{{ emoji }}</span>
-                      <span class="count">{{ data.count }}</span>
-                  </button>
-              {% endfor %}
+        <div class="px-5 py-4 border-t border-zinc-800 flex flex-col gap-4">
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 flex-wrap" id="reactions-container-{{ post.id }}">
+                    {% set summary = post.reactions_summary %}
+                    {% for emoji, data in summary.items() %}
+                       <button onclick="toggleReaction({{ post.id }}, '{{ emoji }}', this)" 
+                               class="reaction-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-colors
+                               {% if session['user_id'] in data.user_ids %}
+                                   bg-emerald-600/10 border-emerald-600/30 text-emerald-400 hover:bg-emerald-600/20
+                               {% else %}
+                                   bg-zinc-800/50 border-transparent text-zinc-400 hover:bg-zinc-800
+                               {% endif %}"
+                               data-emoji="{{ emoji }}">
+                           <span>{{ emoji }}</span>
+                           <span class="count">{{ data.count }}</span>
+                       </button>
+                    {% endfor %}
+                    
+                    <div class="relative group/picker">
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg text-zinc-400 text-sm transition-colors border border-transparent">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </button>
+                        <div class="absolute bottom-full left-0 mb-2 p-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl shadow-black/50 hidden group-hover/picker:grid grid-cols-5 gap-1 w-64 z-10">
+                            {% set available_emojis = ['👍', '👎', '🤡','❤️', '🔥', '🚀', '🐛', '👀', '🎉', '🤯', '🧠', '💩', '💯', '🤔', '☕', '🐍'] %}
+                            {% for emo in available_emojis %}
+                                <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null)" 
+                                        class="p-2 hover:bg-zinc-800 rounded-lg text-lg transition-colors text-center">
+                                    {{ emo }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                 </div>
 
-              <div class="relative group/picker">
-                  <button class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg text-zinc-400 text-sm transition-colors border border-transparent">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                      </svg>
-                  </button>
-                  
-                  <div class="absolute bottom-full left-0 mb-2 p-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl shadow-black/50 hidden group-hover/picker:grid grid-cols-5 gap-1 w-64 z-10">
-                      {% set available_emojis = ['👍', '👎', '🤡','❤️', '🔥', '🚀', '🐛', '👀', '🎉', '🤯', '🧠', '💩', '💯', '🤔', '☕', '🐍'] %}
-                      {% for emo in available_emojis %}
-                          <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null)" 
-                                  class="p-2 hover:bg-zinc-800 rounded-lg text-lg transition-colors text-center">
-                              {{ emo }}
-                          </button>
-                      {% endfor %}
-                  </div>
-              </div>
-          </div>
+                <button onclick="toggleComments({{ post.id }})" class="text-zinc-400 hover:text-white text-sm flex items-center gap-2 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                    <span id="comment-count-{{ post.id }}">{{ post.comments|length }}</span> Comments
+                </button>
+            </div>
 
-          <button class="text-zinc-400 hover:text-white text-sm flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-              Comments
-          </button>
-      </div> 
+            <div id="comments-section-{{ post.id }}" class="hidden pt-2 space-y-4">
+                
+                <div id="comments-list-{{ post.id }}" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin">
+                    {% for comment in post.comments %}
+                    <div class="flex gap-3 text-sm">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-400">
+                            {{ comment.author.username[:2] }}
+                        </div>
+                        <div class="flex-1 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium text-zinc-300">{{ comment.author.username }}</span>
+                                <span class="text-xs text-zinc-500">{{ comment.created_at.strftime('%b %d') }}</span>
+                            </div>
+                            <p class="text-zinc-400 leading-relaxed">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="flex gap-3 items-start mt-4 pt-4 border-t border-zinc-800/50">
+                    <div class="flex-1">
+                        <textarea 
+                            id="comment-input-{{ post.id }}" 
+                            rows="1" 
+                            placeholder="Write a comment..." 
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 resize-none overflow-hidden"
+                            oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                    </div>
+                    <button onclick="postComment({{ post.id }})" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors">
+                        Post
+                    </button>
+                </div>
+            </div>
+        </div> 
       </article>
       {% endfor %}
     </main>
@@ -139,6 +173,7 @@
 </div>
 
 <script>
+// --- Reaction Logic ---
 async function toggleReaction(postId, emoji, btnElement) {
     try {
         const response = await fetch(`/post/${postId}/react`, {
@@ -149,7 +184,6 @@ async function toggleReaction(postId, emoji, btnElement) {
             body: JSON.stringify({ emoji: emoji })
         });
 
-        // Check if response is JSON (if not, it's likely a redirect to login page)
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") === -1) {
              window.location.href = "/login";
@@ -161,7 +195,6 @@ async function toggleReaction(postId, emoji, btnElement) {
             
             const container = document.getElementById(`reactions-container-${postId}`);
             
-            // Search for existing button
             let existingBtn = null;
             if (btnElement && btnElement.classList.contains('reaction-btn')) {
                 existingBtn = btnElement;
@@ -170,14 +203,11 @@ async function toggleReaction(postId, emoji, btnElement) {
             }
 
             if (data.count === 0 && existingBtn) {
-                // If count is 0, remove the button
                 existingBtn.remove();
             } else if (existingBtn) {
-                // Update existing button
                 const countSpan = existingBtn.querySelector('.count');
                 countSpan.textContent = data.count;
                 
-                // Toggle styles
                 if (data.status === 'added') {
                     existingBtn.classList.remove('bg-zinc-800/50', 'text-zinc-400', 'border-transparent');
                     existingBtn.classList.add('bg-emerald-600/10', 'border-emerald-600/30', 'text-emerald-400');
@@ -186,7 +216,6 @@ async function toggleReaction(postId, emoji, btnElement) {
                     existingBtn.classList.remove('bg-emerald-600/10', 'border-emerald-600/30', 'text-emerald-400');
                 }
             } else if (data.status === 'added') {
-                // Create new button if it doesn't exist
                 const newBtnHtml = `
                     <button onclick="toggleReaction(${postId}, '${emoji}', this)" 
                             class="reaction-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-colors bg-emerald-600/10 border-emerald-600/30 text-emerald-400 hover:bg-emerald-600/20"
@@ -195,7 +224,6 @@ async function toggleReaction(postId, emoji, btnElement) {
                         <span class="count">1</span>
                     </button>
                 `;
-                // Insert before the picker button (last element)
                 const pickerContainer = container.lastElementChild; 
                 pickerContainer.insertAdjacentHTML('beforebegin', newBtnHtml);
             }
@@ -204,6 +232,70 @@ async function toggleReaction(postId, emoji, btnElement) {
         }
     } catch (error) {
         console.error('Error:', error);
+    }
+}
+
+// --- Comment Logic ---
+function toggleComments(postId) {
+    const section = document.getElementById(`comments-section-${postId}`);
+    section.classList.toggle('hidden');
+}
+
+async function postComment(postId) {
+    const input = document.getElementById(`comment-input-${postId}`);
+    const content = input.value;
+    
+    if (!content.trim()) return;
+
+    try {
+        const response = await fetch(`/post/${postId}/comment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: content })
+        });
+
+        if (response.status === 401) {
+            window.location.href = "/login";
+            return;
+        }
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Build HTML for new comment
+            const commentHtml = `
+                <div class="flex gap-3 text-sm animate-fade-in">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-400">
+                        ${data.avatar_letter}
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-zinc-300">${data.author}</span>
+                            <span class="text-xs text-zinc-500">${data.created_at}</span>
+                        </div>
+                        <p class="text-zinc-400 leading-relaxed">${data.content}</p>
+                    </div>
+                </div>
+            `;
+
+            const list = document.getElementById(`comments-list-${postId}`);
+            list.insertAdjacentHTML('beforeend', commentHtml);
+            
+            // Clear input and reset height
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Scroll to bottom of comments
+            list.scrollTop = list.scrollHeight;
+
+            // Update counter
+            const counter = document.getElementById(`comment-count-${postId}`);
+            counter.innerText = parseInt(counter.innerText) + 1;
+        }
+    } catch (error) {
+        console.error('Error posting comment:', error);
     }
 }
 </script>

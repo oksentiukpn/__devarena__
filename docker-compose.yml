@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: dhi.io/postgres:18-alpine3.22-dev
