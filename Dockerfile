@@ -1,8 +1,5 @@
 FROM python:3.10-slim
 
-RUN useradd --user-group --system --no-create-home appuser
-
-
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y libpq-dev gcc \
@@ -16,8 +13,7 @@ COPY . .
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # add execute permissions
-RUN chmod +x /usr/local/bin/entrypoint.sh && chown -R appuser:appuser /app
-USER appuser
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 5000
 
