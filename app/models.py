@@ -63,6 +63,13 @@ class Post(db.Model):
     reactions = db.relationship(
         "Reaction", backref="post", lazy="dynamic", cascade="all, delete-orphan"
     )
+    comments = db.relationship(
+        "Comment",
+        backref="post",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="Comment.created_at.asc()",
+    )
 
     @property
     def reactions_summary(self):
@@ -76,3 +83,15 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.created_at}')"
+
+
+class Comment(db.Model):
+    __tablename__ = "comments"
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, Nullable=False)
+    created_at = db.Column(db.DateTime, Nullable=False, default=datetime.utcnow)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
+
+    author = db.relationship("User", backref="comments", lazy=True)

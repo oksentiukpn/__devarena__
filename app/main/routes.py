@@ -14,7 +14,7 @@ from sqlalchemy.orm import joinedload
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
-from app.models import Post, Reaction
+from app.models import Post, Reaction, Comment
 
 main = Blueprint("main", __name__)
 
@@ -125,3 +125,32 @@ def toggle_reaction(post_id):
     count = Reaction.query.filter_by(post_id=post_id, emoji=emoji).count()
 
     return jsonify({"status": status, "emoji": emoji, "count": count})
+
+
+@main.route("/post/<int:post_id>/comment", methods=["POST"])
+@login_required
+def add_comment(post_id):
+    data = request.json
+    content = data.get("content")
+
+    if not content or not content.strip():
+        return jsonify({"error": "Comment can`t be empty"}, 400)
+
+    post = Post.query.get_or_404(post_id)
+
+    new_comment = Comment(
+        content=content.strip(), user_id=session["user_id"], post_id=post_id
+    )
+
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify(
+        {
+            "id": new_comment.content,
+            "content": new_comment.content,
+            "author": new_comment.author.username,
+            "created_at": new_comment.created_at.strftime("%b %d"),
+            "avatar_letter": new_comment.author.username[:2],
+        }
+    )
