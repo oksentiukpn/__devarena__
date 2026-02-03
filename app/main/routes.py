@@ -1,20 +1,12 @@
-from flask import (
-    Blueprint,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from flask import (Blueprint, flash, jsonify, redirect, render_template,
+                   request, session, url_for)
 from sqlalchemy import case, desc
 from sqlalchemy.orm import joinedload
 
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
-from app.models import Post, Reaction, Comment
+from app.models import Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
 
@@ -22,12 +14,6 @@ main = Blueprint("main", __name__)
 @main.route("/")
 def home():
     return render_template("test_pages/main_test.html")
-
-
-@main.route("/profile")
-@login_required
-def profile():
-    return "01101011 01101001 01101100 01101100 00100000 01111001 01101111 01110101 01110010 01110011 01100101 01101100 01100110"
 
 
 @main.route("/privacy")
@@ -100,10 +86,6 @@ def toggle_reaction(post_id):
     if not emoji:
         return jsonify({"error": "Emoji is required"}), 400
 
-    # Перевіряємо чи пост існує
-    post = Post.query.get_or_404(post_id)
-
-    # Шукаємо існуючу реакцію
     existing_reaction = Reaction.query.filter_by(
         user_id=session["user_id"], post_id=post_id, emoji=emoji
     ).first()
@@ -121,7 +103,6 @@ def toggle_reaction(post_id):
 
     db.session.commit()
 
-    # Повертаємо актуальну кількість для цього емодзі
     count = Reaction.query.filter_by(post_id=post_id, emoji=emoji).count()
 
     return jsonify({"status": status, "emoji": emoji, "count": count})
@@ -135,8 +116,6 @@ def add_comment(post_id):
 
     if not content or not content.strip():
         return jsonify({"error": "Comment can`t be empty"}, 400)
-
-    post = Post.query.get_or_404(post_id)
 
     new_comment = Comment(
         content=content.strip(), user_id=session["user_id"], post_id=post_id
@@ -154,3 +133,23 @@ def add_comment(post_id):
             "avatar_letter": new_comment.author.username[:2],
         }
     )
+
+
+# Current User
+@main.route("/profile")
+@login_required
+def profile():
+    user = User.query.get(session["user_id"])
+
+    posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
+
+    return render_template("main/profile.html", user=user, posts=posts)
+
+
+# Other users
+@main.route("/user/<username>")
+@login_required
+def user_profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
+    return render_template("main/profile.html", user=user, posts=posts)
