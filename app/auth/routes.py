@@ -64,7 +64,7 @@ def register():
         # Future data validation
         for value in (username, email, password):
             if not value or len(value) < 5:
-                return f"{value}: is invalid"
+                return f"{value}: has invalid length"
 
         # ///
         user = User(username=username, email=email)
