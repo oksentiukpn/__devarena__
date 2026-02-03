@@ -8,6 +8,7 @@ set -e
 
 # Застосовуємо міграції
 echo "Applying database migrations..."
+flask db migrate
 flask db upgrade
 
 # Запускаємо додаток
