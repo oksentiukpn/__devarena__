@@ -157,4 +157,5 @@ def user_profile(username):
 
 @main.route("/battles")
 def battles():
+    # rick-roll
     return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s")
