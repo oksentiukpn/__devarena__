@@ -1,5 +1,7 @@
+from datetime import timedelta
+
 from authlib.integrations.flask_client import OAuth
-from flask import Flask
+from flask import Flask, session
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -18,6 +20,8 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     oauth.init_app(app)
+
+    # app.permanent_session_lifetime = timedelta(days=14)
 
     # Registering OAuth
     oauth.register(
