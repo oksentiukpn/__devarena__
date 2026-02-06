@@ -153,3 +153,8 @@ def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
     return render_template("main/profile.html", user=user, posts=posts)
+
+
+@main.route("/battles")
+def battles():
+    return redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s")
