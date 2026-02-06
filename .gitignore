@@ -7,3 +7,5 @@ instance/
 
 .env
 nginx/
+
+postgres_data/
