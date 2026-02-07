@@ -9,6 +9,6 @@ instance/
 nginx/
 
 postgres_data/
-backups_tmp/
 backups/
+backups_tmp/
 auto_backup.sh
