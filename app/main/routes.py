@@ -50,8 +50,12 @@ def feed_page():
 def post():
     form = PostForm()
     if request.method == "POST":
-        raw_tags = form.tags.data.replace("#", " ").split()
-        clean_tags = ",".join([tag.strip() for tag in raw_tags])
+        raw_tags = [
+            tag
+            for tag in form.tags.data.replace("#", " ").split()
+            if tag not in ("", " ")
+        ]
+        clean_tags = "".join([tag.strip() for tag in raw_tags])
         feedback_str = ",".join(form.feedback.data)
 
         # 3. Create Post
