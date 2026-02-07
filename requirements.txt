@@ -6,3 +6,7 @@ psycopg2-binary
 python-dotenv
 authlib
 requests
+opentelemetry-distro
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation-flask
+opentelemetry-instrumentation-sqlalchemy
