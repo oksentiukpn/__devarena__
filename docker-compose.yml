@@ -23,6 +23,16 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      OTEL_EXPORTER_OTLP_ENDPOINT: "https://otlp-gateway-prod-eu-north-0.grafana.net/otlp"
+      OTEL_EXPORTER_OTLP_HEADERS: "Authorization=Basic%20Z2xjX2V5SnZJam9pTVRZMk1qRTROQ0lzSW00aU9pSndjbTl0ZEdGcGJERXlNeUlzSW1zaU9pSnNNVk42TkRRME1WUkJiVFk0V0Zkdk5UVm9RelpZUVdRaUxDSnRJanA3SW5JaU9pSndjbTlrTFdWMUxXNXZjblJvTFRBaWZYMD06MTUxODY1MQ=="
+      OTEL_SERVICE_NAME: "devarena-backend"
+      
+      # 3. Додаткові налаштування для Python
+      OTEL_LOGS_EXPORTER: "otlp"
+      OTEL_METRICS_EXPORTER: "otlp"
+      OTEL_TRACES_EXPORTER: "otlp"
+      # Це змушує OTel перехоплювати стандартні print/logging у Python
+      OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: "true"
     depends_on:
       - db
 
@@ -38,4 +48,20 @@ services:
     depends_on:
       - web
 
+  promtail:
+    image: grafana/promtail:2.9.2
+    restart: always
+    volumes:
+      # Монтуємо сокет докера, щоб бачити контейнери
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Монтуємо системну папку з логами контейнерів (ТІЛЬКИ ЧИТАННЯ)
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # Наш конфіг
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    environment:
+      # Підставляємо змінні з .env файлу
+      - LOKI_URL=${LOKI_URL}
+      - LOKI_USER=${LOKI_USER}
+      - LOKI_PASSWORD=${LOKI_PASSWORD}
+    command: -config.file=/etc/promtail/config.yml -config.expand-env=true
 

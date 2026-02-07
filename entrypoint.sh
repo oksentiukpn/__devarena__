@@ -12,4 +12,9 @@ flask db upgrade
 
 # Запускаємо додаток
 echo "Starting Flask..."
-exec python run.py
+
+# Встановлюємо інструменти OTel (одноразово при запуску)
+opentelemetry-bootstrap -a install
+
+# Запускаємо додаток через OTel
+exec opentelemetry-instrument python run.py
