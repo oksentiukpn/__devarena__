@@ -6,5 +6,3 @@ venv/
 __pycache__/
 *.pyc
 *.pyo
-backups_tmp/
-backups/
