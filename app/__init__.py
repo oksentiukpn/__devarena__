@@ -1,3 +1,7 @@
+"""
+Initializing app
+"""
+
 from datetime import timedelta
 
 from authlib.integrations.flask_client import OAuth
@@ -13,8 +17,17 @@ oauth = OAuth()
 
 
 def create_app(config_class=Config):
+    """
+    Create app
+        config_class: Config class
+            Config class is used to load config from .env file
+            Example:
+                from config import Config
+                app = create_app(Config)
+    """
+
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_class)
 
     # Initalising some needed features
     db.init_app(app)
