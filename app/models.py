@@ -1,3 +1,7 @@
+"""
+Defining models for database
+"""
+
 from datetime import datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -6,17 +10,25 @@ from app import db
 
 
 def load_user(user_id):
+    """Loading user func"""
     return User.query.get(int(user_id))
 
 
 class Reaction(db.Model):
+    """
+    Reaction model
+    This model is used to store reactions to posts.
+    Example:
+        Reaction(emoji="👍", user_id=1, post_id=1)
+    """
+
     __tablename__ = "reactions"
     id = db.Column(db.Integer, primary_key=True)
-    emoji = db.Column(db.String(10), nullable=False)  # Сам символ емодзі
+    emoji = db.Column(db.String(10), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
 
-    # Забезпечуємо, щоб один юзер не міг поставити два однакових емодзі на один пост
+    # Only one user one emoji
     __table_args__ = (
         db.UniqueConstraint(
             "user_id", "post_id", "emoji", name="unique_user_post_emoji"
@@ -25,6 +37,13 @@ class Reaction(db.Model):
 
 
 class User(db.Model):
+    """
+    User model
+    This model is used to store users.
+    Example:
+        User(username="John", email="john@example.com", password="password"
+    """
+
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
@@ -33,10 +52,12 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=True)  # hashed of course
     languages = db.Column(db.String(1024), nullable=True)
 
-    def set_password(self, password):
+    def set_password(self, password: str) -> None:
+        """Set password"""
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password: str) -> bool:
+        """Check password"""
         if not self.password_hash:
             return False
         return check_password_hash(self.password_hash, password)
@@ -46,6 +67,16 @@ class User(db.Model):
 
 
 class Post(db.Model):
+    """
+    Post model
+    This model is used to store posts.
+    Example:
+        Post(title="Hello World", description="This is a post", language="python",
+            code="print('Hello World')", tags="python, hello world, programming",
+            feedback_type="code", visibility="public", created_at=datetime.utcnow(),
+            user_id=1)
+    """
+
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -73,6 +104,7 @@ class Post(db.Model):
 
     @property
     def reactions_summary(self):
+        """Get reactions summary"""
         summary = {}
         for reaction in self.reactions:
             if reaction.emoji not in summary:
@@ -86,6 +118,14 @@ class Post(db.Model):
 
 
 class Comment(db.Model):
+    """
+    Comment model
+    This model is used to store comments.
+    Example:
+        Comment(content="This is a comment", created_at=datetime.utcnow(), user_id=1,
+            post_id=1)
+    """
+
     __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)

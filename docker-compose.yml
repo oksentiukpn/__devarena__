@@ -1,5 +1,6 @@
 services:
   db:
+    # Docker hardened image
     image: dhi.io/postgres:18-alpine3.22-dev
     restart: always
     environment:
