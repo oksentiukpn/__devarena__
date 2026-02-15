@@ -1,5 +1,6 @@
+import re
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
-from sqlalchemy.exc import IntegrityError
 
 from app import db, oauth
 from app.models import User
@@ -57,14 +58,37 @@ def register():
         return redirect(url_for("main.home"))
 
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
+        if any(letter.isupper() for letter in email):
+            flash("Email must be in lowercase.", "danger")
+            return redirect(url_for("auth.register"))
+        password = request.form.get("password", "")
         # ///
-        # Future data validation
+        # data validation
+        email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        if not re.match(email_regex, email):
+            flash("Invalid email address.", "danger")
+            return redirect(url_for("auth.register"))
+
+        if not re.match(r"^\w+$", username):
+            flash(
+                "Username can only contain letters, numbers and underscores.", "danger"
+            )
+            return redirect(url_for("auth.register"))
+
         for value in (username, email, password):
-            if not value or len(value) < 5:
-                return f"{value}: has invalid length"
+            if not value or len(value) < 8:
+                flash("All fields must be at least 8 characters long.", "danger")
+                return redirect(url_for("auth.register"))
+
+        # Check if email or username already exists
+        if User.query.filter_by(email=email).first():
+            flash("Email already exists. Please choose a different one.", "danger")
+            return redirect(url_for("auth.register"))
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists. Please choose a different one.", "danger")
+            return redirect(url_for("auth.register"))
 
         # ///
         user = User(username=username, email=email)
