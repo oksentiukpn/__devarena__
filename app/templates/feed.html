@@ -7,7 +7,7 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-    
+
     <aside class="hidden lg:block lg:col-span-1">
       <div class="sticky top-24 space-y-6">
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5">
@@ -44,18 +44,27 @@
 
       {% for post in posts %}
       <article class="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-colors">
+
         <div class="p-5 pb-0">
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-sm font-semibold uppercase text-white">
-                {{ post.author.username[:2] }}
-              </div>
-              <div>
-                <span class="font-semibold text-white block">{{ post.author.username }}</span>
-                <span class="text-zinc-500 text-sm">@{{ post.author.username }} · {{ post.created_at.strftime('%b %d') }}</span>
-              </div>
+            <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold">
+                        {{ post.author.username[:2].upper() }}
+                    </div>
+                    <div>
+                        <span class="font-semibold text-white block">{{ post.author.username }}</span>
+                        <span class="text-zinc-500 text-sm">@{{ post.author.username }} · {{ post.created_at.strftime('%b %d') }}</span>
+                    </div>
+                </div>
+
+                {% if session.get('user_id') == post.author.id %}
+                <button onclick="deletePost({{ post.id }}, this)" class="text-zinc-500 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-zinc-800" title="Delete Project">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+                {% endif %}
             </div>
-          </div>
         </div>
 
         <div class="p-5">
@@ -81,12 +90,12 @@
         </div>
 
         <div class="px-5 py-4 border-t border-zinc-800 flex flex-col gap-4">
-            
+
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 flex-wrap" id="reactions-container-{{ post.id }}">
                     {% set summary = post.reactions_summary %}
                     {% for emoji, data in summary.items() %}
-                       <button onclick="toggleReaction({{ post.id }}, '{{ emoji }}', this)" 
+                       <button onclick="toggleReaction({{ post.id }}, '{{ emoji }}', this)"
                                class="reaction-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-colors
                                {% if session['user_id'] in data.user_ids %}
                                    bg-emerald-600/10 border-emerald-600/30 text-emerald-400 hover:bg-emerald-600/20
@@ -98,7 +107,7 @@
                            <span class="count">{{ data.count }}</span>
                        </button>
                     {% endfor %}
-                    
+
                     <div class="relative group/picker">
                         <button class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg text-zinc-400 text-sm transition-colors border border-transparent">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +117,7 @@
                         <div class="absolute bottom-full left-0 mb-2 p-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl shadow-black/50 hidden group-hover/picker:grid grid-cols-5 gap-1 w-64 z-10">
                             {% set available_emojis = ['👍', '👎', '🤡','❤️', '🔥', '🚀', '🐛', '👀', '🎉', '🤯', '🧠', '💩', '💯', '🤔', '☕', '🐍', '🍓', '🦔'] %}
                             {% for emo in available_emojis %}
-                                <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null)" 
+                                <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null)"
                                         class="p-2 hover:bg-zinc-800 rounded-lg text-lg transition-colors text-center">
                                     {{ emo }}
                                 </button>
@@ -124,17 +133,27 @@
             </div>
 
             <div id="comments-section-{{ post.id }}" class="hidden pt-2 space-y-4">
-                
+
                 <div id="comments-list-{{ post.id }}" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin">
                     {% for comment in post.comments %}
-                    <div class="flex gap-3 text-sm">
+                    <div class="flex gap-3 text-sm group" id="comment-{{ comment.id }}">
                         <div class="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-400">
-                            {{ comment.author.username[:2] }}
+                            {{ comment.author.username[:2].upper() }}
                         </div>
                         <div class="flex-1 space-y-1">
                             <div class="flex items-center justify-between">
                                 <span class="font-medium text-zinc-300">{{ comment.author.username }}</span>
-                                <span class="text-xs text-zinc-500">{{ comment.created_at.strftime('%b %d') }}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-zinc-500">{{ comment.created_at.strftime('%b %d') }}</span>
+
+                                    {% if session.get('user_id') == comment.author.id %}
+                                    <button onclick="deleteComment({{ comment.id }}, this)" class="text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                    {% endif %}
+                                </div>
                             </div>
                             <p class="text-zinc-400 leading-relaxed">{{ comment.content }}</p>
                         </div>
@@ -144,10 +163,10 @@
 
                 <div class="flex gap-3 items-start mt-4 pt-4 border-t border-zinc-800/50">
                     <div class="flex-1">
-                        <textarea 
-                            id="comment-input-{{ post.id }}" 
-                            rows="1" 
-                            placeholder="Write a comment..." 
+                        <textarea
+                            id="comment-input-{{ post.id }}"
+                            rows="1"
+                            placeholder="Write a comment..."
                             class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 resize-none overflow-hidden"
                             oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
                     </div>
@@ -156,7 +175,7 @@
                     </button>
                 </div>
             </div>
-        </div> 
+        </div>
       </article>
       {% endfor %}
     </main>
@@ -165,7 +184,8 @@
       <div class="sticky top-24 space-y-6">
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5">
           <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Active Battles</h3>
-          </div>
+          <div class="text-zinc-500 text-sm">No active battles right now.</div>
+        </div>
       </div>
     </aside>
 
@@ -178,9 +198,7 @@ async function toggleReaction(postId, emoji, btnElement) {
     try {
         const response = await fetch(`/post/${postId}/react`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ emoji: emoji })
         });
 
@@ -192,22 +210,23 @@ async function toggleReaction(postId, emoji, btnElement) {
 
         if (response.ok) {
             const data = await response.json();
-            
             const container = document.getElementById(`reactions-container-${postId}`);
-            
             let existingBtn = null;
+
+            // Find button by element or data attribute
             if (btnElement && btnElement.classList.contains('reaction-btn')) {
                 existingBtn = btnElement;
             } else {
                 existingBtn = container.querySelector(`button[data-emoji="${emoji}"]`);
             }
 
+            // Logic to add/remove/update button styles
             if (data.count === 0 && existingBtn) {
                 existingBtn.remove();
             } else if (existingBtn) {
                 const countSpan = existingBtn.querySelector('.count');
                 countSpan.textContent = data.count;
-                
+
                 if (data.status === 'added') {
                     existingBtn.classList.remove('bg-zinc-800/50', 'text-zinc-400', 'border-transparent');
                     existingBtn.classList.add('bg-emerald-600/10', 'border-emerald-600/30', 'text-emerald-400');
@@ -216,19 +235,18 @@ async function toggleReaction(postId, emoji, btnElement) {
                     existingBtn.classList.remove('bg-emerald-600/10', 'border-emerald-600/30', 'text-emerald-400');
                 }
             } else if (data.status === 'added') {
+                // Create new button if it doesn't exist
                 const newBtnHtml = `
-                    <button onclick="toggleReaction(${postId}, '${emoji}', this)" 
+                    <button onclick="toggleReaction(${postId}, '${emoji}', this)"
                             class="reaction-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-colors bg-emerald-600/10 border-emerald-600/30 text-emerald-400 hover:bg-emerald-600/20"
                             data-emoji="${emoji}">
                         <span>${emoji}</span>
                         <span class="count">1</span>
                     </button>
                 `;
-                const pickerContainer = container.lastElementChild; 
+                const pickerContainer = container.lastElementChild;
                 pickerContainer.insertAdjacentHTML('beforebegin', newBtnHtml);
             }
-        } else {
-            console.error('Failed to toggle reaction');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -244,15 +262,13 @@ function toggleComments(postId) {
 async function postComment(postId) {
     const input = document.getElementById(`comment-input-${postId}`);
     const content = input.value;
-    
+
     if (!content.trim()) return;
 
     try {
         const response = await fetch(`/post/${postId}/comment`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: content })
         });
 
@@ -263,17 +279,25 @@ async function postComment(postId) {
 
         if (response.ok) {
             const data = await response.json();
-            
+
             // Build HTML for new comment
+            // Note: We include the delete button because the user who just posted it definitely owns it
             const commentHtml = `
-                <div class="flex gap-3 text-sm animate-fade-in">
+                <div class="flex gap-3 text-sm animate-fade-in group" id="comment-${data.id}">
                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-400">
                         ${data.avatar_letter}
                     </div>
                     <div class="flex-1 space-y-1">
                         <div class="flex items-center justify-between">
                             <span class="font-medium text-zinc-300">${data.author}</span>
-                            <span class="text-xs text-zinc-500">${data.created_at}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-zinc-500">Just now</span>
+                                <button onclick="deleteComment(${data.id}, this)" class="text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <p class="text-zinc-400 leading-relaxed">${data.content}</p>
                     </div>
@@ -282,11 +306,11 @@ async function postComment(postId) {
 
             const list = document.getElementById(`comments-list-${postId}`);
             list.insertAdjacentHTML('beforeend', commentHtml);
-            
+
             // Clear input and reset height
             input.value = '';
             input.style.height = 'auto';
-            
+
             // Scroll to bottom of comments
             list.scrollTop = list.scrollHeight;
 
@@ -296,6 +320,59 @@ async function postComment(postId) {
         }
     } catch (error) {
         console.error('Error posting comment:', error);
+    }
+}
+
+// --- Delete Logic ---
+
+async function deletePost(postId, btnElement) {
+    if (!confirm("Are you sure you want to delete this project? This cannot be undone.")) return;
+
+    try {
+        const response = await fetch(`/post/${postId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            // Find the closest article tag and remove it
+            const article = btnElement.closest('article');
+            article.style.opacity = '0';
+            setTimeout(() => article.remove(), 300); // Wait for fade out
+        } else {
+            alert("Failed to delete post.");
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function deleteComment(commentId, btnElement) {
+    if (!confirm("Delete this comment?")) return;
+
+    try {
+        const response = await fetch(`/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            // Remove the comment element using ID or closest selector fallback
+            const commentDiv = document.getElementById(`comment-${commentId}`) || btnElement.closest('.flex.gap-3');
+            if (commentDiv) commentDiv.remove();
+
+            // Update comment counter
+            if (data.post_id) {
+                const counter = document.getElementById(`comment-count-${data.post_id}`);
+                if (counter) counter.innerText = data.count;
+            }
+        } else {
+            alert("Failed to delete comment.");
+        }
+    } catch (error) {
+        console.error('Error:', error);
     }
 }
 </script>
