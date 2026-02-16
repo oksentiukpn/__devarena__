@@ -1,14 +1,21 @@
 #!/bin/sh
 
-# Stopping if error occured
+# Stop if error occurs
 set -e
 
+export DATABASE_URL
+
+echo "Extracting database config..."
+DB_HOST=$(python -c "import os, urllib.parse; print(urllib.parse.urlparse(os.environ['DATABASE_URL']).hostname)")
+DB_PORT=$(python -c "import os, urllib.parse; print(urllib.parse.urlparse(os.environ['DATABASE_URL']).port)")
+
 echo "Applying database migrations..."
-# adding wait for the database to be ready
-until nc -z -v -w30 $DB_HOST $DB_PORT; do
+
+until nc -z -v -w 30 "$DB_HOST" "$DB_PORT"; do
   echo "Waiting for database connection..."
   sleep 1
 done
+
 flask db upgrade
 
 echo "Starting Flask..."
