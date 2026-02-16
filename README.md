@@ -8,6 +8,7 @@ Use this guide to start, stop, rebuild, and manage your database with confidence
 ## 🚀 Application Lifecycle
 
 Control the running state of your app and its services.
+Зазвичай використвуйте `docker compose up --build` для запуску, цього достатньо
 
 | Action       | Command                     | Description                                                                      |
 | ------------ | --------------------------- | -------------------------------------------------------------------------------- |
@@ -17,7 +18,7 @@ Control the running state of your app and its services.
 
 ### 💡 Pro Tips
 
-* Add `-d` to run in detached mode:
+* Add `-d` to run in detached(Крутиться у фоні) mode:
 
   ```bash
   docker compose up -d
@@ -30,7 +31,7 @@ Control the running state of your app and its services.
 
 ---
 
-## 🗄️ Database Management
+## 🗄️ Database Management(тільки якщо ви змінювали моделі)
 
 > ⚠️ **Note:**
 > You only need to run migrations if you’ve modified your Python data models (e.g., `models.py`).
