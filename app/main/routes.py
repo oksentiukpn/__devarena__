@@ -1,5 +1,6 @@
 from flask import (
     Blueprint,
+    abort,
     flash,
     jsonify,
     redirect,
@@ -44,7 +45,6 @@ def feed_page():
     feed_posts = (
         Post.query.options(joinedload(Post.author))
         .filter(Post.visibility == "public")
-        .filter(Post.user_id != session["user_id"])
         .order_by(desc(score_case), Post.created_at.desc())
         .limit(20)
         .all()
@@ -138,7 +138,7 @@ def add_comment(post_id):
 
     return jsonify(
         {
-            "id": new_comment.content,
+            "id": new_comment.id,
             "content": new_comment.content,
             "author": new_comment.author.username,
             "created_at": new_comment.created_at.strftime("%b %d"),
@@ -165,6 +165,48 @@ def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
     return render_template("main/profile.html", user=user, posts=posts)
+
+
+@main.route("/post/<int:post_id>", methods=["DELETE"])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+
+    # Security Check: Ensure current user is the author
+    if post.user_id != session["user_id"]:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    try:
+        db.session.delete(post)
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@main.route("/comment/<int:comment_id>", methods=["DELETE"])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    # Security Check: Ensure current user is the author
+    if comment.user_id != session["user_id"]:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    try:
+        # We need the post_id to update the UI counter if needed,
+        # though strictly not required for the DB delete
+        post_id = comment.post_id
+        db.session.delete(comment)
+        db.session.commit()
+
+        # Get new comment count for the UI
+        count = Comment.query.filter_by(post_id=post_id).count()
+        return jsonify({"success": True, "count": count, "post_id": post_id})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
 @main.route("/battles")
