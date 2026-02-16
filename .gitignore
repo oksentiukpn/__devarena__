@@ -6,7 +6,7 @@ instance/
 .coverage
 
 .env
-nginx/
+nginx/certs/
 
 postgres_data/
 backups/
