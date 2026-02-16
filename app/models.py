@@ -135,3 +135,28 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
 
     author = db.relationship("User", backref="comments", lazy=True)
+
+
+class Battle(db.Model):
+    """
+    Battle model
+    Stores coding challenges created by users.
+    """
+
+    __tablename__ = "battles"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    time_limit = db.Column(db.String(20), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
+    difficulty = db.Column(db.String(20), nullable=False)
+    tags = db.Column(db.String(200))
+    visibility = db.Column(db.String(20), default="public", nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    # Relationship
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    author = db.relationship("User", backref="battles", lazy=True)
+
+    def __repr__(self):
+        return f"Battle('{self.title}', '{self.difficulty}')"

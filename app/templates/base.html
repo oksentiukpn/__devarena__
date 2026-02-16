@@ -85,7 +85,7 @@
                 Feed
               </span>
             </a>
-            <a href="/battles"
+            <a href="/battle/create"
               class="{% block nav_battles_class %}px-4 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors{% endblock %}">
               <span class="flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +245,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const messages = document.querySelectorAll('.flash-message');
-      
+
       messages.forEach((msg, index) => {
         // Animate in with slight stagger
         setTimeout(() => {
@@ -263,7 +263,7 @@
       if (!element) return;
       // Slide out animation
       element.classList.add('translate-x-full', 'opacity-0');
-      
+
       // Remove from DOM after animation completes
       setTimeout(() => {
         if(element.parentElement) {

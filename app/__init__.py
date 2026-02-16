@@ -46,9 +46,11 @@ def create_app(config_class=Config):
     )
 
     from app.auth.routes import auth
+    from app.challenges.routes import challenges
     from app.main.routes import main
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
+    app.register_blueprint(challenges)
 
     return app

@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Create Battle - DevArena{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="flex items-center gap-3 mb-8">
+        <div class="w-12 h-12 bg-amber-600/10 rounded-xl flex items-center justify-center border border-amber-600/20">
+            <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        </div>
+        <div>
+            <h1 class="text-2xl font-bold text-white">Create New Battle</h1>
+            <p class="text-zinc-400 text-sm">Set up a coding challenge and compete head-to-head with other developers</p>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('challenges.create_battle') }}" class="space-y-6">
+        {{ form.hidden_tag() }}
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label for="title" class="block text-sm font-medium text-zinc-300 mb-2">
+                Battle title <span class="text-red-500">*</span>
+            </label>
+            {{ form.title(class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all", placeholder="Enter title...", id="input-title") }}
+            {% if form.title.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.title.errors[0] }}</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label for="description" class="block text-sm font-medium text-zinc-300 mb-2">
+                Description <span class="text-red-500">*</span>
+            </label>
+            {{ form.description(class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all resize-none", rows="5", placeholder="Describe the challenge rules and requirements...", id="input-desc") }}
+            {% if form.description.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.description.errors[0] }}</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-300 mb-4">
+                Time limit <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {% for subfield in form.time_limit %}
+                <label class="cursor-pointer">
+                    {{ subfield(class="sr-only peer") }}
+                    <div class="text-center py-2 px-4 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 text-sm font-medium transition-all peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-500 hover:bg-zinc-700">
+                        {{ subfield.label.text }}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-300 mb-4">
+                Language <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                {% for subfield in form.language %}
+                <label class="cursor-pointer group">
+                    {{ subfield(class="sr-only peer", onchange="updatePreviewLanguage(this)") }}
+                    <div class="flex items-center gap-2 py-2.5 px-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 text-sm transition-all peer-checked:bg-zinc-800 peer-checked:border-zinc-500 peer-checked:text-white hover:bg-zinc-750">
+                        <span class="w-2 h-2 rounded-full bg-zinc-600 group-hover:bg-zinc-500 peer-checked:bg-emerald-500 transition-colors"></span>
+                        {{ subfield.label.text }}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-300 mb-4">
+                Difficulty <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {% for subfield in form.difficulty %}
+                <label class="cursor-pointer">
+                    {{ subfield(class="sr-only peer", onchange="updatePreviewDifficulty(this)") }}
+                    <div class="text-center py-3 px-4 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 font-medium transition-all peer-checked:bg-zinc-700 peer-checked:text-white peer-checked:border-zinc-500 hover:bg-zinc-750">
+                        {{ subfield.label.text }}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-300 mb-4">
+                Visibility <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 gap-4">
+                {% for subfield in form.visibility %}
+                <label class="cursor-pointer">
+                    {{ subfield(class="sr-only peer") }}
+                    <div class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 font-medium transition-all peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-500 hover:bg-zinc-700">
+                        {% if subfield.data == 'public' %}
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        {% else %}
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        {% endif %}
+                        {{ subfield.label.text }}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label for="tags" class="block text-sm font-medium text-zinc-300 mb-2">
+                Tags
+            </label>
+            {{ form.tags(class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all", placeholder="#python, #algorithms, #data-structures", id="input-tags") }}
+            <p class="text-zinc-600 text-xs mt-2">Number of tags is limited to 5</p>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <label class="block text-sm font-medium text-zinc-400 mb-4">
+                Battle preview
+            </label>
+
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+                <div class="flex items-start justify-between">
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">
+                            {{ session.get('user_name', 'U')[:1] if session.get('user_name') else 'U' }}
+                        </div>
+                        <div>
+                            <h3 id="preview-title" class="text-white font-medium">Your battle title</h3>
+                            <div class="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
+                                <span>@you</span>
+                                <span>•</span>
+                                <span>just now</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <span id="preview-language" class="px-2.5 py-1 bg-emerald-600/10 text-emerald-400 border border-emerald-600/20 text-xs rounded-md uppercase font-bold">
+                        Python
+                    </span>
+                </div>
+
+                <div class="mt-4 flex items-center gap-2 text-sm text-zinc-300">
+                    <span>15m</span>
+                    <span>•</span>
+                    <span id="preview-difficulty">Intermediate</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-emerald-900/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Create Battle
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // --- Live Preview Logic ---
+    const titleInput = document.getElementById('input-title');
+    const previewTitle = document.getElementById('preview-title');
+    const previewLang = document.getElementById('preview-language');
+    const previewDiff = document.getElementById('preview-difficulty');
+
+    // Update Title
+    titleInput.addEventListener('input', (e) => {
+        previewTitle.textContent = e.target.value || 'Your battle title';
+    });
+
+    // Update Language Badge
+    function updatePreviewLanguage(radio) {
+        if(radio.checked) {
+            previewLang.textContent = radio.value;
+        }
+    }
+
+    // Update Difficulty Text
+    function updatePreviewDifficulty(radio) {
+        if(radio.checked) {
+            previewDiff.textContent = radio.value;
+        }
+    }
+
+    // Initialize with default checked values (if any)
+    document.addEventListener('DOMContentLoaded', () => {
+        const checkedLang = document.querySelector('input[name="language"]:checked');
+        if(checkedLang) updatePreviewLanguage(checkedLang);
+
+        const checkedDiff = document.querySelector('input[name="difficulty"]:checked');
+        if(checkedDiff) updatePreviewDifficulty(checkedDiff);
+    });
+</script>
+{% endblock %}
