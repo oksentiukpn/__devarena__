@@ -53,6 +53,7 @@ class User(db.Model):
     languages = db.Column(db.String(1024), nullable=True)
 
 
+
     points = db.Column(db.Integer, default=0, nullable=False)
 
     def set_password(self, password: str) -> None:
@@ -115,6 +116,24 @@ class Post(db.Model):
             summary[reaction.emoji]["count"] += 1
             summary[reaction.emoji]["user_ids"].add(reaction.user_id)
         return summary
+
+    def update_popularity_points(self):
+        """
+        Calculates post popularity: 1 reaction = 5 p, 1 comment = 10 p.
+        Updates the author's total points balance.
+        """
+
+        if hasattr(self.reactions, 'count'):
+            count_reactions = self.reactions.count()
+        else:
+            count_reactions = len(list(self.reactions))
+        count_comments = len(self.comments)
+
+        popularity_value = (count_reactions * 5) + (count_comments * 10)
+
+        self.author.points += popularity_value
+        db.session.commit()
+
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.created_at}')"
