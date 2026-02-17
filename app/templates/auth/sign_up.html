@@ -4,115 +4,110 @@
 
 {% block content %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In</title>
-    <link rel="stylesheet" href="log_in.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-</head>
-<body>
-    <!-- Header -->
-    <!-- <div class="nav-div">
-        <p class="lst-item">DevArena</p>
-        <p class="lst-item">Home</p>
-        <p class="lst-item">Feed</p>
-        <p class="lst-item">Battles</p>
-        <p class="lst-item">New Post</p>
-        <p class="lst-item">Search</p>
-        <p class="lst-item">Sign In</p>
-        <p class="lst-item">Sign Up</p>
-    </div> -->
-    <!-- ... -->
+<link rel="stylesheet" href="/app/templates/auth/sign_up.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Main -->
-     <div class="main-div">
-        <div class="header-main-div">
-            <div class="svg-header">
-                <svg class="svg-dev" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+    <main class="main-container">
+        <div class="logo-section">
+            <div class="logo-wrapper">
+                <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                 </svg>
-                <h2 class="header-main">DevArena</h2>
+                <span class="logo-text">DevArena</span>
             </div>
-            <h3 class="subheader-main">Welcome back, developer</h3>
+            <p class="logo-subtitle">Join the developer community</p>
         </div>
 
-        <div class="form-div">
-            <h2 class="sign-h2">Sign in to your account</h2>
-            <div class="btn-div-google">
-                <button class="btn-google"><a href="/login/google" class="google-log-in">
-                    <svg class="svg" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
-                    </svg>
-                    Continue with Google
-                </a></button>
+        <div class="auth-card">
+            <h1 class="card-title">Create your account</h1>
+
+            <button class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-logo">
+                Sign up with Google
+            </button>
+
+            <div class="divider">
+                <span class="divider-text">or register with email</span>
             </div>
 
-            <div class="relative mb-6">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-zinc-700"></div>
-                </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="px-4 bg-zinc-900 text-zinc-500">or continue with email</span>
-                </div>
-            </div>
             <form>
-                <label for="email">Email address</label>
-                <input placeholder="you@example.com" type="email" id="email" name="email" required>
-
-                <div class="password-div">
-                    <label for="password">Password</label>
-                    <a href="/forgot-password" class="password-forgot">Forgot password?</a>
+                <div class="input-field">
+                    <label>Username</label>
+                    <input type="text" placeholder="@your_username" required>
+                    <p class="hint">3-20 characters; letters, numbers and underscores only</p>
                 </div>
-                <input placeholder="Enter your password" type="password" id="password" name="password" required>
 
-                <div class="form-options">
-                    <label class="checkbox-container">
-                        <input type="checkbox">
-                        <span class="checkmark"></span>
-                        Remember me for 30 days
+                <div class="input-field">
+                    <label>Email address</label>
+                    <input type="email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="input-field">
+                    <label>Password</label>
+                    <input type="password" placeholder="Create a strong password" required>
+                    <div class="password-strength">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <p class="hint">Minimum 8 characters with uppercase, lowercase and numbers</p>
+                </div>
+
+                <div class="input-field">
+                    <label>Confirm password</label>
+                    <input type="password" placeholder="Confirm your password" required>
+                </div>
+
+                <div class="terms-row">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
                     </label>
                 </div>
 
+                <button type="submit" class="submit-btn">Create account</button>
+            </form>
 
-        <button type="submit" class="sign-in-btn">Sign in</button>
-
-        <div class="signup-text-div">
-            <p class="signup-text">
-                Don't have an account? <a href="/signup">Create one</a>
+            <p class="footer-link">
+                Already have an account? <a href="log_in.html">Sign in</a>
             </p>
         </div>
-            </form>
+
+
+    <!-- <div class="auth-card">
+    </div> -->
+
+<div class="features-nav">
+    <div class="feature-item">
+        <div class="feature-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
         </div>
-
-        <p class="terms-text">
-            By signing in, you agree to our <a class="terms-a" href="#">Terms of Service</a> and <a class="terms-a" href="#">Privacy Policy</a>
-        </p>
-
-     </div>
-
-<!-- <footer class="site-footer">
-    <div class="footer-left">
-        © 2026 DevArena
+        <span>Code Reviews</span>
     </div>
-    <div class="footer-right">
-        <a href="#">Authors</a>
-        <span class="dot">•</span>
-        <a href="#">Privacy Policy</a>
-        <span class="dot">•</span>
-        <a href="#">Terms of Use</a>
+
+    <div class="feature-item">
+        <div class="feature-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+        </div>
+        <span>Battle Mode</span>
     </div>
-</footer> -->
 
-</body>
-</html>
+    <div class="feature-item">
+        <div class="feature-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+        </div>
+        <span>Leaderboards</span>
+    </div>
+</div>
 
+</main>
 
 {% endblock %}
