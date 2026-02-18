@@ -261,7 +261,8 @@ input[type="password"] {
     color: #a0a1a6;
 }
 
-a {
+.password-div a,
+.terms-text a {
     text-decoration: none;
     color: #26a57c;
 }
