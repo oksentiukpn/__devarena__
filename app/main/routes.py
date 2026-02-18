@@ -29,6 +29,25 @@ def home():
 def privacy_policy():
     return render_template("main/privacy.html")
 
+@main.route("/authors")
+def authors():
+    return render_template("main/authors.html")
+
+@main.route("/terms")
+def terms_of_service():
+    return render_template("main/terms.html")
+
+@main.route("/settings")
+@login_required
+def settings_page():
+    # user_languages = (
+    #     db.session.query(Post.language)
+    #     .filter_by(user_id=session["user_id"])
+    #     .distinct()
+    #     .all()
+    # )
+    # user_languages = [lang[0] for lang in user_languages]
+    return render_template("main/settings.html")
 
 @main.route("/feed")
 @login_required

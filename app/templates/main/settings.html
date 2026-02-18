@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+
+<main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <div class="flex items-center gap-2 mb-8">
+    <h1 class="text-2xl font-medium text-white tracking-wide">Settings</h1>
+  </div>
+
+  <div class="bg-zinc-900/80 rounded-full p-1.5 mb-8 inline-flex flex-wrap items-center gap-1 border border-zinc-800">
+    <a href="#profile" class="px-9 py-2 rounded-full bg-zinc-800 text-emerald-500 font-medium text-sm transition-colors">profile</a>
+    <a href="#account" class="px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">account</a>
+    <a href="#notifications" class="px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">notifications</a>
+    <a href="#privacy" class="px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">privacy</a>
+    <a href="#defaults" class="px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">defaults</a>
+    <a href="#danger" class="px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">danger</a>
+  </div>
+
+  <div class="w-full space-y-6">
+    <h2 class="text-xl font-medium text-white mb-4">Profile</h2>
+
+    <div class="flex items-center gap-4 mb-2">
+      <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-emerald-900/20">
+        {{ current_user.username[:1].upper() if current_user else 'U' }}
+      </div>
+      <button type="button" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 rounded-full text-sm font-medium transition-colors border border-zinc-700/50">
+        Upload new picture
+      </button>
+    </div>
+
+    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8">
+      <form action="#" method="POST">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+          <div>
+            <label for="username" class="block text-base font-medium text-white mb-2">Username</label>
+            <input type="text" id="username" placeholder="username"
+              class="w-full bg-zinc-800 border-none rounded-full py-2.5 px-4 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all shadow-inner">
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <label for="bio" class="block text-base font-medium text-white mb-2">Bio</label>
+          <textarea id="bio" rows="5" placeholder="Tell us about yourself..."
+            class="w-full bg-zinc-800 border-none rounded-[20px] py-4 px-5 text-sm text-zinc-400 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all resize-none shadow-inner leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</textarea>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+          <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors">
+            Save Changes
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</main>
+{% endblock %}
