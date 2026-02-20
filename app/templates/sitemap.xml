@@ -23,7 +23,7 @@
 
     {% for post in posts %}
     <url>
-        <loc>{{ url_for('main.post_detail', post_id=post.id, _external=True) }}</loc>
+        <loc>{{ url_for('main.view_post', post_id=post.id, _external=True) }}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
