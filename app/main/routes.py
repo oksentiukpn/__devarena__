@@ -228,3 +228,15 @@ def sitemap():
     xml_content = render_template("sitemap.xml", users=users, posts=posts)
 
     return Response(xml_content, mimetype="application/xml")
+
+
+@main.route("/robots.txt")
+def robots():
+    robots_content = """User-agent: *
+Disallow: /login
+Disallow: /register
+Allow: /
+
+Sitemap: https://devarena.pp.ua/sitemap.xml
+"""
+    return Response(robots_content, mimetype="text/plain")
