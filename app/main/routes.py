@@ -1,6 +1,6 @@
 from flask import (
     Blueprint,
-    abort,
+    Response,
     flash,
     jsonify,
     redirect,
@@ -160,7 +160,6 @@ def profile():
 
 # Other users
 @main.route("/user/<username>")
-@login_required
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
@@ -183,6 +182,12 @@ def delete_post(post_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@main.route("/post/<int:post_id>", methods=["GET"])
+def view_post(post_id):
+    post = Post.query.options(joinedload(Post.author)).get_or_404(post_id)
+    return render_template("main/view_post.html", post=post)
 
 
 @main.route("/comment/<int:comment_id>", methods=["DELETE"])
@@ -213,3 +218,13 @@ def delete_comment(comment_id):
 def battles():
     # rick-roll
     return redirect(url_for("challenges.create_battle"))
+
+
+@main.route("/sitemap.xml")
+def sitemap():
+    users = User.query.all()
+    posts = Post.query.filter_by(visibility="public").all()
+
+    xml_content = render_template("sitemap.xml", users=users, posts=posts)
+
+    return Response(xml_content, mimetype="application/xml")
