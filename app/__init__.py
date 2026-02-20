@@ -5,11 +5,11 @@ Initializing app
 from datetime import timedelta
 
 from authlib.integrations.flask_client import OAuth
+from config import Config
 from flask import Flask, session
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-
-from config import Config
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -33,7 +33,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     oauth.init_app(app)
-
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     # app.permanent_session_lifetime = timedelta(days=14)
 
     # Registering OAuth
