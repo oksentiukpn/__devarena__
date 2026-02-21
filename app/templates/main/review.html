@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Review Battle: {{ battle.title }} - DevArena{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6">
+        <div>
+            <h1 class="text-2xl font-bold text-white mb-1">{{ battle.title }}</h1>
+            <p class="text-zinc-400 text-sm">{{ battle.description }}</p>
+        </div>
+        <div class="text-right">
+            {% if battle.status == 'in_review' %}
+                <div class="inline-flex flex-col items-center px-4 py-2 bg-emerald-600/10 border border-emerald-600/20 rounded-xl">
+                    <span class="text-xs text-emerald-500 font-bold uppercase tracking-wider mb-1">Voting Closes In</span>
+                    <span id="review-timer" class="text-2xl font-mono font-bold text-emerald-400">--:--</span>
+                </div>
+            {% else %}
+                <div class="inline-flex flex-col items-center px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-xl">
+                    <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider mb-1">Battle Concluded</span>
+                    <span class="text-lg font-bold text-white">
+                        {% if battle.winner_id %}
+                            Winner: {{ battle.winner.username }} 🏆
+                        {% else %}
+                            Draw 🤝
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <div class="flex flex-col bg-[#0d1117] border {% if battle.winner_id == battle.user_id %}border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.1)]{% else %}border-zinc-800{% endif %} rounded-2xl overflow-hidden">
+            <div class="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400">
+                        {{ battle.author.username[:2].upper() }}
+                    </div>
+                    <span class="font-medium text-white">{{ battle.author.username }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-emerald-500" id="creator-votes">{{ creator_votes }}</span>
+                    <span class="text-xs text-zinc-500 uppercase">Votes</span>
+                </div>
+            </div>
+
+            <pre class="flex-1 p-4 overflow-x-auto text-sm scrollbar-thin m-0"><code class="language-{{ battle.language }} font-mono text-zinc-300">{{ battle.creator_code or 'No code submitted.' }}</code></pre>
+
+            <div class="p-4 bg-zinc-900 border-t border-zinc-800">
+                <button onclick="castVote({{ battle.user_id }})"
+                        class="vote-btn w-full py-2.5 rounded-lg font-medium transition-all {% if user_vote == battle.user_id %}bg-emerald-600 text-white{% else %}bg-zinc-800 hover:bg-zinc-700 text-zinc-300{% endif %}"
+                        {% if battle.status != 'in_review' %}disabled{% endif %}>
+                    {% if user_vote == battle.user_id %}Voted{% else %}Vote for {{ battle.author.username }}{% endif %}
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col bg-[#0d1117] border {% if battle.winner_id == battle.opponent_id %}border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.1)]{% else %}border-zinc-800{% endif %} rounded-2xl overflow-hidden">
+            <div class="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400">
+                        {{ battle.opponent.username[:2].upper() }}
+                    </div>
+                    <span class="font-medium text-white">{{ battle.opponent.username }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-emerald-500" id="opponent-votes">{{ opponent_votes }}</span>
+                    <span class="text-xs text-zinc-500 uppercase">Votes</span>
+                </div>
+            </div>
+
+            <pre class="flex-1 p-4 overflow-x-auto text-sm scrollbar-thin m-0"><code class="language-{{ battle.language }} font-mono text-zinc-300">{{ battle.opponent_code or 'No code submitted.' }}</code></pre>
+
+            <div class="p-4 bg-zinc-900 border-t border-zinc-800">
+                <button onclick="castVote({{ battle.opponent_id }})"
+                        class="vote-btn w-full py-2.5 rounded-lg font-medium transition-all {% if user_vote == battle.opponent_id %}bg-emerald-600 text-white{% else %}bg-zinc-800 hover:bg-zinc-700 text-zinc-300{% endif %}"
+                        {% if battle.status != 'in_review' %}disabled{% endif %}>
+                    {% if user_vote == battle.opponent_id %}Voted{% else %}Vote for {{ battle.opponent.username }}{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-6">Discussion</h3>
+
+        <div class="flex gap-4 mb-8">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white">
+                {{ session.get('user_name', 'U')[:2].upper() }}
+            </div>
+            <div class="flex-1">
+                <textarea id="comment-input" rows="2" placeholder="Analyze the code, suggest improvements..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 resize-none"></textarea>
+                <div class="mt-2 flex justify-end">
+                    <button onclick="postComment()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors">Post Comment</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="comments-list" class="space-y-6">
+            {% for comment in comments %}
+            <div class="flex gap-4 group">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-400">
+                    {{ comment.author.username[:2].upper() }}
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-baseline justify-between mb-1">
+                        <span class="font-medium text-white">{{ comment.author.username }}</span>
+                        <span class="text-xs text-zinc-500">{{ comment.created_at.strftime('%b %d, %H:%M') }}</span>
+                    </div>
+                    <p class="text-zinc-400 text-sm leading-relaxed">{{ comment.content }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+    // Initialize syntax highlighting
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('pre code').forEach((el) => {
+            hljs.highlightElement(el);
+        });
+    });
+
+    const battleId = {{ battle.id }};
+    const status = "{{ battle.status }}";
+
+    // --- Timer Logic ---
+    let timeLeft = {{ review_time_left|default(0) }};
+    const timerDisplay = document.getElementById('review-timer');
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    if (status === 'in_review' && timeLeft > 0) {
+        timerDisplay.textContent = formatTime(timeLeft);
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = "00:00";
+                window.location.reload(); // Reload to show winner
+            } else {
+                timerDisplay.textContent = formatTime(timeLeft);
+            }
+        }, 1000);
+    }
+
+    // --- Voting Logic ---
+    async function castVote(userId) {
+        if (status !== 'in_review') return;
+
+        try {
+            const res = await fetch(`/battle/${battleId}/vote`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ voted_for_id: userId })
+            });
+
+            if (res.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+
+            if (res.ok) {
+                window.location.reload(); // Quickest way to update UI and vote counts reliably
+            }
+        } catch (err) {
+            console.error("Voting failed", err);
+        }
+    }
+
+    // --- Comment Logic ---
+    async function postComment() {
+        const input = document.getElementById('comment-input');
+        const content = input.value.trim();
+        if (!content) return;
+
+        try {
+            const res = await fetch(`/battle/${battleId}/comment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            });
+
+            if (res.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+
+            if (res.ok) {
+                const data = await res.json();
+
+                const commentHtml = `
+                    <div class="flex gap-4 group animate-fade-in">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-400">
+                            ${data.avatar_letter}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-baseline justify-between mb-1">
+                                <span class="font-medium text-white">${data.author}</span>
+                                <span class="text-xs text-zinc-500">${data.created_at}</span>
+                            </div>
+                            <p class="text-zinc-400 text-sm leading-relaxed">${data.content}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('comments-list').insertAdjacentHTML('beforeend', commentHtml);
+                input.value = '';
+            }
+        } catch (err) {
+            console.error("Comment failed", err);
+        }
+    }
+</script>
+{% endblock %}

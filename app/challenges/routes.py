@@ -6,7 +6,7 @@ from app import db
 from app.auth.utils import login_required
 from app.challenges import challenges
 from app.main.form import BattleForm
-from app.models import Battle, User
+from app.models import Battle, BattleComment, BattleVote, User
 
 
 def parse_time_limit(limit_str):
@@ -114,6 +114,7 @@ def battle_status(battle_id):
         time_left = (battle.end_time - datetime.utcnow()).total_seconds()
         if time_left <= 0:
             battle.status = "in_review"
+            battle.review_end_time = datetime.utcnow() + timedelta(minutes=30)
             db.session.commit()
             time_left = 0
 
@@ -180,6 +181,126 @@ def submit_code(battle_id):
     if battle.creator_submitted and battle.opponent_submitted:
         battle.status = "in_review"
         battle.end_time = datetime.utcnow()
+        battle.review_end_time = datetime.utcnow() + timedelta(minutes=30)
 
     db.session.commit()
     return jsonify({"success": True, "status": battle.status})
+
+
+@challenges.route("/battle/<int:battle_id>/review")
+def review(battle_id):
+    battle = Battle.query.get_or_404(battle_id)
+
+    if battle.status in ["waiting", "ready", "in_progress"]:
+        flash("This battle is not ready for review yet.", "warning")
+        return redirect(url_for("main.battles"))
+
+    # Check if review time is up and we need to declare a winner
+    if (
+        battle.status == "in_review"
+        and battle.review_end_time
+        and datetime.utcnow() > battle.review_end_time
+    ):
+        battle.status = "completed"
+        creator_votes = BattleVote.query.filter_by(
+            battle_id=battle.id, voted_for_id=battle.user_id
+        ).count()
+        opponent_votes = BattleVote.query.filter_by(
+            battle_id=battle.id, voted_for_id=battle.opponent_id
+        ).count()
+
+        if creator_votes > opponent_votes:
+            battle.winner_id = battle.user_id
+        elif opponent_votes > creator_votes:
+            battle.winner_id = battle.opponent_id
+        else:
+            battle.winner_id = battle.user_id
+        db.session.commit()
+
+    creator_votes = BattleVote.query.filter_by(
+        battle_id=battle.id, voted_for_id=battle.user_id
+    ).count()
+    opponent_votes = BattleVote.query.filter_by(
+        battle_id=battle.id, voted_for_id=battle.opponent_id
+    ).count()
+
+    user_vote = None
+    if "user_id" in session:
+        vote = BattleVote.query.filter_by(
+            battle_id=battle.id, user_id=session["user_id"]
+        ).first()
+        if vote:
+            user_vote = vote.voted_for_id
+
+    # Time left for voting
+    review_time_left = 0
+    if battle.status == "in_review" and battle.review_end_time:
+        review_time_left = max(
+            0, (battle.review_end_time - datetime.utcnow()).total_seconds()
+        )
+
+    comments = battle.comments.order_by(BattleComment.created_at.asc()).all()
+
+    return render_template(
+        "main/review.html",
+        battle=battle,
+        creator_votes=creator_votes,
+        opponent_votes=opponent_votes,
+        user_vote=user_vote,
+        review_time_left=review_time_left,
+        comments=comments,
+    )
+
+
+@challenges.route("/battle/<int:battle_id>/vote", methods=["POST"])
+@login_required
+def vote_battle(battle_id):
+    battle = Battle.query.get_or_404(battle_id)
+
+    if battle.status != "in_review":
+        return jsonify({"error": "Voting is closed."}), 400
+
+    data = request.json
+    voted_for_id = data.get("voted_for_id")
+
+    if voted_for_id not in [battle.user_id, battle.opponent_id]:
+        return jsonify({"error": "Invalid vote."}), 400
+
+    existing_vote = BattleVote.query.filter_by(
+        user_id=session["user_id"], battle_id=battle.id
+    ).first()
+    if existing_vote:
+        existing_vote.voted_for_id = voted_for_id
+    else:
+        new_vote = BattleVote(
+            user_id=session["user_id"], battle_id=battle.id, voted_for_id=voted_for_id
+        )
+        db.session.add(new_vote)
+
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+@challenges.route("/battle/<int:battle_id>/comment", methods=["POST"])
+@login_required
+def add_battle_comment(battle_id):
+    data = request.json
+    content = data.get("content")
+    if not content or not content.strip():
+        return jsonify({"error": "Comment can't be empty"}), 400
+
+    new_comment = BattleComment(
+        content=content.strip(), user_id=session["user_id"], battle_id=battle_id
+    )
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify(
+        {
+            "id": new_comment.id,
+            "content": new_comment.content,
+            "author": new_comment.author.username,
+            "created_at": "Just now",
+            "avatar_letter": new_comment.author.username[:2].upper(),
+        }
+    )
