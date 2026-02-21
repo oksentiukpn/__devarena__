@@ -2,7 +2,7 @@
 Defining models for database
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -156,7 +156,28 @@ class Battle(db.Model):
 
     # Relationship
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    author = db.relationship("User", backref="battles", lazy=True)
+    opponent_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    author = db.relationship(
+        "User", foreign_keys=[user_id], backref="battles", lazy=True
+    )
+    status = db.Column(
+        db.String(20), default="waiting"
+    )  # waiting, ready, in_progress, in_review, completed
+
+    creator_ready = db.Column(db.Boolean, default=False)
+    opponent_ready = db.Column(db.Boolean, default=False)
+
+    start_time = db.Column(db.DateTime, nullable=True)
+    end_time = db.Column(db.DateTime, nullable=True)
+
+    creator_code = db.Column(db.Text, nullable=True)
+    opponent_code = db.Column(db.Text, nullable=True)
+
+    opponent = db.relationship(
+        "User", foreign_keys=[opponent_id], backref="joined_battles"
+    )
+    creator_submitted = db.Column(db.Boolean, default=False)
+    opponent_submitted = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"Battle('{self.title}', '{self.difficulty}')"

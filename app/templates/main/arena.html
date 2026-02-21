@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Arena: {{ battle.title }} - DevArena{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-80px)] flex flex-col">
+
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-white">{{ battle.title }}</h1>
+            <p class="text-sm text-zinc-400">Language: {{ battle.language }} | {{ battle.difficulty }}</p>
+        </div>
+
+        <div class="text-center">
+            <div id="status-badge" class="px-3 py-1 bg-zinc-800 text-zinc-300 text-xs font-bold uppercase rounded-md mb-1">
+                {{ battle.status }}
+            </div>
+            <div id="timer-display" class="text-3xl font-mono font-bold text-white tracking-widest">
+                --:--
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-0">
+
+        <div class="lg:col-span-1 space-y-4">
+            <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
+                <h3 class="text-sm font-semibold text-zinc-400 mb-4">Players</h3>
+
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded bg-emerald-600/20 text-emerald-500 flex items-center justify-center font-bold">
+                            {{ battle.author.username[:2].upper() }}
+                        </div>
+                        <span class="text-white">{{ battle.author.username }}</span>
+                    </div>
+                    <span id="creator-status" class="w-3 h-3 rounded-full bg-red-500"></span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded bg-zinc-800 text-zinc-500 flex items-center justify-center font-bold">
+                            <span id="opponent-avatar">?</span>
+                        </div>
+                        <span id="opponent-name" class="text-zinc-400 italic">Waiting...</span>
+                    </div>
+                    <span id="opponent-status" class="w-3 h-3 rounded-full bg-red-500"></span>
+                </div>
+            </div>
+
+            <button id="ready-btn" onclick="toggleReady()" class="w-full py-4 rounded-xl font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white">
+                I'm Ready
+            </button>
+        </div>
+
+        <div class="lg:col-span-3 bg-[#0d1117] border border-zinc-800 rounded-xl flex flex-col overflow-hidden relative">
+
+            <div id="editor-overlay" class="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                <svg class="w-12 h-12 text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <p id="overlay-text" class="text-zinc-400 font-medium">Waiting for both players to be ready...</p>
+            </div>
+
+            <div class="flex items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800">
+                <span class="text-xs text-zinc-500 font-mono">Your Code</span>
+            </div>
+
+            <textarea id="code-editor" class="flex-1 w-full bg-transparent text-zinc-100 font-mono text-sm p-4 resize-none focus:outline-none placeholder-zinc-700" placeholder="Write your solution here..."></textarea>
+
+            <div class="px-4 py-3 bg-zinc-900 border-t border-zinc-800 text-right">
+                <button id="submit-btn" onclick="submitCode()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors flex items-center gap-2 ml-auto">
+                    <span>Submit Final Code</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const battleId = {{ battle.id }};
+    const isCreator = {{ 'true' if is_creator else 'false' }};
+
+    // Elements
+    const creatorStatus = document.getElementById('creator-status');
+    const opponentStatus = document.getElementById('opponent-status');
+    const opponentName = document.getElementById('opponent-name');
+    const opponentAvatar = document.getElementById('opponent-avatar');
+    const readyBtn = document.getElementById('ready-btn');
+    const statusBadge = document.getElementById('status-badge');
+    const overlay = document.getElementById('editor-overlay');
+    const overlayText = document.getElementById('overlay-text');
+    const timerDisplay = document.getElementById('timer-display');
+
+    // NEW Elements
+    const submitBtn = document.getElementById('submit-btn');
+    const codeEditor = document.getElementById('code-editor');
+
+    let currentStatus = "{{ battle.status }}";
+    let timerInterval;
+
+    // --- NEW: Submit Code Logic ---
+    async function submitCode() {
+        if (currentStatus !== 'in_progress') return;
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>Submitting...</span>`;
+
+        try {
+            const res = await fetch(`/battle/${battleId}/api/submit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: codeEditor.value })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                // Visual Success Feedback
+                submitBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500', 'text-white');
+                submitBtn.classList.add('bg-zinc-800', 'text-emerald-400', 'border', 'border-emerald-500/30', 'cursor-not-allowed');
+                submitBtn.innerHTML = `
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Submitted</span>
+                `;
+
+                // Lock editor
+                codeEditor.readOnly = true;
+                codeEditor.classList.add('opacity-50');
+
+                pollStatus(); // Instantly update state
+            }
+        } catch (err) {
+            console.error("Failed to submit code", err);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<span>Submit Final Code</span>`;
+        }
+    }
+
+    // Toggle Ready Status
+    async function toggleReady() {
+        await fetch(`/battle/${battleId}/api/ready`, { method: 'POST' });
+        pollStatus();
+    }
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function startLocalTimer(initialSeconds) {
+        if (timerInterval) clearInterval(timerInterval);
+        let left = initialSeconds;
+
+        timerDisplay.textContent = formatTime(left);
+
+        timerInterval = setInterval(() => {
+            left--;
+            if (left <= 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = "00:00";
+                pollStatus();
+            } else {
+                timerDisplay.textContent = formatTime(left);
+            }
+        }, 1000);
+    }
+
+    // Polling logic
+    async function pollStatus() {
+        try {
+            const res = await fetch(`/battle/${battleId}/api/status`);
+            const data = await res.json();
+
+            if (data.opponent_joined) {
+                // Update Opponent name, and if they submitted, show it visually
+                if (data.opponent_submitted && data.status === 'in_progress') {
+                    opponentName.textContent = data.opponent_username + " (Finished)";
+                    opponentStatus.className = 'w-3 h-3 rounded-full bg-blue-500'; // Turn blue when they finish early
+                } else {
+                    opponentName.textContent = data.opponent_username;
+                }
+
+                opponentName.classList.remove('italic', 'text-zinc-400');
+                opponentName.classList.add('text-white');
+                opponentAvatar.textContent = data.opponent_username.substring(0, 2).toUpperCase();
+            }
+
+            // Update Ready Indicators (Only matters before progress starts)
+            if (data.status !== 'in_progress' && data.status !== 'in_review') {
+                creatorStatus.className = data.creator_ready ? 'w-3 h-3 rounded-full bg-emerald-500' : 'w-3 h-3 rounded-full bg-red-500';
+                opponentStatus.className = data.opponent_ready ? 'w-3 h-3 rounded-full bg-emerald-500' : 'w-3 h-3 rounded-full bg-red-500';
+            }
+
+            statusBadge.textContent = data.status;
+
+            const iAmReady = isCreator ? data.creator_ready : data.opponent_ready;
+
+            if (iAmReady) {
+                readyBtn.textContent = "Cancel Ready";
+                readyBtn.className = "w-full py-4 rounded-xl font-bold transition-all bg-zinc-700 hover:bg-zinc-600 text-white";
+            } else {
+                readyBtn.textContent = "I'm Ready";
+                readyBtn.className = "w-full py-4 rounded-xl font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white";
+            }
+
+            if (data.status === 'in_progress' && currentStatus !== 'in_progress') {
+                currentStatus = 'in_progress';
+                overlay.style.display = 'none';
+                readyBtn.style.display = 'none';
+                startLocalTimer(data.time_left);
+            }
+            else if (data.status === 'in_review') {
+                overlay.style.display = 'flex';
+                // Change text to reflect an early finish vs time out
+                overlayText.textContent = "Battle finished! Entering review stage...";
+                readyBtn.style.display = 'none';
+                clearInterval(timerInterval);
+                timerDisplay.textContent = formatTime(data.time_left); // Will freeze on time remaining if finished early
+
+                // Wait 2 seconds, then redirect to the review page (which we will build next)
+                if (currentStatus !== 'in_review') {
+                     currentStatus = 'in_review';
+                     // setTimeout(() => window.location.href = `/battle/${battleId}/review`, 2000);
+                }
+            }
+
+        } catch (err) {
+            console.error("Polling failed", err);
+        }
+    }
+
+    setInterval(pollStatus, 2000);
+    pollStatus();
+</script>
+{% endblock %}

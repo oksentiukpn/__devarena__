@@ -47,12 +47,25 @@
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 {% for subfield in form.time_limit %}
                 <label class="cursor-pointer">
-                    {{ subfield(class="sr-only peer") }}
+                    {{ subfield(class="sr-only peer", onchange="toggleCustomTime(this)") }}
                     <div class="text-center py-2 px-4 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 text-sm font-medium transition-all peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-500 hover:bg-zinc-700">
                         {{ subfield.label.text }}
                     </div>
                 </label>
                 {% endfor %}
+            </div>
+
+            <div id="custom-time-container" class="mt-4 hidden">
+                <label for="custom_time" class="block text-sm font-medium text-zinc-400 mb-2">
+                    Enter minutes <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center gap-3">
+                    {{ form.custom_time(class="w-32 bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50", placeholder="e.g., 45", type="number", min="1") }}
+                    <span class="text-zinc-500 text-sm">minutes</span>
+                </div>
+                {% if form.custom_time.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.custom_time.errors[0] }}</p>
+                {% endif %}
             </div>
         </div>
 
@@ -171,32 +184,47 @@
     const previewLang = document.getElementById('preview-language');
     const previewDiff = document.getElementById('preview-difficulty');
 
-    // Update Title
     titleInput.addEventListener('input', (e) => {
         previewTitle.textContent = e.target.value || 'Your battle title';
     });
 
-    // Update Language Badge
     function updatePreviewLanguage(radio) {
         if(radio.checked) {
             previewLang.textContent = radio.value;
         }
     }
 
-    // Update Difficulty Text
     function updatePreviewDifficulty(radio) {
         if(radio.checked) {
             previewDiff.textContent = radio.value;
         }
     }
 
-    // Initialize with default checked values (if any)
+    // --- Custom Time Toggle Logic ---
+    function toggleCustomTime(radio) {
+        const container = document.getElementById('custom-time-container');
+        const customInput = document.getElementById('custom_time');
+
+        if (radio.value === 'Custom') {
+            container.classList.remove('hidden');
+            customInput.required = true;
+        } else {
+            container.classList.add('hidden');
+            customInput.required = false;
+            customInput.value = ''; // Reset if user clicks away
+        }
+    }
+
+    // Initialize states on page load
     document.addEventListener('DOMContentLoaded', () => {
         const checkedLang = document.querySelector('input[name="language"]:checked');
         if(checkedLang) updatePreviewLanguage(checkedLang);
 
         const checkedDiff = document.querySelector('input[name="difficulty"]:checked');
         if(checkedDiff) updatePreviewDifficulty(checkedDiff);
+
+        const checkedTime = document.querySelector('input[name="time_limit"]:checked');
+        if(checkedTime) toggleCustomTime(checkedTime);
     });
 </script>
 {% endblock %}
