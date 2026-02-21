@@ -85,17 +85,23 @@
           </div>
 
           <div class="border-t border-zinc-800 pt-4 mt-2">
-            <form action="{{ url_for('challenges.join_battle', battle_id=battle.id) }}" method="POST">
-                <button type="submit" class="w-full py-2.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 font-medium rounded-lg transition-colors">
-                    {% if session.get('user_id') == battle.user_id or session.get('user_id') == battle.opponent_id %}
-                        Enter Arena
-                    {% elif battle.opponent_id %}
-                        Spectate (Full)
-                    {% else %}
-                        Join Battle
-                    {% endif %}
-                </button>
-            </form>
+              {% if battle.status in ['in_review', 'completed'] %}
+                  <a href="{{ url_for('challenges.review', battle_id=battle.id) }}" class="flex justify-center w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-colors">
+                      View Review & Vote
+                  </a>
+              {% else %}
+                  <form action="{{ url_for('challenges.join_battle', battle_id=battle.id) }}" method="POST">
+                      <button type="submit" class="w-full py-2.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 font-medium rounded-lg transition-colors">
+                          {% if session.get('user_id') == battle.user_id or session.get('user_id') == battle.opponent_id %}
+                              Enter Arena
+                          {% elif battle.opponent_id %}
+                              Spectate (Full)
+                          {% else %}
+                              Join Battle
+                          {% endif %}
+                      </button>
+                  </form>
+              {% endif %}
           </div>
         </div>
       </article>

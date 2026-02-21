@@ -210,16 +210,15 @@
             }
             else if (data.status === 'in_review') {
                 overlay.style.display = 'flex';
-                // Change text to reflect an early finish vs time out
                 overlayText.textContent = "Battle finished! Entering review stage...";
                 readyBtn.style.display = 'none';
                 clearInterval(timerInterval);
-                timerDisplay.textContent = formatTime(data.time_left); // Will freeze on time remaining if finished early
+                timerDisplay.textContent = formatTime(data.time_left);
 
-                // Wait 2 seconds, then redirect to the review page (which we will build next)
                 if (currentStatus !== 'in_review') {
                      currentStatus = 'in_review';
-                     // setTimeout(() => window.location.href = `/battle/${battleId}/review`, 2000);
+                     // Redirect to the newly created review page!
+                     setTimeout(() => window.location.href = `/battle/${battleId}/review`, 2000);
                 }
             }
 
