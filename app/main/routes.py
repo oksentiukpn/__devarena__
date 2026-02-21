@@ -15,7 +15,7 @@ from sqlalchemy.orm import joinedload
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
-from app.models import Comment, Post, Reaction, User
+from app.models import Battle, Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
 
@@ -215,9 +215,16 @@ def delete_comment(comment_id):
 
 
 @main.route("/battles")
+@login_required
 def battles():
-    # rick-roll
-    return redirect(url_for("challenges.create_battle"))
+    feed_battles = (
+        Battle.query.options(joinedload(Battle.author))
+        .filter(Battle.visibility == "public")
+        .order_by(Battle.created_at.desc())
+        .limit(20)
+        .all()
+    )
+    return render_template("battles.html", battles=feed_battles)
 
 
 @main.route("/sitemap.xml")
