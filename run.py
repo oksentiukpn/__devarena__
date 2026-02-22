@@ -2,12 +2,26 @@
 Runner
 """
 
+import socket
 from os import environ
 
 from app import create_app, mail
 from app.models import User
 from flask import render_template
 from flask_mail import Message
+
+# ---------------------------------- #
+# IPV4 Patch to ignore IPV6
+old_getaddrinfo = socket.getaddrinfo
+
+
+def new_getaddrinfo(*args, **kwargs):
+    responses = old_getaddrinfo(*args, **kwargs)
+    return [response for response in responses if response[0] == socket.AF_INET]
+
+
+socket.getaddrinfo = new_getaddrinfo
+# ---------------------------------- #
 
 app = create_app()
 
