@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Sign up - DevArena{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='sign_up.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="logo-section">
+        <div class="logo-wrapper">
+            <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            </svg>
+            <span class="logo-text">DevArena</span>
+        </div>
+        <p class="logo-subtitle">Join the developer community</p>
+    </div>
+
+    <div class="auth-card">
+        <h1 class="card-title">Create your account</h1>
+
+        <a href="{{ url_for('auth.google_login') }}" class="google-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-logo">
+            Sign up with Google
+        </a>
+
+        <div class="divider">
+            <span class="divider-text">or register with email</span>
+        </div>
+
+        <form>
+            <div class="input-field">
+                <label>Username</label>
+                <input type="text" placeholder="@your_username" required>
+            </div>
+
+            <div class="input-field">
+                <label>Email address</label>
+                <input type="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="input-field">
+                <label>Password</label>
+                <input type="password" placeholder="Create a strong password" required>
+            </div>
+
+            <div class="terms-row">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">
+                    I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn">Create account</button>
+        </form>
+
+        <p class="footer-link">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
