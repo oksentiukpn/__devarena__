@@ -5,10 +5,10 @@
 
 {% block content %}
 
-<!-- <link rel="stylesheet" href="/app/templates/auth/log_in.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='log_in.css') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"> -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <!-- Header -->
     <!-- <div class="nav-div">
         <p class="lst-item">DevArena</p>
@@ -122,6 +122,10 @@ body {
     gap: 10px;
     cursor: pointer;
     transition: background 0.2s;
+    padding: 25px;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 16px;
     /* color: #272729; */
 }
 
@@ -258,12 +262,6 @@ input:focus {
     margin-left: 20px;
 }
 
-.btn-google {
-    padding: 25px;
-    text-align: center;
-    border-radius: 15px;
-    font-size: 16px;
-}
 
 .btn-div-google {
     display: flex;
@@ -341,7 +339,7 @@ a {
                     <span class="px-4 bg-zinc-900 text-zinc-500">or continue with email</span>
                 </div>
             </div>
-            <form>
+            <form method="POST" action="/login">
                 <label for="email">Email address</label>
                 <input placeholder="you@example.com" type="email" id="email" name="email" required>
 
@@ -371,7 +369,7 @@ a {
         </div>
 
         <p class="terms-text">
-            By signing in, you agree to our <a class="terms-a" href="#">Terms of Service</a> and <a class="terms-a" href="#">Privacy Policy</a>
+            By signing in, you agree to our <a class="terms-a" href="/terms">Terms of Service</a> and <a class="terms-a" href="/privacy">Privacy Policy</a>
         </p>
 
      </div>
