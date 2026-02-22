@@ -104,10 +104,15 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<span>Submitting...</span>`;
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         try {
             const res = await fetch(`/battle/${battleId}/api/submit`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify({ code: codeEditor.value })
             });
             const data = await res.json();
@@ -136,7 +141,14 @@
 
     // Toggle Ready Status
     async function toggleReady() {
-        await fetch(`/battle/${battleId}/api/ready`, { method: 'POST' });
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        await fetch(`/battle/${battleId}/api/ready`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
         pollStatus();
     }
 
@@ -167,6 +179,7 @@
     // Polling logic
     async function pollStatus() {
         try {
+            // Note: GET requests don't need CSRF tokens
             const res = await fetch(`/battle/${battleId}/api/status`);
             const data = await res.json();
 

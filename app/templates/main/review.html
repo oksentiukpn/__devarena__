@@ -159,10 +159,15 @@
     async function castVote(userId) {
         if (status !== 'in_review') return;
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         try {
             const res = await fetch(`/battle/${battleId}/vote`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify({ voted_for_id: userId })
             });
 
@@ -185,10 +190,15 @@
         const content = input.value.trim();
         if (!content) return;
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         try {
             const res = await fetch(`/battle/${battleId}/comment`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify({ content: content })
             });
 
