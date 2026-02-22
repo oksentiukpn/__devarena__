@@ -352,9 +352,9 @@ a {
                 <input placeholder="Enter your password" type="password" id="password" name="password" required>
 
                 <div class="form-options">
-                    <label class="checkbox-container">
+                    <label>
                         <input type="checkbox">
-                        <span class="checkmark"></span>
+                        <!-- <span></span> -->
                         Remember me for 30 days
                     </label>
                 </div>
@@ -364,7 +364,7 @@ a {
 
         <div class="signup-text-div">
             <p class="signup-text">
-                Don't have an account? <a href="/signup">Create one</a>
+                Don't have an account? <a href="{{ url_for('auth.register') }}">Create one</a>
             </p>
         </div>
             </form>

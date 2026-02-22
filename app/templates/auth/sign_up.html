@@ -286,10 +286,10 @@ input[type="checkbox"] {
         <div class="auth-card">
             <h1 class="card-title">Create your account</h1>
 
-            <button class="google-btn">
+            <a href="{{ url_for('auth.google_login') }}" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-logo">
                 Sign up with Google
-            </button>
+            </a>
 
             <div class="divider">
                 <span class="divider-text">or register with email</span>
@@ -335,7 +335,7 @@ input[type="checkbox"] {
             </form>
 
             <p class="footer-link">
-                Already have an account? <a href="log_in.html">Sign in</a>
+                Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
             </p>
         </div>
 
