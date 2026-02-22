@@ -6,4 +6,3 @@ psycopg2-binary
 python-dotenv
 authlib
 requests
-Flask-Mail
