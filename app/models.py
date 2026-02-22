@@ -56,6 +56,28 @@ class User(db.Model):
 
     points = db.Column(db.Integer, default=0, nullable=False)
 
+
+    rating = db.Column(db.Integer, default=1000, nullable=False)
+    wins = db.Column(db.Integer, default=0, nullable=False)
+    losses = db.Column(db.Integer, default=0, nullable=False)
+    total_battles = db.Column(db.Integer, default=0, nullable=False)
+
+    @staticmethod
+    def update_battle_stats(winner_id, loser_id):
+        winner = User.query.get(winner_id)
+        loser = User.query.get(loser_id)
+
+        if winner and loser:
+            winner.rating += 25
+            winner.wins += 1
+            winner.total_battles += 1
+
+            loser.rating = max(0, loser.rating - 10)
+            loser.losses += 1
+            loser.total_battles += 1
+
+            db.session.commit()
+
     def set_password(self, password: str) -> None:
         """Set password"""
         self.password_hash = generate_password_hash(password)

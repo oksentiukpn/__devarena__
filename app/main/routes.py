@@ -213,3 +213,32 @@ def delete_comment(comment_id):
 def battles():
     # rick-roll
     return redirect(url_for("challenges.create_battle"))
+
+
+@main.route("/api/leaderboard", methods=["GET"])
+def get_leaderboard():
+    """Returns top 10 users by rating"""
+    top_users = User.query.order_by(User.rating.desc()).limit(10).all()
+
+    leaderboard_data = [
+        {
+            "username": user.username,
+            "rating": user.rating,
+            "wins": user.wins,
+            "points": user.points
+        } for user in top_users
+    ]
+    return jsonify(leaderboard_data), 200
+
+@main.route("/api/battle/result", methods=["POST"])
+@login_required
+def handle_battle_result():
+    """Updates stats after a battle using User model method"""
+    data = request.get_json()
+    winner_id = data.get('winner_id')
+    loser_id = data.get('loser_id')
+
+    if winner_id and loser_id:
+        User.update_battle_stats(winner_id, loser_id)
+        return jsonify({"status": "success"}), 200
+    return jsonify({"status": "error", "message": "Missing IDs"}), 400
