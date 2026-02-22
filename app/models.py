@@ -127,7 +127,7 @@ class Post(db.Model):
             count_reactions = self.reactions.count()
         else:
             count_reactions = len(list(self.reactions))
-        count_comments = len(self.comments)
+        count_comments = Comment.query.filter_by(post_id=self.id).count()
 
         popularity_value = (count_reactions * 5) + (count_comments * 10)
 
