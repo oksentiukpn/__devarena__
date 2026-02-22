@@ -54,7 +54,7 @@ class User(db.Model):
 
 
 
-    points = db.Column(db.Integer, default=0, nullable=False)
+    points = db.Column(db.Integer, default=0, server_default="0", nullable=False)
 
     def set_password(self, password: str) -> None:
         """Set password"""
