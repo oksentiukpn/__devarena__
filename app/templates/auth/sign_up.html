@@ -141,11 +141,12 @@ input[type="text"], input[type="email"], input[type="password"] {
     background: var(--bg-black);
     border: 1px solid var(--border-gray);
     padding: 12px 16px;
-    border-radius: 8px;
-    color: white;
-    outline: none;
-}
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='auth/sign_up.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
 
+{% block content %}
 
 input:focus {
     border-color: var(--emerald);
