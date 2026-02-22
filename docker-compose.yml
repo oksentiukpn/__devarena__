@@ -24,6 +24,8 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     depends_on:
       - db
 
@@ -38,5 +40,3 @@ services:
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - web
-
-
