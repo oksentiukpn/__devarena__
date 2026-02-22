@@ -117,21 +117,13 @@ class Post(db.Model):
             summary[reaction.emoji]["user_ids"].add(reaction.user_id)
         return summary
 
-    def update_popularity_points(self):
+    def update_popularity_points(self, value_to_add):
         """
         Calculates post popularity: 1 reaction = 5 p, 1 comment = 10 p.
         Updates the author's total points balance.
         """
 
-        if hasattr(self.reactions, 'count'):
-            count_reactions = self.reactions.count()
-        else:
-            count_reactions = len(list(self.reactions))
-        count_comments = Comment.query.filter_by(post_id=self.id).count()
-
-        popularity_value = (count_reactions * 5) + (count_comments * 10)
-
-        self.author.points += popularity_value
+        self.author.points += value_to_add
         db.session.commit()
 
 
