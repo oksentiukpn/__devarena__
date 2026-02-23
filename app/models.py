@@ -119,12 +119,13 @@ class Post(db.Model):
 
     def update_popularity_points(self, value_to_add):
         """
-        Calculates post popularity: 1 reaction = 5 p, 1 comment = 10 p.
-        Updates the author's total points balance.
+        Increment the author's total points balance by the given value.
+
+        Note: This method only updates the in-memory value; committing the
+        database session is the responsibility of the caller.
         """
 
         self.author.points += value_to_add
-        db.session.commit()
 
 
     def __repr__(self):
