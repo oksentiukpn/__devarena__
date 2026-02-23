@@ -1,6 +1,7 @@
 from flask import (
     Blueprint,
     Response,
+    current_app,
     flash,
     jsonify,
     redirect,
@@ -9,6 +10,7 @@ from flask import (
     session,
     url_for,
 )
+from itsdangerous import URLSafeSerializer
 from sqlalchemy import case, desc
 from sqlalchemy.orm import joinedload
 
@@ -247,3 +249,24 @@ Allow: /
 Sitemap: https://devarena.pp.ua/sitemap.xml
 """
     return Response(robots_content, mimetype="text/plain")
+
+
+@main.route("/unsubscribe/<token>", methods=["GET", "POST"])
+def unsubscribe(token):
+    ser = URLSafeSerializer(current_app.config["SECRET_KEY"])
+    try:
+        user_id = ser.loads(token, salt="unsubscribe-daily-prompt")
+    except Exception:
+        flash("Invalid or corrupted unsubscribe link.", "danger")
+        return redirect(url_for("main.home"))
+
+    user = User.query.get(user_id)
+    if user:
+        user.subscribed_to_daily_prompt = False
+        db.session.commit()
+
+    if request.method == "POST":
+        return "Unsubscribed successfully", 200
+
+    flash("You have been successfully unsubscribed from daily prompts.", "success")
+    return redirect(url_for("main.home"))

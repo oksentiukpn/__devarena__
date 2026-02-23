@@ -9,6 +9,7 @@ import requests
 from app import create_app
 from app.models import User
 from flask import render_template
+from itsdangerous import URLSafeSerializer
 
 app = create_app()
 
@@ -16,27 +17,36 @@ app = create_app()
 @app.cli.command("send-daily-prompt")
 def send_daily_prompt():
     """Send email to all users with daily prompt"""
-    users = User.query.all()
+    users = User.query.filter_by(subscribed_to_daily_prompt=True).all()
     api_key = environ.get("EMAIL_API_KEY")
 
     if not api_key:
         print("Error: EMAIL_API_KEY is not found.")
         return
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    ser = URLSafeSerializer(app.config["SECRET_KEY"])
 
     success_count = 0
     for user in users:
-        html_content = render_template("email/daily_prompt.html", user=user)
+        token = ser.dumps(user.id, salt="unsubscribe-daily-prompt")
+        unsubscribe_url = f"https://devarena.pp.ua/unsubscribe/{token}"
+        html_content = render_template(
+            "email/daily_prompt.html", user=user, unsubscribe_url=unsubscribe_url
+        )
 
-        url = "https://api.resend.com/emails"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
         payload = {
             "from": "DevArena <notifications@devarena.pp.ua>",
             "to": [user.email],
             "subject": "Time to Code!",
             "html": html_content,
+            "headers": {
+                "List-Unsubscribe": f"<{unsubscribe_url}>",
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
         }
 
         try:
