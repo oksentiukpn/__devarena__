@@ -43,6 +43,37 @@
         <form method="POST" action="/login">
             <label for="email">Email address</label>
             <input placeholder="you@example.com" type="email" id="email" name="email" required>
+            <!-- Login Form -->
+            <form action="/login" method="POST" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-zinc-300 mb-2">Email address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        placeholder="you@example.com"
+                        class="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+                    >
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="password" class="block text-sm font-medium text-zinc-300">Password</label>
+                        <a href="/forgot-password" class="text-sm text-emerald-500 hover:text-emerald-400 transition-colors">Forgot password?</a>
+                    </div>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        placeholder="Enter your password"
+                        class="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+                    >
+                </div>
 
             <div class="password-div">
                 <label for="password">Password</label>

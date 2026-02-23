@@ -1,6 +1,6 @@
 from flask import (
     Blueprint,
-    abort,
+    Response,
     flash,
     jsonify,
     redirect,
@@ -15,7 +15,7 @@ from sqlalchemy.orm import joinedload
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
-from app.models import Comment, Post, Reaction, User
+from app.models import Battle, Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
 
@@ -160,7 +160,6 @@ def profile():
 
 # Other users
 @main.route("/user/<username>")
-@login_required
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
@@ -183,6 +182,12 @@ def delete_post(post_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@main.route("/post/<int:post_id>", methods=["GET"])
+def view_post(post_id):
+    post = Post.query.options(joinedload(Post.author)).get_or_404(post_id)
+    return render_template("main/view_post.html", post=post)
 
 
 @main.route("/comment/<int:comment_id>", methods=["DELETE"])
@@ -210,6 +215,35 @@ def delete_comment(comment_id):
 
 
 @main.route("/battles")
+@login_required
 def battles():
-    # rick-roll
-    return redirect(url_for("challenges.create_battle"))
+    feed_battles = (
+        Battle.query.options(joinedload(Battle.author))
+        .filter(Battle.visibility == "public")
+        .order_by(Battle.created_at.desc())
+        .limit(20)
+        .all()
+    )
+    return render_template("battles.html", battles=feed_battles)
+
+
+@main.route("/sitemap.xml")
+def sitemap():
+    users = User.query.all()
+    posts = Post.query.filter_by(visibility="public").all()
+
+    xml_content = render_template("sitemap.xml", users=users, posts=posts)
+
+    return Response(xml_content, mimetype="application/xml")
+
+
+@main.route("/robots.txt")
+def robots():
+    robots_content = """User-agent: *
+Disallow: /login
+Disallow: /register
+Allow: /
+
+Sitemap: https://devarena.pp.ua/sitemap.xml
+"""
+    return Response(robots_content, mimetype="text/plain")
