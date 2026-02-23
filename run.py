@@ -3,6 +3,7 @@ Runner
 """
 
 from os import environ
+from time import sleep
 
 import requests
 from app import create_app
@@ -44,6 +45,7 @@ def send_daily_prompt():
             success_count += 1
         except Exception as e:
             print(f"Failed sending to user {user.email}: {e}")
+        sleep(1)
 
     print(f"Successfully sent {success_count}/{len(users)} messages.")
 
