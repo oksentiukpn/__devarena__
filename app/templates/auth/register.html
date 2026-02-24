@@ -43,15 +43,16 @@
 
             <!-- Register Form -->
             <form action="/register" method="POST" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <!-- Username Field -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-zinc-300 mb-2">Username</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">@</span>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            name="username" 
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
                             required
                             minlength="3"
                             maxlength="20"
@@ -65,10 +66,10 @@
                 <!-- Email Field -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-zinc-300 mb-2">Email address</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
                         required
                         placeholder="you@example.com"
                         class="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
@@ -78,10 +79,10 @@
                 <!-- Password Field -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-zinc-300 mb-2">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
                         required
                         minlength="8"
                         placeholder="Create a strong password"
@@ -100,10 +101,10 @@
                 <!-- Confirm Password Field -->
                 <div>
                     <label for="confirm_password" class="block text-sm font-medium text-zinc-300 mb-2">Confirm password</label>
-                    <input 
-                        type="password" 
-                        id="confirm_password" 
-                        name="confirm_password" 
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
                         required
                         minlength="8"
                         placeholder="Confirm your password"
@@ -113,24 +114,24 @@
 
                 <!-- Terms Checkbox -->
                 <div class="flex items-start">
-                    <input 
-                        type="checkbox" 
-                        id="terms" 
+                    <input
+                        type="checkbox"
+                        id="terms"
                         name="terms"
                         required
                         class="mt-1 w-4 h-4 bg-zinc-800 border-zinc-700 rounded text-emerald-500 focus:ring-emerald-500 focus:ring-offset-zinc-900"
                     >
                     <label for="terms" class="ml-2 text-sm text-zinc-400">
-                        I agree to the 
-                        <a href="/terms" class="text-emerald-500 hover:text-emerald-400 transition-colors">Terms of Service</a> 
-                        and 
+                        I agree to the
+                        <a href="/terms" class="text-emerald-500 hover:text-emerald-400 transition-colors">Terms of Service</a>
+                        and
                         <a href="/privacy" class="text-emerald-500 hover:text-emerald-400 transition-colors">Privacy Policy</a>
                     </label>
                 </div>
 
                 <!-- Submit Button -->
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
                 >
                     Create account
@@ -139,7 +140,7 @@
 
             <!-- Sign In Link -->
             <p class="mt-6 text-center text-zinc-400">
-                Already have an account? 
+                Already have an account?
                 <a href="/login" class="text-emerald-500 hover:text-emerald-400 font-medium transition-colors">Sign in</a>
             </p>
         </div>
@@ -174,4 +175,3 @@
     </div>
 </div>
 {% endblock %}
-
