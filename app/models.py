@@ -141,19 +141,26 @@ class Post(db.Model):
 
     def update_popularity_points(self):
         """
-        Calculates post popularity: 1 reaction = 5 p, 1 comment = 10 p.
-        Updates the author's total points balance.
+        Calculates popularity-based points for the author:
+        1 reaction = 5 points, 1 comment = 10 points.
+
+        Recomputes the author's total points balance from all of their posts
+        to avoid double-counting when this method is called multiple times.
         """
 
-        if hasattr(self.reactions, 'count'):
-            count_reactions = self.reactions.count()
-        else:
-            count_reactions = len(list(self.reactions))
-        count_comments = len(self.comments)
+        total_points = 0
 
-        popularity_value = (count_reactions * 5) + (count_comments * 10)
+        # Recalculate total popularity points across all posts by this author
+        for post in self.author.posts:
+            if hasattr(post.reactions, "count"):
+                count_reactions = post.reactions.count()
+            else:
+                count_reactions = len(list(post.reactions))
 
-        self.author.points += popularity_value
+            count_comments = len(post.comments)
+            total_points += (count_reactions * 5) + (count_comments * 10)
+
+        self.author.points = total_points
         db.session.commit()
 
 
