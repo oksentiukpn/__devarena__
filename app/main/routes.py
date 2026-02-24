@@ -238,7 +238,13 @@ def handle_battle_result():
     winner_id = data.get('winner_id')
     loser_id = data.get('loser_id')
 
-    if winner_id and loser_id:
-        User.update_battle_stats(winner_id, loser_id)
-        return jsonify({"status": "success"}), 200
-    return jsonify({"status": "error", "message": "Missing IDs"}), 400
+    # Validate presence of IDs
+    if not winner_id or not loser_id:
+        return jsonify({"status": "error", "message": "Missing IDs"}), 400
+
+    # Ensure winner and loser are not the same user
+    if winner_id == loser_id:
+        return jsonify({"status": "error", "message": "winner_id and loser_id must be different"}), 400
+
+    User.update_battle_stats(winner_id, loser_id)
+    return jsonify({"status": "success"}), 200
