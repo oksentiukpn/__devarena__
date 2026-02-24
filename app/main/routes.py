@@ -17,8 +17,9 @@ from app.auth.utils import login_required
 from app.main.form import PostForm
 from app.models import Comment, Post, Reaction, User
 
-main = Blueprint("main", __name__)
 
+main = Blueprint("main", __name__)
+sttgs = Blueprint("settings", __name__)
 
 @main.route("/")
 def home():
@@ -164,6 +165,39 @@ def add_comment(post_id):
             "avatar_letter": new_comment.author.username[:2],
         }
     )
+
+# @sttgs.route("/settings", methods=["GET", "POST"])
+# @login_required
+# def settings():
+#     if request.method == "POST":
+#         new_username = (request.form.get("username") or "").strip()
+#         new_bio = (request.form.get("bio") or "").strip()
+
+#         # basic validation
+#         if not (3 <= len(new_username) <= 20):
+#             flash("Username must be 3–20 characters.", "error")
+#             return redirect(url_for("settings.settings", _anchor="profile"))
+
+#         if len(new_bio) > 1024:
+#             flash("Bio is too long (max 1024 chars).", "error")
+#             return redirect(url_for("settings.settings", _anchor="profile"))
+
+#         username_taken = (
+#             User.query.filter(User.username == new_username, User.id != current_user.id).first()
+#         )
+#         if username_taken:
+#             flash("That username is already taken.", "error")
+#             return redirect(url_for("settings.settings", _anchor="profile"))
+
+#         # save
+#         current_user.username = new_username
+#         current_user.bio = new_bio
+#         db.session.commit()
+
+#         flash("Profile updated.", "success")
+#         return redirect(url_for("settings.settings", _anchor="profile"))
+
+#     return render_template("settings.html")  # current_user is available in template
 
 
 # Current User
