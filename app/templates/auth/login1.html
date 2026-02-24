@@ -1,76 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Login - DevArena{% endblock %}
+{# 
+  NOTE:
+  This template is intentionally kept as a stub/legacy template.
+  It is not the canonical login page and should not be used for new code.
+  Use `auth/login.html` as the primary login template instead.
+#}
 
+{% block title %}Legacy Login Template - DevArena{% endblock %}
 
 {% block content %}
-
-<link rel="stylesheet" href="{{ url_for('static', filename='log_in.css') }}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <!-- Header -->
-    <!-- <div class="nav-div">
-        <p class="lst-item">DevArena</p>
-        <p class="lst-item">Home</p>
-        <p class="lst-item">Feed</p>
-        <p class="lst-item">Battles</p>
-        <p class="lst-item">New Post</p>
-        <p class="lst-item">Search</p>
-        <p class="lst-item">Sign In</p>
-        <p class="lst-item">Sign Up</p>
-    </div> -->
-    <!-- ... -->
-
-    <!-- Main -->
-
-<style>
-
-body {
-    margin: 0;
-    background-color: #09090b;
-    color: white;
-    font-family: "Inter", sans-serif;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-
-.nav-div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10%;
-    height: 64px;
-    border-bottom: 1px solid #27272a;
-    background-color: #09090b;
-}
-
-.lst-item {
-    color: #a1a1aa;
-    text-decoration: none;
-    font-size: 14px;
-    margin: 0 12px;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.lst-item:hover {
-    color: white;
-}
-
-
-.nav-div p:first-child {
-    color: white;
-    font-weight: 700;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-
+  <div style="max-width: 640px; margin: 4rem auto; padding: 2rem; border-radius: 0.75rem; border: 1px solid #27272a; background-color: #09090b;">
+    <h1 style="margin-top: 0; margin-bottom: 1rem;">Legacy Login Template</h1>
+    <p style="margin: 0 0 0.75rem 0;">
+      This template (<code>auth/login1.html</code>) is retained only for backward compatibility
+      and should not be used as the main login page.
+    </p>
+    <p style="margin: 0;">
+      The canonical login template is <code>auth/login.html</code>. Please update any code
+      that references this file to use <code>auth/login.html</code> instead.
+    </p>
+  </div>
+{% endblock %}
 .main-div {
     flex: 1;
     display: flex;
