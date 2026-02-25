@@ -36,17 +36,17 @@
 
         <div class="stats-container">
             <div class="stat-box">
-                <span class="stat-num">0+</span>
+                <span class="stat-num">{{ code_reviews_count|default(0) }}+</span>
                 <span class="stat-label">Code Reviews</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-box">
-                <span class="stat-num">1+</span>
+                <span class="stat-num">{{ developers_count|default(1) }}+</span>
                 <span class="stat-label">Developers</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-box">
-                <span class="stat-num">0+</span>
+                <span class="stat-num">{{ battles_count|default(0) }}+</span>
                 <span class="stat-label">Battles</span>
             </div>
         </div>
