@@ -10,7 +10,6 @@ information for the top matching posts.
 
 # import json
 import re
-import numpy as np
 from rank_bm25 import BM25Okapi
 # from transform import write_data # important!
 
