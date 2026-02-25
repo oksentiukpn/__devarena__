@@ -51,7 +51,9 @@ class User(db.Model):
     image_file = db.Column(db.String(255), nullable=False, default="default.jpg")
     password_hash = db.Column(db.String(256), nullable=True)  # hashed of course
     languages = db.Column(db.String(1024), nullable=True)
-    subscribed_to_daily_prompt = db.Column(db.Boolean, default=True, nullable=False)
+
+    points = db.Column(db.Integer, default=0, server_default="0", nullable=False)
+    subscribed_to_daily_prompt = db.Column(db.Boolean, default=True)
 
     def set_password(self, password: str) -> None:
         """Set password"""
@@ -113,6 +115,15 @@ class Post(db.Model):
             summary[reaction.emoji]["count"] += 1
             summary[reaction.emoji]["user_ids"].add(reaction.user_id)
         return summary
+
+    def update_popularity_points(self, value_to_add):
+        """
+        Calculates post popularity: 1 reaction = 5 p, 1 comment = 10 p.
+        Updates the author's total points balance.
+        """
+
+        self.author.points += value_to_add
+        db.session.commit()
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.created_at}')"
