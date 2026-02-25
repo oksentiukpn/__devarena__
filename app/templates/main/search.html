@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8 text-white">
+  <h1 class="text-2xl font-semibold mb-4">Search</h1>
+
+  <form method="get" action="{{ url_for('main.search_page') }}" class="flex gap-2 mb-6">
+    <input name="q" value="{{ q }}" placeholder="Search..."
+      class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl py-2 px-3" />
+    <select name="tab" class="bg-zinc-900 border border-zinc-800 rounded-xl py-2 px-3">
+      <option value="posts" {% if tab=='posts' %}selected{% endif %}>Posts</option>
+      <option value="users" {% if tab=='users' %}selected{% endif %}>Users</option>
+    </select>
+    <button class="bg-emerald-600 hover:bg-emerald-500 rounded-xl px-4 py-2">Search</button>
+  </form>
+
+  {% if q and tab=='posts' %}
+    <div class="space-y-3">
+      {% for p in posts %}
+        <a href="{{ url_for('main.post', post_id=p.id) }}" class="block p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+          <div class="font-semibold">{{ p.title }}</div>
+          <div class="text-sm text-zinc-400">{{ p.description[:200] }}{% if p.description|length > 200 %}...{% endif %}</div>
+          <div class="text-xs text-zinc-500 mt-2">{{ p.tags }}</div>
+        </a>
+      {% else %}
+        <div class="text-zinc-400">No posts found.</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if q and tab=='users' %}
+    <div class="space-y-3">
+      {% for u in users %}
+        <a href="{{ url_for('main.profile', user_id=u.id) }}" class="block p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+          <div class="font-semibold">{{ u.username }}</div>
+          <div class="text-sm text-zinc-400">{{ (u.bio or '')[:200] }}{% if (u.bio or '')|length > 200 %}...{% endif %}</div>
+        </a>
+      {% else %}
+        <div class="text-zinc-400">No users found.</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

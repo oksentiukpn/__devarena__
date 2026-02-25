@@ -51,7 +51,7 @@ class User(db.Model):
     image_file = db.Column(db.String(255), nullable=False, default="default.jpg")
     password_hash = db.Column(db.String(256), nullable=True)  # hashed of course
     languages = db.Column(db.String(1024), nullable=True)
-    bio = db.Column(db.String(1024)) # bio
+    bio = db.Column(db.String(1024), nullable=True, default = "") # bio
 
     def set_password(self, password: str) -> None:
         """Set password"""

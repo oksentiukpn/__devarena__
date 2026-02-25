@@ -115,9 +115,11 @@
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <input type="text" placeholder="Search projects, users, or battles..."
+            <form method="GET" action="{{ url_for('main.search_page') }}" class="relative"></form>
+              <input type="text" placeholder="Search projects, users, or battles..."
               class="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all">
-          </div>
+          </from>
+            </div>
         </div>
 
         <div class="profile-container relative">

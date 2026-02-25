@@ -125,6 +125,7 @@ def search(query: str, ids, posts, tag_sets, bm25, top_k: int = 10, detailed: bo
         return [(ids[i], posts[i], float(scores[i])) for i in idx if scores[i] > 0]
     return sorted([(ids[i], float(scores[i])) for i in idx if scores[i] > 0], key = lambda x: x[1])
 
+
 if __name__ == "__main__":
 
     data = {

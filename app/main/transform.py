@@ -78,26 +78,25 @@ def iter_posts(dump_path: str | Path) -> Iterator[Dict[str, Any]]:
             if first in (r"\.", "."):
                 break
 
-            # Robustness: if row length doesn't match expected, skip it.
-            # (Usually means dump corruption or odd formatting.)
+            # if row length doesn't match expected
             if len(row) != len(POST_COLUMNS):
                 continue
 
             rec = dict(zip(POST_COLUMNS, row))
 
-            # Convert types & NULLs
-            pid = int(rec["id"])  # id is NOT NULL in your schema
+              # id is NOT NULL in schema
+            pid = int(rec["id"])
 
             yield {
                 "id": pid,
                 "title": nullify(rec["title"]) or "",
                 "description": nullify(rec["description"]) or "",
                 "tags": parse_tags(nullify(rec["tags"])),
-                # keep extra fields if you want:
-                "language": nullify(rec["language"]) or "",
-                "visibility": nullify(rec["visibility"]) or "",
-                "created_at": nullify(rec["created_at"]) or "",
-                "user_id": int(rec["user_id"]) if nullify(rec["user_id"]) else None,
+                # # keep extra fields
+                # "language": nullify(rec["language"]) or "",
+                # "visibility": nullify(rec["visibility"]) or "",
+                # "created_at": nullify(rec["created_at"]) or "",
+                # "user_id": int(rec["user_id"]) if nullify(rec["user_id"]) else None,
             }
 
 
@@ -127,5 +126,5 @@ def write_json(dump_path: str | Path, outpath: str | Path = "posts.json") -> Non
             # "visibility": p["visibility"],
         }
 
-    Path(outpath).write_text(dumps(posts, ensure_ascii = False, indent = 2), encoding = "utf-8")
+    # Path(outpath).write_text(dumps(posts, ensure_ascii = False, indent = 2), encoding = "utf-8")
     # print("Extracted")
