@@ -2,7 +2,7 @@
 Defining models for database
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
 

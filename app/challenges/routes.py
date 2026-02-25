@@ -1,12 +1,21 @@
 from datetime import datetime, timedelta
 
-from flask import flash, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from app import db
 from app.auth.utils import login_required
 from app.challenges import challenges
 from app.main.form import BattleForm
-from app.models import Battle, BattleComment, BattleVote, User
+from app.models import Battle, BattleComment, BattleVote
 
 
 def parse_time_limit(limit_str):
@@ -20,6 +29,10 @@ def parse_time_limit(limit_str):
 @challenges.route("/battle/create", methods=["GET", "POST"])
 @login_required
 def create_battle():
+    """Create battle route
+    GET: Render battle creation form
+    POST: Handle battle creation logic
+    """
     form = BattleForm()
 
     if form.validate_on_submit():
@@ -29,7 +42,7 @@ def create_battle():
             for tag in form.tags.data.replace("#", " ").split()
             if tag not in ("", " ")
         ]
-        # Joining with comma to ensure template compatibility: post.tags.split(',')
+        # joining with comma to ensure template compatibility: post.tags.split(',')
         clean_tags = ",".join([tag.strip() for tag in raw_tags])
 
         final_time_limit = form.time_limit.data
@@ -56,11 +69,14 @@ def create_battle():
         try:
             db.session.add(new_battle)
             db.session.commit()
+            current_app.logger.info(
+                f"User {session['user_id']} created battle '{new_battle.title}' (ID: {new_battle.id})"
+            )
             flash("Battle created successfully!", "success")
-            # Redirecting to feed for now, or a specific battles list if it exists
             return redirect(url_for("main.battles"))
         except Exception as e:
             db.session.rollback()
+            current_app.logger.error(f"Error creating battle: {e}")
             flash(f"An error occurred creating the battle: {e}", "danger")
 
     return render_template("main/create_battle.html", form=form)
@@ -77,8 +93,11 @@ def join_battle(battle_id):
 
     if battle.opponent_id is None:
         battle.opponent_id = session["user_id"]
-        battle.status = "ready"  # Move from waiting to ready state
+        battle.status = "ready"
         db.session.commit()
+        current_app.logger.info(
+            f"User {session['user_id']} joined battle '{battle.title}' (ID: {battle.id})"
+        )
         flash("Joined the battle!", "success")
 
     elif battle.opponent_id != session["user_id"]:
@@ -189,6 +208,7 @@ def submit_code(battle_id):
 
 @challenges.route("/battle/<int:battle_id>/review")
 def review(battle_id):
+    """Battle review route"""
     battle = Battle.query.get_or_404(battle_id)
 
     if battle.status in ["waiting", "ready", "in_progress"]:
