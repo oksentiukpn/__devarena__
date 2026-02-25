@@ -24,7 +24,7 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def home():
-    return render_template("test_pages/main_test.html")
+    return render("home.html")
 
 
 @main.route("/privacy")
