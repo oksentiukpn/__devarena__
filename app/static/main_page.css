@@ -171,13 +171,6 @@ body {
     width: 100%;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-
 .section-header {
     text-align: center;
     margin-bottom: 60px;
@@ -385,7 +378,7 @@ body {
 
 .code-content {
     padding: 20px;
-    font-family: 'Fira Code', monospace;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.5;
 }
