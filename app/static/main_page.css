@@ -171,13 +171,6 @@ body {
     width: 100%;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-
 .section-header {
     text-align: center;
     margin-bottom: 60px;
