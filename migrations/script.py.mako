@@ -17,8 +17,10 @@ depends_on = ${repr(depends_on)}
 
 
 def upgrade():
+    """Executes the database schema changes required to move forward to this revision"""
     ${upgrades if upgrades else "pass"}
 
 
 def downgrade():
+    """Reverts the changes made by the upgrade, returning the database to its previous state"""
     ${downgrades if downgrades else "pass"}
