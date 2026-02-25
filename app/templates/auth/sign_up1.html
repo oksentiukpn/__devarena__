@@ -2,17 +2,7 @@
 
 {% block title %}Sign up - DevArena{% endblock %}
 
-<!-- {% block extra_styles %}
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='sign_up.css') }}">
-{% endblock %} -->
-
 {% block content %}
-
-<!-- <link rel="stylesheet" href="/app/templates/auth/sign_up.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"> -->
-
-
 <style>
 
 :root {
@@ -292,7 +282,8 @@ input[type="checkbox"] {
                 <span class="divider-text">or register with email</span>
             </div>
 
-            <form>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="input-field">
                     <label>Username</label>
                     <input type="text" placeholder="@your_username" required>
