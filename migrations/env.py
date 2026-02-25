@@ -16,6 +16,9 @@ logger = logging.getLogger('alembic.env')
 
 
 def get_engine():
+    """"
+    Retrieves the SQLAlchemy engine object from the Flask-Migrate extension, handling version compatibility
+    """
     try:
         # this works with Flask-SQLAlchemy<3 and Alchemical
         return current_app.extensions['migrate'].db.get_engine()
@@ -25,6 +28,9 @@ def get_engine():
 
 
 def get_engine_url():
+    """
+    Generates the database connection string (URL) and escapes special characters for Alembic's config
+    """
     try:
         return get_engine().url.render_as_string(hide_password=False).replace(
             '%', '%%')
@@ -46,6 +52,9 @@ target_db = current_app.extensions['migrate'].db
 
 
 def get_metadata():
+    """
+    Returns the database metadata object, supporting both single and multiple bind configurations in Flask-SQLAlchemy
+    """
     if hasattr(target_db, 'metadatas'):
         return target_db.metadatas[None]
     return target_db.metadata
