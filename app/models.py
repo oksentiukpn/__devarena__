@@ -53,6 +53,32 @@ class User(db.Model):
     languages = db.Column(db.String(1024), nullable=True)
     subscribed_to_daily_prompt = db.Column(db.Boolean, default=True, nullable=False)
 
+
+
+    points = db.Column(db.Integer, default=0, nullable=False)
+
+
+    rating = db.Column(db.Integer, default=1000, nullable=False)
+    wins = db.Column(db.Integer, default=0, nullable=False)
+    losses = db.Column(db.Integer, default=0, nullable=False)
+    total_battles = db.Column(db.Integer, default=0, nullable=False)
+
+    @staticmethod
+    def update_battle_stats(winner_id, loser_id):
+        winner = User.query.get(winner_id)
+        loser = User.query.get(loser_id)
+
+        if winner and loser:
+            winner.rating += 25
+            winner.wins += 1
+            winner.total_battles += 1
+
+            loser.rating = max(0, loser.rating - 10)
+            loser.losses += 1
+            loser.total_battles += 1
+
+            db.session.commit()
+
     def set_password(self, password: str) -> None:
         """Set password"""
         self.password_hash = generate_password_hash(password)
@@ -113,6 +139,31 @@ class Post(db.Model):
             summary[reaction.emoji]["count"] += 1
             summary[reaction.emoji]["user_ids"].add(reaction.user_id)
         return summary
+
+    def update_popularity_points(self):
+        """
+        Calculates popularity-based points for the author:
+        1 reaction = 5 points, 1 comment = 10 points.
+
+        Recomputes the author's total points balance from all of their posts
+        to avoid double-counting when this method is called multiple times.
+        """
+
+        total_points = 0
+
+        # Recalculate total popularity points across all posts by this author
+        for post in self.author.posts:
+            if hasattr(post.reactions, "count"):
+                count_reactions = post.reactions.count()
+            else:
+                count_reactions = len(list(post.reactions))
+
+            count_comments = len(post.comments)
+            total_points += (count_reactions * 5) + (count_comments * 10)
+
+        self.author.points = total_points
+        db.session.commit()
+
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.created_at}')"

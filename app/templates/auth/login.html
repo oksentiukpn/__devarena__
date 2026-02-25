@@ -2,37 +2,323 @@
 
 {% block title %}Login - DevArena{% endblock %}
 
+
 {% block content %}
-<div class="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12">
-    <div class="w-full max-w-md">
-        <!-- Logo -->
-        <!-- !!!!!!!! -->
-        <div class="text-center mb-8">
-            <a href="/" class="inline-flex items-center gap-2 text-2xl font-bold text-white">
-                <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                </svg>
-                DevArena
-            </a>
-            <p class="mt-2 text-zinc-400">Welcome back, developer</p>
+
+<!-- <link rel="stylesheet" href="/app/templates/auth/log_in.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"> -->
+    <!-- Header -->
+    <!-- <div class="nav-div">
+        <p class="lst-item">DevArena</p>
+        <p class="lst-item">Home</p>
+        <p class="lst-item">Feed</p>
+        <p class="lst-item">Battles</p>
+        <p class="lst-item">New Post</p>
+        <p class="lst-item">Search</p>
+        <p class="lst-item">Sign In</p>
+        <p class="lst-item">Sign Up</p>
+    </div> -->
+    <!-- ... -->
+
+    <!-- Main -->
+
+<style>
+
+body {
+    margin: 0;
+    background-color: #09090b;
+    color: white;
+    font-family: "Inter", sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+
+.nav-div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10%;
+    height: 64px;
+    border-bottom: 1px solid #27272a;
+    background-color: #09090b;
+}
+
+.lst-item {
+    color: #a1a1aa;
+    text-decoration: none;
+    font-size: 14px;
+    margin: 0 12px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.lst-item:hover {
+    color: white;
+}
+
+
+.nav-div p:first-child {
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.main-div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+}
+
+.header-main {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.subheader-main {
+    color: #a1a1aa;
+    font-weight: 400;
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+
+.form-div {
+    background-color: #151517;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    padding: 40px;
+}
+
+.sign-h2 {
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+
+.btn-google {
+    width: 100%;
+    background-color: #272729;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    /* color: #272729; */
+}
+
+.btn-google:hover {
+    background-color: #35353c;
+}
+
+.google-log-in {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Inter", sans-serif;
+
+}
+
+
+.relative {
+    margin: 24px 0;
+}
+
+.w-full.border-t {
+    border-top: 1px solid #27272a;
+}
+
+.px-4.bg-zinc-900 {
+    background-color: #17181a;
+    color: #71717a;
+    padding: 0 10px;
+}
+
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+
+label {
+    font-size: 14px;
+    margin-bottom: 0px;
+    display: block;
+    font-family: "Inter", sans-serif;
+}
+
+input[type="email"],
+input[type="password"] {
+    background-color: #09090b;
+    border: 1px solid #27272a;
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #10b981;
+}
+
+
+.form-options {
+    margin: 8px 0;
+    color: #a1a1aa;
+}
+
+
+.sign-in-btn {
+    background-color: #05976a;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    font-size: 20px;
+}
+
+.sign-in-btn:hover {
+    background-color: #059669;
+}
+
+.signup-text-div {
+    display: flex;
+    justify-content: center;
+}
+
+.signup-text {
+    color: #acacb6;
+}
+
+.site-footer {
+    padding: 24px 10%;
+    border-top: 1px solid #27272a;
+    background-color: #09090b;
+    display: flex;
+    justify-content: space-between;
+    color: #71717a;
+    font-size: 12px;
+}
+
+.site-footer .footer-right a {
+    color: #71717a;
+    text-decoration: none;
+    margin-left: 16px;
+}
+
+.site-footer .footer-right a:hover {
+    color: white;
+}
+
+
+.svg-dev {
+    width: 10%;
+    margin: 10px;
+    margin-top: 20px;
+    color: #1ab482;
+}
+
+.svg-header {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-google {
+    padding: 25px;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 16px;
+}
+
+.btn-div-google {
+    display: flex;
+    justify-content: center;
+}
+
+
+.password-div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.terms-text {
+    margin-top: 35px;
+    font-size: 12px;
+    color: #a0a1a6;
+}
+
+a {
+    text-decoration: none;
+    color: #26a57c;
+}
+
+
+.terms-a {
+    color: #d2d2d7;
+}
+
+@media (max-width: 320px) {
+    .svg {
+        width: 25%;
+    }
+}
+
+</style>
+     <div class="main-div">
+        <div class="header-main-div">
+            <div class="svg-header">
+                <!-- <svg class="svg-dev" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                </svg> -->
+                <h2 class="header-main">DevArena</h2>
+            </div>
+            <h3 class="subheader-main">Welcome back, developer</h3>
         </div>
 
-        <!-- Login Card -->
-        <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl p-8 backdrop-blur-sm">
-            <h2 class="text-xl font-semibold text-white mb-6 text-center">Sign in to your account</h2>
+        <div class="form-div">
+            <h2 class="sign-h2">Sign in to your account</h2>
+            <div class="btn-div-google">
+                <button class="btn-google"><a href="{{ url_for('auth.google_login') }}" class="google-log-in">
+                    <svg class="svg" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
+                    </svg>
+                    Continue with Google
+                </a></button>
+            </div>
 
-            <!-- Google OAuth Button -->
-            <a href="{{ url_for('auth.google_login') }}" class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg text-white font-medium transition-colors mb-6">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Continue with Google
-            </a>
-
-            <!-- Divider -->
             <div class="relative mb-6">
                 <div class="absolute inset-0 flex items-center">
                     <div class="w-full border-t border-zinc-700"></div>
@@ -41,6 +327,9 @@
                     <span class="px-4 bg-zinc-900 text-zinc-500">or continue with email</span>
                 </div>
             </div>
+            <form action="/login" method="POST">
+                <label for="email">Email address</label>
+                <input placeholder="you@example.com" type="email" id="email" name="email" required>
 
             <!-- Login Form -->
             <form action="/login" method="POST" class="space-y-5">
@@ -57,57 +346,45 @@
                         class="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
                     >
                 </div>
+                <input placeholder="Enter your password" type="password" id="password" name="password" required>
 
-                <!-- Password Field -->
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <label for="password" class="block text-sm font-medium text-zinc-300">Password</label>
-                        <a href="/forgot-password" class="text-sm text-emerald-500 hover:text-emerald-400 transition-colors">Forgot password?</a>
-                    </div>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        required
-                        placeholder="Enter your password"
-                        class="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-                    >
+                <div class="form-options">
+                    <label for="remember" class="checkbox-container">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span class="checkmark"></span>
+                        Remember me for 30 days
+                    </label>
                 </div>
 
-                <!-- Remember Me -->
-                <div class="flex items-center">
-                    <input
-                        type="checkbox"
-                        id="remember"
-                        name="remember"
-                        class="w-4 h-4 bg-zinc-800 border-zinc-700 rounded text-emerald-500 focus:ring-emerald-500 focus:ring-offset-zinc-900"
-                    >
-                    <label for="remember" class="ml-2 text-sm text-zinc-400">Remember me for 30 days</label>
-                </div>
 
-                <!-- Submit Button -->
-                <button
-                    type="submit"
-                    class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
-                >
-                    Sign in
-                </button>
-            </form>
+        <button type="submit" class="sign-in-btn">Sign in</button>
 
-            <!-- Sign Up Link -->
-            <p class="mt-6 text-center text-zinc-400">
-                Don't have an account?
-                <a href="/register" class="text-emerald-500 hover:text-emerald-400 font-medium transition-colors">Create one</a>
+        <div class="signup-text-div">
+            <p class="signup-text">
+                Don't have an account? <a href="/sign_up">Create one</a>
             </p>
         </div>
+            </form>
+        </div>
 
-        <!-- Security Notice -->
-        <p class="mt-6 text-center text-xs text-zinc-500">
-            By signing in, you agree to our
-            <a href="/terms" class="text-zinc-400 hover:text-white transition-colors">Terms of Service</a>
-            and
-            <a href="/privacy" class="text-zinc-400 hover:text-white transition-colors">Privacy Policy</a>
+        <p class="terms-text">
+            By signing in, you agree to our <a class="terms-a" href="{{ url_for('main.terms_of_service') }}">Terms of Service</a> and <a class="terms-a" href="{{ url_for('main.privacy_policy') }}">Privacy Policy</a>
         </p>
+
+     </div>
+
+<!-- <footer class="site-footer">
+    <div class="footer-left">
+        © 2026 DevArena
     </div>
-</div>
+    <div class="footer-right">
+        <a href="#">Authors</a>
+        <span class="dot">•</span>
+        <a href="#">Privacy Policy</a>
+        <span class="dot">•</span>
+        <a href="#">Terms of Use</a>
+    </div>
+</footer> -->
+
+
 {% endblock %}
