@@ -19,4 +19,4 @@ done
 flask db upgrade
 
 echo "Starting Flask..."
-exec python run.py
+exec gunicorn --workers 5 --bind 0.0.0.0:5000 run:app
