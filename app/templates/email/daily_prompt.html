@@ -5,20 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time to Code!</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Progressive Enhancement: Animations & Gradients (Works in Apple Mail, iOS, Superhuman, etc.) */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .cta-button {
+            transition: all 0.3s ease;
+            animation: pulse-glow 2.5s infinite;
+        }
+
+        .cta-button:hover {
+            background-color: #047857 !important;
+            transform: translateY(-2px);
+        }
+
+        /* WebKit Text Gradients */
+        .text-gradient {
+            background-image: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #34d399; /* Fallback for Gmail */
+        }
     </style>
 </head>
 <body style="background-color: #09090b; color: #d4d4d8; margin: 0; padding: 0; -webkit-font-smoothing: antialiased;">
     <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #09090b; padding: 40px 20px;">
         <tr>
             <td align="center">
-                <table max-width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 600px; width: 100%; border: 1px solid #27272a; border-radius: 16px; background-color: #0c0c0e; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                <table max-width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 600px; width: 100%; border: 1px solid #27272a; border-radius: 16px; background-color: #0c0c0e; background-image: linear-gradient(180deg, #111113 0%, #0c0c0e 100%); padding: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
 
                     <tr>
                         <td align="center" style="padding-bottom: 32px;">
-                            <table cellpadding="0" cellspacing="0" role="presentation" style="background-color: rgba(6, 78, 59, 0.3); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px;">
+                            <table cellpadding="0" cellspacing="0" role="presentation" style="background-color: rgba(6, 78, 59, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);">
                                 <tr>
-                                    <td style="padding: 8px 20px;">
+                                    <td style="padding: 10px 24px;">
                                         <p style="margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.05em; color: #ffffff;">
                                             Dev<span style="color: #34d399;">Arena</span>
                                         </p>
@@ -30,7 +57,7 @@
 
                     <tr>
                         <td align="center" style="padding-bottom: 24px;">
-                            <h1 style="color: #ffffff; font-size: 24px; font-weight: bold; margin: 0;">
+                            <h1 style="color: #ffffff; font-size: 26px; font-weight: bold; margin: 0; letter-spacing: -0.02em;">
                                 Ready to code, {{ user.username }}? 🚀
                             </h1>
                         </td>
@@ -54,9 +81,22 @@
 
                     <tr>
                         <td style="padding-bottom: 32px;">
-                            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #1e1e2e; border: 1px solid #27272a; border-radius: 12px; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);">
+                            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #1e1e2e; border: 1px solid #3f3f46; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+
                                 <tr>
-                                    <td style="padding: 20px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; line-height: 1.6;">
+                                    <td style="background-color: #27272a; padding: 10px 16px; border-bottom: 1px solid #3f3f46;">
+                                        <table cellpadding="0" cellspacing="0" role="presentation">
+                                            <tr>
+                                                <td style="width: 12px; height: 12px; background-color: #ff5f56; border-radius: 50%; display: inline-block; margin-right: 6px;"></td>
+                                                <td style="width: 12px; height: 12px; background-color: #ffbd2e; border-radius: 50%; display: inline-block; margin-right: 6px;"></td>
+                                                <td style="width: 12px; height: 12px; background-color: #27c93f; border-radius: 50%; display: inline-block;"></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; line-height: 1.6;">
                                         <p style="margin: 0; color: #71717a; padding-bottom: 8px;">// Today's objective:</p>
                                         <p style="margin: 0;">
                                             <span style="color: #f472b6;">const</span>
@@ -76,7 +116,7 @@
 
                     <tr>
                         <td align="center" style="padding-bottom: 32px;">
-                            <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #a1a1aa;">
+                            <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #a1a1aa; max-width: 90%;">
                                 The community is waiting. Drop what you are working on right now, get peer-reviewed, and climb the global ranks.
                             </p>
                         </td>
@@ -84,8 +124,8 @@
 
                     <tr>
                         <td align="center" style="padding-bottom: 40px;">
-                            <a href="https://devarena.pp.ua/post" style="display: inline-block; background-color: #059669; color: #ffffff; font-weight: bold; font-size: 16px; text-decoration: none; padding: 16px 32px; border-radius: 8px; box-shadow: 0 0 20px rgba(5, 150, 105, 0.3);">
-                                Share Your Code &gt;_
+                            <a href="https://devarena.pp.ua/post" class="cta-button" style="display: inline-block; background-color: #059669; background-image: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; font-weight: bold; font-size: 16px; text-decoration: none; padding: 16px 36px; border-radius: 8px; border: 1px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);">
+                                Share Your Code <span style="color: #a7f3d0;">&gt;_</span>
                             </a>
                         </td>
                     </tr>
@@ -96,7 +136,7 @@
                                 Level up your code through peer review.<br />
                                 &copy; 2026 DevArena. All rights reserved.
                             </p>
-                            <a href="{{ unsubscribe_url }}" style="color: red; font-size: 12px; text-decoration: underline;">
+                            <a href="{{ unsubscribe_url }}" style="color: #ef4444; font-size: 12px; text-decoration: none; border-bottom: 1px dotted #ef4444;">
                                 Unsubscribe from daily prompts
                             </a>
                         </td>
