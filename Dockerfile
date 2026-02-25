@@ -27,4 +27,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 5000
 
 # Run script to run app
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

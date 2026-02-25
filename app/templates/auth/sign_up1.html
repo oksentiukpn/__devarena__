@@ -132,7 +132,7 @@ input[type="text"], input[type="email"], input[type="password"] {
     border: 1px solid var(--border-gray);
     padding: 12px 16px;
 {% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='auth/sign_up.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='sign_up.css') }}">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 {% endblock %}
 
@@ -315,7 +315,7 @@ input[type="checkbox"] {
                 <div class="terms-row">
                     <input type="checkbox" id="terms" required>
                     <label for="terms">
-                        I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+                        I agree to the Terms of Service and <a href="{{ url_for('main.privacy_policy') }}">Privacy Policy</a>
                     </label>
                 </div>
 
