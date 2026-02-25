@@ -83,10 +83,14 @@ def post():
         try:
             db.session.add(new_post)
             db.session.commit()
+            current_app.logger.info(
+                f"New post created: '{new_post.title}' by user_id {session['user_id']}"
+            )
             flash("Your project has been posted!", "success")
             return redirect(url_for("main.feed_page"))
         except Exception as e:
             db.session.rollback()
+            current_app.logger.error(f"Error creating post: {e}")
             flash(f"An error occurred saving the post: {e}", "danger")
     return render_template("post.html")
 
@@ -138,6 +142,10 @@ def add_comment(post_id):
     db.session.add(new_comment)
     db.session.commit()
 
+    current_app.logger.info(
+        f"New comment added to post_id {post_id} by user_id {session['user_id']}"
+    )
+
     return jsonify(
         {
             "id": new_comment.id,
@@ -180,6 +188,9 @@ def delete_post(post_id):
     try:
         db.session.delete(post)
         db.session.commit()
+        current_app.logger.info(
+            f"Post with id {post_id} deleted by user_id {session['user_id']}"
+        )
         return jsonify({"success": True})
     except Exception as e:
         db.session.rollback()
@@ -268,5 +279,6 @@ def unsubscribe(token):
     if request.method == "POST":
         return "Unsubscribed successfully", 200
 
+    current_app.logger.info(f"User with id {user_id} unsubscribed from daily prompts.")
     flash("You have been successfully unsubscribed from daily prompts.", "success")
     return redirect(url_for("main.home"))
