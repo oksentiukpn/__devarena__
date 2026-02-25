@@ -36,7 +36,10 @@ def send_daily_prompt():
         token = ser.dumps(user.id, salt="unsubscribe-daily-prompt")
         unsubscribe_url = f"https://devarena.pp.ua/unsubscribe/{token}"
         html_content = render_template(
-            "email/daily_prompt.html", user=user, unsubscribe_url=unsubscribe_url
+            "email/daily_prompt.html",
+            user=user,
+            unsubscribe_url=unsubscribe_url,
+            streak_days=3,  # hardcoded
         )
 
         payload = {
