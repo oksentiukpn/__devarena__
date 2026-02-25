@@ -8,7 +8,7 @@
 
 **DevArena** is a community-driven platform where developers share projects, get constructive peer reviews, and compete in real-time coding battles. Whether you're looking to sharpen your skills, showcase your architecture, or prove yourself in a head-to-head challenge — this is your arena.
 
-[Live Demo](https://devarena.pp.ua) · [Report Bug](https://github.com/oksentiukpn/__devarena__/issues) · [Request Feature](https://github.com/oksentiukpn/__devarena__/issues)
+[Live Demo](https://devarena.pp.ua) · [Report Bug](https://github.com/oksentiukpn/__devarena__/issues)
 
 </div>
 
@@ -94,7 +94,6 @@
 ### 1. Clone the Repository
 
 ```
-/dev/null/bash.sh#L1-2
 git clone https://github.com/oksentiukpn/__devarena__.git
 cd __devarena__
 ```
@@ -104,7 +103,6 @@ cd __devarena__
 Create a `.env` file in the project root:
 
 ```
-/dev/null/.env.example#L1-15
 # Flask
 SECRET_KEY=your_super_secret_key_here
 FLASK_DEBUG=True
@@ -129,17 +127,15 @@ EMAIL_API_KEY=your_resend_api_key
 Nginx requires SSL certificates. For local development, generate self-signed ones:
 
 ```
-/dev/null/bash.sh#L1-4
 mkdir -p nginx/certs
 openssl req -x509 -nodes -days 365 \
   -newkey rsa:2048 -keyout nginx/certs/key.pem \
   -out nginx/certs/cert.pem -subj "/CN=localhost"
 ```
-
+## ! But cloudflare certs recommended for production !
 ### 4. Build & Start
 
 ```
-/dev/null/bash.sh#L1
 docker compose up -d --build
 ```
 
@@ -171,7 +167,7 @@ This single command will:
 | `POSTGRES_DB` | ✅ | PostgreSQL database name |
 | `GOOGLE_CLIENT_ID` | ✅ | Google OAuth 2.0 Client ID |
 | `GOOGLE_CLIENT_SECRET` | ✅ | Google OAuth 2.0 Client Secret |
-| `EMAIL_API_KEY` | ❌ | Resend API key for daily prompt emails |
+| `EMAIL_API_KEY` | ✅ | Resend API key for daily prompt emails |
 
 ---
 
@@ -194,21 +190,18 @@ This single command will:
 **Create a migration** (after modifying models):
 
 ```
-/dev/null/bash.sh#L1
 docker compose exec web flask db migrate -m "describe_your_change_here"
 ```
 
 **Apply pending migrations:**
 
 ```
-/dev/null/bash.sh#L1
 docker compose exec web flask db upgrade
 ```
 
 **Rollback last migration:**
 
 ```
-/dev/null/bash.sh#L1
 docker compose exec web flask db downgrade
 ```
 
@@ -221,14 +214,12 @@ DevArena includes custom Flask CLI commands for managing the daily prompt email 
 **Send daily prompt to all subscribed users:**
 
 ```
-/dev/null/bash.sh#L1
 docker compose exec web flask send-daily-prompt
 ```
 
 **Send prompt to a specific user (interactive):**
 
 ```
-/dev/null/bash.sh#L1
 docker compose exec web flask send-prompt-to
 ```
 
