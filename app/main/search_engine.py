@@ -1,5 +1,11 @@
 """
-Docstring for SearchEngine
+BM25-based search engine for posts.
+
+This module provides utilities to tokenize post titles, descriptions, and tags,
+build a BM25Okapi index over those posts, and execute ranked search queries.
+It exposes helper functions to create the index from a mapping of post IDs to
+post metadata and to search that index, optionally returning detailed scoring
+information for the top matching posts.
 """
 
 # import json
