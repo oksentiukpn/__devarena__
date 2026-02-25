@@ -106,8 +106,6 @@ def search(query: str, ids, posts, tag_sets, bm25, top_k: int = 10, detailed: bo
     :param bm25: Description
     :param top_k: Description
     :type top_k: int
-    :param tag_bonus: Description
-    :type tag_bonus: float
     :return: Description
     :rtype: list | list[tuple[Any, Any, float]]
     """
