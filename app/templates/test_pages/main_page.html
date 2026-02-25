@@ -29,12 +29,12 @@
         </p>
 
         <div class="button-container">
-            <button class="btn-green">
+            <a href="{{ url_for('auth.register') }}" class="btn-green">
                 Get Started Free <i class="fa-solid fa-arrow-right"></i>
-            </button>
-            <button class="btn-outline">
+            </a>
+            <a href="{{ url_for('projects.browse') }}" class="btn-outline">
                 <i class="fa-regular fa-eye"></i> Browse Projects
-            </button>
+            </a>
         </div>
 
         <div class="stats-container">
