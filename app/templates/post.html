@@ -38,15 +38,16 @@
 
     <!-- Form -->
     <form action="/post" method="POST" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <!-- Project Name -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
             <label for="project-name" class="block text-sm font-medium text-zinc-300 mb-2">
                 Project Name <span class="text-red-400">*</span>
             </label>
-            <input 
-                type="text" 
-                id="project-name" 
-                name="project_name" 
+            <input
+                type="text"
+                id="project-name"
+                name="project_name"
                 required
                 placeholder="e.g., Async Task Queue Implementation"
                 class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all"
@@ -58,9 +59,9 @@
             <label for="description" class="block text-sm font-medium text-zinc-300 mb-2">
                 Description <span class="text-red-400">*</span>
             </label>
-            <textarea 
-                id="description" 
-                name="description" 
+            <textarea
+                id="description"
+                name="description"
                 rows="4"
                 required
                 placeholder="Describe what your code does, the problem it solves, and any specific areas you'd like feedback on..."
@@ -202,9 +203,9 @@
                     <span>19</span>
                     <span>20</span>
                 </div>
-                <textarea 
-                    id="code-editor" 
-                    name="code" 
+                <textarea
+                    id="code-editor"
+                    name="code"
                     required
                     spellcheck="false"
                     placeholder="// Paste or type your code here..."
@@ -218,10 +219,10 @@
             <label for="tags" class="block text-sm font-medium text-zinc-300 mb-2">
                 Tags
             </label>
-            <input 
-                type="text" 
-                id="tags" 
-                name="tags" 
+            <input
+                type="text"
+                id="tags"
+                name="tags"
                 placeholder="#algorithm, #optimization, #async, #data-structures (comma separated)"
                 class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all"
             >
@@ -308,4 +309,3 @@
     </form>
 </div>
 {% endblock %}
-

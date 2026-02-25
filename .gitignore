@@ -12,3 +12,6 @@ postgres_data/
 backups/
 backups_tmp/
 auto_backup.sh
+
+app/static/css/output.css
+node_modules/

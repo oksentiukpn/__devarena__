@@ -32,6 +32,7 @@
         </div>
 
         <form>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="input-field">
                 <label>Username</label>
                 <input type="text" placeholder="@your_username" required>
