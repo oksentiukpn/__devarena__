@@ -1,6 +1,15 @@
 import re
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from app import db, oauth
 from app.models import User
@@ -43,11 +52,15 @@ def google_callback():
 
             db.session.add(user)
             db.session.commit()
+            current_app.logger.info(
+                f"New user created: {email} with username {username}"
+            )
 
         session["user_id"] = user.id
         flash("Successfull login with Google.", "success")
         return redirect(url_for("main.home"))
     except Exception as e:
+        current_app.logger.error(f"Google login failed: {e}")
         flash(f"Failed Authentification: {e}", "danger")
         return redirect(url_for("auth.login"))
 
@@ -97,6 +110,9 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        current_app.logger.info(
+            f"New user registered: {email} with username {username}"
+        )
         flash(f"Account with name <{username}> was successfully created!", "success")
         return redirect(url_for("auth.login"))
     # if not sending data, just give html
@@ -116,9 +132,10 @@ def login():
         if user and user.check_password(password):
             session["user_id"] = user.id
             flash("Successfull login!", "success")
+            current_app.logger.info(f"User logged in: {email}")
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("main.home"))
-
+        current_app.logger.warning(f"Failed login attempt for email: {email}")
         flash("Login failed: Invalid password or email", "danger")
 
     # if not sending data, just give html

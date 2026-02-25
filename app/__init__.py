@@ -2,6 +2,8 @@
 Initializing app
 """
 
+import logging
+
 from authlib.integrations.flask_client import OAuth
 from config import Config
 from flask import Flask
@@ -36,6 +38,21 @@ def create_app(config_class=Config):
     csrf.init_app(app)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     # app.permanent_session_lifetime = timedelta(days=14)
+    #
+    log_level = logging.DEBUG if app.debug else logging.INFO
+
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+    if gunicorn_logger.handlers:
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+    else:
+        logging.basicConfig(
+            level=log_level,
+            format="[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+        )
+        app.logger.setLevel(log_level)
+
+    app.logger.info("DevArena application initialized.")
 
     # Registering OAuth
     oauth.register(
