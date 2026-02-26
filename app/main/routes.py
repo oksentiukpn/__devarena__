@@ -65,7 +65,7 @@ def post():
             for tag in form.tags.data.replace("#", " ").split()
             if tag not in ("", " ")
         ]
-        clean_tags = "".join([tag.strip() for tag in raw_tags])
+        clean_tags = ",".join([tag.strip() for tag in raw_tags])
         feedback_str = ",".join(form.feedback.data)
 
         # 3. Create Post

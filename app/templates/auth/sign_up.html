@@ -31,21 +31,21 @@
             <span class="divider-text">or register with email</span>
         </div>
 
-        <form>
+        <form method="POST" action="{{ url_for('auth.register') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="input-field">
                 <label>Username</label>
-                <input type="text" placeholder="@your_username" required>
+                <input type="text" placeholder="@your_username" name="username" value="{{ username }}" required>
             </div>
 
             <div class="input-field">
                 <label>Email address</label>
-                <input type="email" placeholder="you@example.com" required>
+                <input type="email" placeholder="you@example.com" name="email" value="{{ email }}" required>
             </div>
 
             <div class="input-field">
                 <label>Password</label>
-                <input type="password" placeholder="Create a strong password" required>
+                <input type="password" placeholder="Create a strong password" name="password" required>
             </div>
 
             <div class="terms-row">

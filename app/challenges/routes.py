@@ -36,7 +36,7 @@ def create_battle():
     form = BattleForm()
 
     if form.validate_on_submit():
-        # Clean tags logic (similar to Post logic)
+        # Clean tags logic
         raw_tags = [
             tag
             for tag in form.tags.data.replace("#", " ").split()
@@ -112,7 +112,6 @@ def join_battle(battle_id):
 def arena(battle_id):
     battle = Battle.query.get_or_404(battle_id)
 
-    # Security check: only participants can view the arena
     if session["user_id"] not in [battle.user_id, battle.opponent_id]:
         flash("You are not part of this battle.", "danger")
         return redirect(url_for("main.battles"))
@@ -234,6 +233,7 @@ def review(battle_id):
         elif opponent_votes > creator_votes:
             battle.winner_id = battle.opponent_id
         else:
+            flash("The battle ended in a tie, so creator wins!", "info")
             battle.winner_id = battle.user_id
         db.session.commit()
 
