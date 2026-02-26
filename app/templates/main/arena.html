@@ -48,14 +48,14 @@
                 </div>
             </div>
 
-            <button id="ready-btn" onclick="toggleReady()" class="w-full py-4 rounded-xl font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white">
+            <button id="ready-btn" onclick="toggleReady()" class="w-full py-4 rounded-xl font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white" {% if battle.status == 'in_progress' %} style="display: none;" {% endif %}>
                 I'm Ready
             </button>
         </div>
 
         <div class="lg:col-span-3 bg-[#0d1117] border border-zinc-800 rounded-xl flex flex-col overflow-hidden relative">
 
-            <div id="editor-overlay" class="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+            <div id="editor-overlay" class="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center" {% if battle.status == 'in_progress' %}style="display: none;"{% endif %}>
                 <svg class="w-12 h-12 text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 <p id="overlay-text" class="text-zinc-400 font-medium">Waiting for both players to be ready...</p>
             </div>
@@ -64,11 +64,18 @@
                 <span class="text-xs text-zinc-500 font-mono">Your Code</span>
             </div>
 
-            <textarea id="code-editor" class="flex-1 w-full bg-transparent text-zinc-100 font-mono text-sm p-4 resize-none focus:outline-none placeholder-zinc-700" placeholder="Write your solution here..."></textarea>
+            {% set user_submitted = (is_creator and battle.creator_submitted) or (not is_creator and battle.opponent_submitted) %}
+
+            <textarea id="code-editor" class="flex-1 w-full bg-transparent text-zinc-100 font-mono text-sm p-4 resize-none focus:outline-none placeholder-zinc-700 {% if user_submitted %}opacity-50{% endif %}" placeholder="Write your solution here..." {% if user_submitted %}readonly{% endif %}>{% if is_creator %}{{ battle.creator_code or '' }}{% else %}{{ battle.opponent_code or '' }}{% endif %}</textarea>
 
             <div class="px-4 py-3 bg-zinc-900 border-t border-zinc-800 text-right">
-                <button id="submit-btn" onclick="submitCode()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors flex items-center gap-2 ml-auto">
-                    <span>Submit Final Code</span>
+                <button id="submit-btn" onclick="submitCode()" class="px-6 py-2 font-medium rounded-lg transition-colors flex items-center gap-2 ml-auto {% if user_submitted %}bg-zinc-800 text-emerald-400 border border-emerald-500/30 cursor-not-allowed{% else %}bg-emerald-600 hover:bg-emerald-500 text-white{% endif %}" {% if user_submitted %}disabled{% endif %}>
+                    {% if user_submitted %}
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Submitted</span>
+                    {% else %}
+                        <span>Submit Final Code</span>
+                    {% endif %}
                 </button>
             </div>
         </div>
@@ -96,6 +103,7 @@
 
     let currentStatus = "{{ battle.status }}";
     let timerInterval;
+    let timerStarted = false;
 
     // --- NEW: Submit Code Logic ---
     async function submitCode() {
@@ -215,11 +223,16 @@
                 readyBtn.className = "w-full py-4 rounded-xl font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white";
             }
 
-            if (data.status === 'in_progress' && currentStatus !== 'in_progress') {
-                currentStatus = 'in_progress';
+            if (data.status === 'in_progress') {
                 overlay.style.display = 'none';
                 readyBtn.style.display = 'none';
-                startLocalTimer(data.time_left);
+
+                // If timer isn't running yet, start it
+                if (!timerStarted) {
+                    timerStarted = true;
+                    currentStatus = 'in_progress';
+                    startLocalTimer(data.time_left);
+                }
             }
             else if (data.status === 'in_review') {
                 overlay.style.display = 'flex';
@@ -229,9 +242,8 @@
                 timerDisplay.textContent = formatTime(data.time_left);
 
                 if (currentStatus !== 'in_review') {
-                     currentStatus = 'in_review';
-                     // Redirect to the newly created review page!
-                     setTimeout(() => window.location.href = `/battle/${battleId}/review`, 2000);
+                      currentStatus = 'in_review';
+                      setTimeout(() => window.location.href = `/battle/${battleId}/review`, 2000);
                 }
             }
 
