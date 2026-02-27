@@ -54,7 +54,7 @@ def send_daily_prompt():
         }
 
         try:
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(url, headers=headers, json=payload, timeout=10)
             response.raise_for_status()
             success_count += 1
         except Exception as e:
@@ -104,7 +104,7 @@ def send_prompt_to():
     }
 
     try:
-        response = requests.post(url, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
         response.raise_for_status()
         current_app.logger.info(f"Successfully sent to {user.email}")
         print(f"Successfully sent to {user.email}")
