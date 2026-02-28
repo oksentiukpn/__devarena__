@@ -14,13 +14,12 @@
           <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Your Stats</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-zinc-400 text-sm">Reputation</span>
-              <span class="text-emerald-500 font-semibold">2,450</span>
+              <span class="text-zinc-400 text-sm">Points</span>
+              <span class="text-emerald-500 font-semibold">{{ current_user.points }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-zinc-400 text-sm">Projects</span>
-              <span class="text-white font-semibold">12</span>
-            </div>
+              <span class="text-white font-semibold">{{ post_count }}</span>
           </div>
         </div>
       </div>
