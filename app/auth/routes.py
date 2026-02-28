@@ -117,9 +117,9 @@ def register():
             f"New user registered: {email} with username {username}"
         )
         flash(f"Account with name <{username}> was successfully created!", "success")
-        return render_template("auth/login.html", email=email)
+        return redirect(url_for("auth.login"))
     # if not sending data, just give html
-    return render_template("auth/sign_up.html")
+    return render_template("auth/sign_up.html", username="", email="")
 
 
 @auth.route("/login", methods=["GET", "POST"])
