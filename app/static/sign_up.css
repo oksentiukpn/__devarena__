@@ -156,14 +156,23 @@ input[type="password"] {
 .password-strength {
     display: flex;
     gap: 4px;
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .bar {
-    height: 3px;
+    height: 4px;
     flex: 1;
     background: #27272a;
     border-radius: 2px;
+    transition: background 0.3s ease;
+}
+
+.hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 4px 0 0 0;
+    min-height: 18px;
+    transition: color 0.3s ease;
 }
 
 
