@@ -58,6 +58,10 @@ class User(db.Model):
     streak_days = db.Column(db.Integer, default=0, server_default="0", nullable=False)
     last_active_date = db.Column(db.Date, nullable=True)
 
+    is_admin = db.Column(
+        db.Boolean, default=False, server_default="false", nullable=True
+    )
+
     def set_password(self, password: str) -> None:
         """Set password"""
         self.password_hash = generate_password_hash(password)

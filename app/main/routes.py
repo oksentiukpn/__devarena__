@@ -189,9 +189,10 @@ def user_profile(username):
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
+    current_user = User.query.get(session["user_id"])
 
     # Security Check: Ensure current user is the author
-    if post.user_id != session["user_id"]:
+    if post.user_id != current_user.id and not current_user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
@@ -216,9 +217,10 @@ def view_post(post_id):
 @login_required
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
+    current_user = User.query.get(session["user_id"])
 
     # Security Check: Ensure current user is the author
-    if comment.user_id != session["user_id"]:
+    if comment.user_id != current_user.id and not current_user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
