@@ -21,19 +21,11 @@ from app.models import Battle, Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
 
-@main.route('/leaderboard')
-def leaderboard():
-    users_list = (
-        User.query
-        .order_by(User.points.desc())
-        .limit(10)
-        .all()
-    )
-    return render_template('leaderboard.html', users=users_list)
 
 @main.route("/")
 def home():
     return render_template("home.html")
+
 
 @main.route("/privacy")
 def privacy():
@@ -70,6 +62,7 @@ def feed_page():
     return render_template(
         "feed.html", posts=feed_posts, post_count=post_count, current_user=current_user
     )
+
 
 @main.route("/post", methods=["GET", "POST"])
 @login_required
@@ -109,6 +102,7 @@ def post():
             flash(f"An error occurred saving the post: {e}", "danger")
     return render_template("post.html")
 
+
 @main.route("/post/<int:post_id>/react", methods=["POST"])
 @login_required
 def toggle_reaction(post_id):
@@ -118,7 +112,6 @@ def toggle_reaction(post_id):
     if not emoji:
         return jsonify({"error": "Emoji is required"}), 400
 
-    post = Post.query.get_or_404(post_id)
     existing_reaction = Reaction.query.filter_by(
         user_id=session["user_id"], post_id=post_id, emoji=emoji
     ).first()
@@ -126,19 +119,18 @@ def toggle_reaction(post_id):
     status = ""
     if existing_reaction:
         db.session.delete(existing_reaction)
-        post.update_popularity_points(-5)
         status = "removed"
     else:
         new_reaction = Reaction(
             user_id=session["user_id"], post_id=post_id, emoji=emoji
         )
         db.session.add(new_reaction)
-        post.update_popularity_points(5)
         status = "added"
 
     db.session.commit()
     count = Reaction.query.filter_by(post_id=post_id, emoji=emoji).count()
     return jsonify({"status": status, "emoji": emoji, "count": count})
+
 
 @main.route("/post/<int:post_id>/comment", methods=["POST"])
 @login_required
@@ -149,18 +141,12 @@ def add_comment(post_id):
     if not content or not content.strip():
         return jsonify({"error": "Comment can't be empty"}), 400
 
-    post = Post.query.get_or_404(post_id)
     new_comment = Comment(
-        content=content.strip(),
-        user_id=session["user_id"],
-        post_id=post_id
+        content=content.strip(), user_id=session["user_id"], post_id=post_id
     )
 
     db.session.add(new_comment)
-    post.update_popularity_points(10)
 
-    comment_author = User.query.get(session["user_id"])
-    comment_author.points += 2
     current_app.logger.info(
         f"New comment added to post_id {post_id} by user_id {session['user_id']}"
     )
@@ -175,15 +161,6 @@ def add_comment(post_id):
         }
     )
 
-    db.session.commit()
-
-    return jsonify({
-        "id": new_comment.id,
-        "content": new_comment.content,
-        "author": new_comment.author.username,
-        "created_at": new_comment.created_at.strftime("%b %d"),
-        "avatar_letter": new_comment.author.username[:2],
-    })
 
 @main.route("/profile")
 @login_required
@@ -192,11 +169,13 @@ def profile():
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
     return render_template("main/profile.html", user=user, posts=posts)
 
+
 @main.route("/user/<username>")
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
     return render_template("main/profile.html", user=user, posts=posts)
+
 
 @main.route("/post/<int:post_id>", methods=["DELETE"])
 @login_required
@@ -237,25 +216,21 @@ def delete_comment(comment_id):
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
-        post = comment.post
-        post.update_popularity_points(-10)
-
-        comment_author = User.query.get(session["user_id"])
-        comment_author.points -= 2
+        post_id = comment.post_id
 
         db.session.delete(comment)
         db.session.commit()
 
-        count = Comment.query.filter_by(post_id=post.id).count()
-        return jsonify({"success": True, "count": count, "post_id": post.id})
+        count = Comment.query.filter_by(post_id=post_id).count()
+        return jsonify({"success": True, "count": count, "post_id": post_id})
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @main.route("/battles")
 @login_required
 def battles():
-    return redirect(url_for("challenges.create_battle"))
     feed_battles = (
         Battle.query.options(joinedload(Battle.author))
         .filter(Battle.visibility == "public")
@@ -319,3 +294,9 @@ def settings():
 @main.route("/authors")
 def authors():
     return "Not implemented yet"
+
+
+@main.route("/leaderboard")
+def leaderboard():
+    users_list = User.query.order_by(User.points.desc()).limit(10).all()
+    return render_template("leaderboard.html", users=users_list)
