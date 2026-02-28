@@ -77,7 +77,6 @@ def post():
         clean_tags = ",".join([tag.strip() for tag in raw_tags])
         feedback_str = ",".join(form.feedback.data)
 
-        # 3. Create Post
         new_post = Post(
             title=form.project_name.data,
             description=form.description.data,
@@ -129,9 +128,7 @@ def toggle_reaction(post_id):
         status = "added"
 
     db.session.commit()
-
     count = Reaction.query.filter_by(post_id=post_id, emoji=emoji).count()
-
     return jsonify({"status": status, "emoji": emoji, "count": count})
 
 
@@ -142,14 +139,13 @@ def add_comment(post_id):
     content = data.get("content")
 
     if not content or not content.strip():
-        return jsonify({"error": "Comment can`t be empty"}, 400)
+        return jsonify({"error": "Comment can't be empty"}), 400
 
     new_comment = Comment(
         content=content.strip(), user_id=session["user_id"], post_id=post_id
     )
 
     db.session.add(new_comment)
-    db.session.commit()
 
     current_app.logger.info(
         f"New comment added to post_id {post_id} by user_id {session['user_id']}"
@@ -166,18 +162,14 @@ def add_comment(post_id):
     )
 
 
-# Current User
 @main.route("/profile")
 @login_required
 def profile():
     user = User.query.get(session["user_id"])
-
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
-
     return render_template("main/profile.html", user=user, posts=posts)
 
 
-# Other users
 @main.route("/user/<username>")
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
@@ -224,13 +216,11 @@ def delete_comment(comment_id):
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
-        # We need the post_id to update the UI counter if needed,
-        # though strictly not required for the DB delete
         post_id = comment.post_id
+
         db.session.delete(comment)
         db.session.commit()
 
-        # Get new comment count for the UI
         count = Comment.query.filter_by(post_id=post_id).count()
         return jsonify({"success": True, "count": count, "post_id": post_id})
     except Exception as e:
@@ -304,3 +294,9 @@ def settings():
 @main.route("/authors")
 def authors():
     return "Not implemented yet"
+
+
+@main.route("/leaderboard")
+def leaderboard():
+    users_list = User.query.order_by(User.points.desc()).limit(10).all()
+    return render_template("leaderboard.html", users=users_list)
