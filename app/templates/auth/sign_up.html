@@ -46,7 +46,14 @@
 
             <div class="input-field">
                 <label>Password</label>
-                <input type="password" placeholder="Create a strong password" name="password" required>
+                <input type="password" placeholder="Create a strong password" name="password" id="password" required>
+                <div class="password-strength">
+                    <div class="bar" id="bar-1"></div>
+                    <div class="bar" id="bar-2"></div>
+                    <div class="bar" id="bar-3"></div>
+                    <div class="bar" id="bar-4"></div>
+                </div>
+                <p class="hint" id="password-hint"></p>
             </div>
 
             <div class="terms-row">
@@ -64,4 +71,60 @@
         </p>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('password');
+    const bars = [
+        document.getElementById('bar-1'),
+        document.getElementById('bar-2'),
+        document.getElementById('bar-3'),
+        document.getElementById('bar-4')
+    ];
+    const hint = document.getElementById('password-hint');
+
+    const levels = [
+        { color: '#ef4444', label: 'Weak' },
+        { color: '#f97316', label: 'Fair' },
+        { color: '#eab308', label: 'Good' },
+        { color: '#10b981', label: 'Strong' }
+    ];
+
+    function getStrength(password) {
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^a-zA-Z0-9]/.test(password)) score++;
+        return score;
+    }
+
+    passwordInput.addEventListener('input', () => {
+        const value = passwordInput.value;
+        const strength = getStrength(value);
+
+        bars.forEach((bar, i) => {
+            if (value.length === 0) {
+                bar.style.background = '#27272a';
+                bar.style.transition = 'background 0.3s ease';
+            } else if (i < strength) {
+                bar.style.background = levels[strength - 1].color;
+                bar.style.transition = 'background 0.3s ease';
+            } else {
+                bar.style.background = '#27272a';
+                bar.style.transition = 'background 0.3s ease';
+            }
+        });
+
+        if (value.length === 0) {
+            hint.textContent = '';
+            hint.style.color = '';
+        } else {
+            hint.textContent = levels[strength - 1]?.label || 'Too short';
+            hint.style.color = levels[strength - 1]?.color || '#71717a';
+            hint.style.transition = 'color 0.3s ease';
+        }
+    });
+});
+</script>
 {% endblock %}
