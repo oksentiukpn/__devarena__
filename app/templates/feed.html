@@ -14,13 +14,12 @@
           <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Your Stats</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-zinc-400 text-sm">Reputation</span>
-              <span class="text-emerald-500 font-semibold">2,450</span>
+              <span class="text-zinc-400 text-sm">Points</span>
+              <span class="text-emerald-500 font-semibold">{{ current_user.points }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-zinc-400 text-sm">Projects</span>
-              <span class="text-white font-semibold">12</span>
-            </div>
+              <span class="text-white font-semibold">{{ post_count }}</span>
           </div>
         </div>
       </div>
@@ -57,7 +56,7 @@
                     </div>
                 </div>
 
-                {% if session.get('user_id') == post.author.id %}
+                {% if current_user and (current_user.id == post.author.id or current_user.is_admin) %}
                 <button onclick="deletePost({{ post.id }}, this)" class="text-zinc-500 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-zinc-800" title="Delete Project">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -146,7 +145,7 @@
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs text-zinc-500">{{ comment.created_at.strftime('%b %d') }}</span>
 
-                                    {% if session.get('user_id') == comment.author.id %}
+                                    {% if current_user and (current_user.id == comment.author.id or current_user.is_admin) %}
                                     <button onclick="deleteComment({{ comment.id }}, this)" class="text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

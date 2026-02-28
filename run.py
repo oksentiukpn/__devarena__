@@ -7,7 +7,7 @@ from time import sleep
 
 import requests
 from app import create_app
-from app.models import User
+from app.models import Comment, Reaction, User
 from flask import current_app, render_template
 from itsdangerous import URLSafeSerializer
 
@@ -111,6 +111,63 @@ def send_prompt_to():
     except Exception as e:
         current_app.logger.error(f"Failed sending to {user.email}: {e}")
         print(f"Failed sending to {user.email}: {e}")
+
+
+@app.cli.command("recalculate-points")
+def recalculate_points():
+    """Recalculate scores for all users."""
+    users = User.query.all()
+
+    for user in users:
+        # Start at 0 to overwrite any 'null' (None) values
+        total_points = 0
+
+        # Calculate points from all posts authored by this user
+        for post in user.posts:
+            # 5 points per reaction
+            reactions_count = Reaction.query.filter_by(post_id=post.id).count()
+            total_points += reactions_count * 5
+
+            # 10 points per comment
+            comments_count = Comment.query.filter_by(post_id=post.id).count()
+            total_points += comments_count * 10
+
+        user.points = total_points
+
+    from app import db
+
+    try:
+        db.session.commit()
+        current_app.logger.info(
+            f"Successfully recalculated points for {len(users)} users."
+        )
+        print(f"Successfully recalculated points for {len(users)} users.")
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error recalculating points: {e}")
+        print(f"Error recalculating points: {e}")
+
+
+@app.cli.command("make-admin")
+def make_admin():
+    """Promote an existing user to admin status."""
+    email = input("Enter the email of the user to promote: ")
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        print(f"User with email {email} not found.")
+        return
+
+    user.is_admin = True
+
+    from app import db
+
+    try:
+        db.session.commit()
+        print(f"Success! {user.username} ({user.email}) is now an admin.")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Failed to promote user: {e}")
 
 
 if __name__ == "__main__":
