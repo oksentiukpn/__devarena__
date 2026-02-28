@@ -19,6 +19,16 @@ from app.models import Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
 
+@main.route('/leaderboard')
+def leaderboard():
+    users_list = (
+        User.query
+        .order_by(User.points.desc())
+        .limit(10)
+        .all()
+    )
+    return render_template('leaderboard.html', users=users_list)
+
 
 @main.route("/")
 def home():
@@ -97,6 +107,7 @@ def toggle_reaction(post_id):
 
     if not emoji:
         return jsonify({"error": "Emoji is required"}), 400
+    post = Post.query.get_or_404(post_id)
 
     existing_reaction = Reaction.query.filter_by(
         user_id=session["user_id"], post_id=post_id, emoji=emoji
@@ -105,18 +116,19 @@ def toggle_reaction(post_id):
     status = ""
     if existing_reaction:
         db.session.delete(existing_reaction)
+        post.update_popularity_points(-5)
         status = "removed"
     else:
         new_reaction = Reaction(
             user_id=session["user_id"], post_id=post_id, emoji=emoji
         )
         db.session.add(new_reaction)
+        post.update_popularity_points(5)
         status = "added"
 
     db.session.commit()
 
     count = Reaction.query.filter_by(post_id=post_id, emoji=emoji).count()
-
     return jsonify({"status": status, "emoji": emoji, "count": count})
 
 
@@ -127,13 +139,19 @@ def add_comment(post_id):
     content = data.get("content")
 
     if not content or not content.strip():
-        return jsonify({"error": "Comment can`t be empty"}, 400)
+        return jsonify({"error": "Comment can't be empty"}), 400
+
+    post = Post.query.get_or_404(post_id)
 
     new_comment = Comment(
-        content=content.strip(), user_id=session["user_id"], post_id=post_id
+        content=content.strip(),
+        user_id=session["user_id"],
+        post_id=post_id
     )
 
     db.session.add(new_comment)
+    post.update_popularity_points(10)
+
     db.session.commit()
 
     return jsonify(
@@ -145,6 +163,8 @@ def add_comment(post_id):
             "avatar_letter": new_comment.author.username[:2],
         }
     )
+
+
 
 
 # Current User
