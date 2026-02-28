@@ -52,6 +52,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=True)  # hashed of course
     languages = db.Column(db.String(1024), nullable=True)
 
+    points = db.Column(db.Integer, default=0, nullable=False)
+
     def set_password(self, password: str) -> None:
         """Set password"""
         self.password_hash = generate_password_hash(password)

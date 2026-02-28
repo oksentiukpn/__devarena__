@@ -29,16 +29,13 @@ def leaderboard():
     )
     return render_template('leaderboard.html', users=users_list)
 
-
 @main.route("/")
 def home():
     return render_template("test_pages/main_test.html")
 
-
 @main.route("/privacy")
 def privacy_policy():
     return render_template("main/privacy.html")
-
 
 @main.route("/feed")
 @login_required
@@ -62,7 +59,6 @@ def feed_page():
 
     return render_template("feed.html", posts=feed_posts)
 
-
 @main.route("/post", methods=["GET", "POST"])
 @login_required
 def post():
@@ -76,7 +72,6 @@ def post():
         clean_tags = "".join([tag.strip() for tag in raw_tags])
         feedback_str = ",".join(form.feedback.data)
 
-        # 3. Create Post
         new_post = Post(
             title=form.project_name.data,
             description=form.description.data,
@@ -98,7 +93,6 @@ def post():
             flash(f"An error occurred saving the post: {e}", "danger")
     return render_template("post.html")
 
-
 @main.route("/post/<int:post_id>/react", methods=["POST"])
 @login_required
 def toggle_reaction(post_id):
@@ -107,8 +101,8 @@ def toggle_reaction(post_id):
 
     if not emoji:
         return jsonify({"error": "Emoji is required"}), 400
-    post = Post.query.get_or_404(post_id)
 
+    post = Post.query.get_or_404(post_id)
     existing_reaction = Reaction.query.filter_by(
         user_id=session["user_id"], post_id=post_id, emoji=emoji
     ).first()
@@ -127,10 +121,8 @@ def toggle_reaction(post_id):
         status = "added"
 
     db.session.commit()
-
     count = Reaction.query.filter_by(post_id=post_id, emoji=emoji).count()
     return jsonify({"status": status, "emoji": emoji, "count": count})
-
 
 @main.route("/post/<int:post_id>/comment", methods=["POST"])
 @login_required
@@ -142,7 +134,6 @@ def add_comment(post_id):
         return jsonify({"error": "Comment can't be empty"}), 400
 
     post = Post.query.get_or_404(post_id)
-
     new_comment = Comment(
         content=content.strip(),
         user_id=session["user_id"],
@@ -152,33 +143,26 @@ def add_comment(post_id):
     db.session.add(new_comment)
     post.update_popularity_points(10)
 
+    comment_author = User.query.get(session["user_id"])
+    comment_author.points += 2
+
     db.session.commit()
 
-    return jsonify(
-        {
-            "id": new_comment.id,
-            "content": new_comment.content,
-            "author": new_comment.author.username,
-            "created_at": new_comment.created_at.strftime("%b %d"),
-            "avatar_letter": new_comment.author.username[:2],
-        }
-    )
+    return jsonify({
+        "id": new_comment.id,
+        "content": new_comment.content,
+        "author": new_comment.author.username,
+        "created_at": new_comment.created_at.strftime("%b %d"),
+        "avatar_letter": new_comment.author.username[:2],
+    })
 
-
-
-
-# Current User
 @main.route("/profile")
 @login_required
 def profile():
     user = User.query.get(session["user_id"])
-
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
-
     return render_template("main/profile.html", user=user, posts=posts)
 
-
-# Other users
 @main.route("/user/<username>")
 @login_required
 def user_profile(username):
@@ -186,13 +170,10 @@ def user_profile(username):
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
     return render_template("main/profile.html", user=user, posts=posts)
 
-
 @main.route("/post/<int:post_id>", methods=["DELETE"])
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
-
-    # Security Check: Ensure current user is the author
     if post.user_id != session["user_id"]:
         return jsonify({"error": "Unauthorized"}), 403
 
@@ -204,32 +185,29 @@ def delete_post(post_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-
 @main.route("/comment/<int:comment_id>", methods=["DELETE"])
 @login_required
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-
-    # Security Check: Ensure current user is the author
     if comment.user_id != session["user_id"]:
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
-        # We need the post_id to update the UI counter if needed,
-        # though strictly not required for the DB delete
-        post_id = comment.post_id
+        post = comment.post
+        post.update_popularity_points(-10)
+
+        comment_author = User.query.get(session["user_id"])
+        comment_author.points -= 2
+
         db.session.delete(comment)
         db.session.commit()
 
-        # Get new comment count for the UI
-        count = Comment.query.filter_by(post_id=post_id).count()
-        return jsonify({"success": True, "count": count, "post_id": post_id})
+        count = Comment.query.filter_by(post_id=post.id).count()
+        return jsonify({"success": True, "count": count, "post_id": post.id})
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-
 @main.route("/battles")
 def battles():
-    # rick-roll
     return redirect(url_for("challenges.create_battle"))
