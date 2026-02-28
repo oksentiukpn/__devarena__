@@ -12,6 +12,7 @@
     <div class="logo-section">
         <div class="logo-wrapper">
             <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <title>DevArena Logo</title>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
             </svg>
             <span class="logo-text">DevArena</span>
@@ -51,7 +52,7 @@
             <div class="terms-row">
                 <input type="checkbox" id="terms" required>
                 <label for="terms">
-                    I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+                    I agree to the <a href="{{ url_for('main.terms') }}">Terms of Service</a> and <a href="{{ url_for('main.privacy') }}">Privacy Policy</a>
                 </label>
             </div>
 

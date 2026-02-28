@@ -60,6 +60,7 @@
           <a href="/" class="flex items-center gap-2">
             <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <title>DevArena Logo</title>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
@@ -71,36 +72,40 @@
               class="{% block nav_home_class %}px-4 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors{% endblock %}">
               <span class="flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <title>Home</title>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 Home
               </span>
             </a>
-            <a href="/feed"
+            <a href="{{ url_for('main.feed') }}"
               class="{% block nav_feed_class %}px-4 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors{% endblock %}">
               <span class="flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <title>Feed</title>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
                 Feed
               </span>
             </a>
-            <a href="/battles"
+            <a href="{{ url_for('main.battles') }}"
               class="{% block nav_battles_class %}px-4 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors{% endblock %}">
               <span class="flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <title>Battles</title>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 Battles
               </span>
             </a>
-            <a href="/post"
+            <a href="{{ url_for('main.new_post') }}"
               class="{% block nav_newpost_class %}ml-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-colors{% endblock %}">
               <span class="flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <title>New Post</title>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
                 New Post
@@ -113,6 +118,7 @@
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <title>Search</title>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -124,9 +130,9 @@
 
         <div class="profile-container relative">
           {% if session.get('user_id') %}
-          <button class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-800/50 transition-colors" tabindex="0">
+          <button class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-800/50 transition-colors" tabindex="0" type="button">
             <div
-              class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-sm font-semibold ring-2 ring-zinc-800">
+              class="w-9 h-9 rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-sm font-semibold ring-2 ring-zinc-800">
               U
             </div>
           </button>
@@ -136,17 +142,19 @@
               <p class="text-sm font-semibold text-white">My Account</p>
             </div>
             <div class="py-1">
-              <a href="/profile"
+              <a href="{{ url_for('main.profile'}}"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <title>Profile</title>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 View Profile
               </a>
-              <a href="/settings"
+              <a href="{{ url_for('main.settings') }}"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <title>Settings</title>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -156,9 +164,10 @@
               </a>
             </div>
             <div class="border-t border-zinc-800 py-1">
-              <a href="/logout"
+              <a href="{{ url_for('auth.logout') }}"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800 hover:text-red-300 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <title>Logout</title>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -168,8 +177,8 @@
           </div>
           {% else %}
           <div class="flex items-center gap-4">
-            <a href="/login" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</a>
-            <a href="/register"
+            <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</a>
+            <a href="{{ url_for('auth.register') }}"
               class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors">
               Sign Up
             </a>
@@ -180,11 +189,10 @@
     </div>
   </nav>
 
-  <div id="flash-container" class="fixed top-20 right-4 z-[100] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+  <div id="flash-container" class="fixed top-20 right-4 z-100 flex flex-col gap-3 w-full max-w-sm pointer-events-none">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          {# Define colors based on category #}
           {% if category == 'success' %}
             {% set border_color = 'border-emerald-500' %}
             {% set icon_color = 'text-emerald-500' %}
@@ -204,16 +212,18 @@
           {% endif %}
 
           <div class="flash-message pointer-events-auto bg-zinc-900 border-l-4 {{ border_color }} rounded-r-lg shadow-xl shadow-black/50 p-4 transform transition-all duration-300 ease-out translate-x-full opacity-0 flex items-start gap-3">
-            <div class="flex-shrink-0 mt-0.5">
+            <div class="shrink-0 mt-0.5">
               <svg class="w-5 h-5 {{ icon_color }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <title>{{ category|capitalize }}</title>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ icon_path }}" />
               </svg>
             </div>
             <div class="flex-1">
               <p class="text-sm font-medium text-white">{{ message }}</p>
             </div>
-            <button onclick="dismissFlash(this.parentElement)" class="flex-shrink-0 text-zinc-500 hover:text-zinc-300 transition-colors">
+            <button onclick="dismissFlash(this.parentElement)" class="shrink-0 text-zinc-500 hover:text-zinc-300 transition-colors" type="button">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <title>Dismiss</title>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -234,11 +244,11 @@
           <span>© 2026 DevArena</span>
         </div>
         <div class="flex items-center gap-6">
-          <a href="/authors" class="text-sm text-zinc-500 hover:text-emerald-500 transition-colors">Authors</a>
+          <a href="{{ url_for('main.authors') }}" class="text-sm text-zinc-500 hover:text-emerald-500 transition-colors">Authors</a>
           <span class="text-zinc-700">•</span>
-          <a href="/privacy" class="text-sm text-zinc-500 hover:text-emerald-500 transition-colors">Privacy Policy</a>
+          <a href="{{ url_for('main.privacy') }}" class="text-sm text-zinc-500 hover:text-emerald-500 transition-colors">Privacy Policy</a>
           <span class="text-zinc-700">•</span>
-          <a href="/terms" class="text-sm text-zinc-500 hover:text-emerald-500 transition-colors">Terms of Use</a>
+          <a href="{{ url_for('main.terms') }}" class="text-sm text-zinc-500 hover:text-emerald-500 transition-colors">Terms of Use</a>
         </div>
       </div>
     </div>
