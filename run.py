@@ -148,6 +148,28 @@ def recalculate_points():
         print(f"Error recalculating points: {e}")
 
 
+@app.cli.command("make-admin")
+def make_admin():
+    """Promote an existing user to admin status."""
+    email = input("Enter the email of the user to promote: ")
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        print(f"User with email {email} not found.")
+        return
+
+    user.is_admin = True
+
+    from app import db
+
+    try:
+        db.session.commit()
+        print(f"Success! {user.username} ({user.email}) is now an admin.")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Failed to promote user: {e}")
+
+
 if __name__ == "__main__":
     debug_mode = environ.get("FLASK_DEBUG", "False").lower() == "true"
     app.run(host="0.0.0.0", debug=debug_mode)
