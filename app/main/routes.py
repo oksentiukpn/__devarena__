@@ -16,7 +16,9 @@ from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
 from app.models import Comment, Post, Reaction, User
-
+from app.main.utils import save_profile_picture
+import re
+# from app.main.search import search_posts, search_users
 
 main = Blueprint("main", __name__)
 sttgs = Blueprint("settings", __name__)
@@ -38,9 +40,16 @@ def authors():
 def terms_of_service():
     return render_template("main/terms.html")
 
+
 @main.route("/settings")
 @login_required
 def settings_page():
+    user = User.query.get(session["user_id"])
+    return render_template("main/settings.html", user=user)
+
+# @main.route("/settings")
+# @login_required
+# def settings_page():
     # user_languages = (
     #     db.session.query(Post.language)
     #     .filter_by(user_id=session["user_id"])
@@ -48,7 +57,15 @@ def settings_page():
     #     .all()
     # )
     # user_languages = [lang[0] for lang in user_languages]
-    return render_template("main/settings.html")
+    # return render_template("main/settings.html")
+
+@sttgs.route("/profile_save_changes")
+@login_required
+def save_changes():
+
+
+    return redirect(url_for("settings.html"))
+    # return render_template("main/settings.html")
 
 @main.route("/feed")
 @login_required
@@ -266,3 +283,65 @@ def delete_comment(comment_id):
 def battles():
     # rick-roll
     return redirect(url_for("challenges.create_battle"))
+
+
+@main.route("/profile_save_changes", methods=["POST"])
+@login_required
+def profile_save_changes():
+    user = User.query.get(session["user_id"])
+
+    # 1) read inputs
+    new_username = request.form.get("username", "").strip()
+    new_bio = request.form.get("bio", "").strip()
+
+    # 2) validate username if changed
+    if new_username and new_username != user.username:
+        if not re.match(r"^\w+$", new_username):
+            flash("Username can only contain letters, numbers and underscores.", "danger")
+            return redirect(url_for("main.settings_page", _anchor="profile"))
+
+        if User.query.filter_by(username=new_username).first():
+            flash("Username already exists.", "danger")
+            return redirect(url_for("main.settings_page", _anchor="profile"))
+
+        user.username = new_username
+
+    # 3) update bio (bio is non-null, so store empty string if blank)
+    user.bio = new_bio
+
+    # 4) handle image upload (optional)
+    file = request.files.get("profile_picture")
+    if file and file.filename:
+        try:
+            filename = save_profile_picture(file)
+            user.image_file = filename
+        except Exception as e:
+            flash(f"Image upload failed: {e}", "danger")
+            return redirect(url_for("main.settings_page", _anchor="profile"))
+
+    # 5) commit safely
+    try:
+        db.session.commit()
+        flash("Profile updated!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Database error: {e}", "danger")
+
+    return redirect(url_for("main.settings_page", _anchor="profile"))
+
+
+# @main.route("/search")
+# def search_page():
+#     q = (request.args.get("q") or "").strip()
+#     tab = (request.args.get("tab") or "posts").strip()  # "posts" or "users"
+
+#     posts = []
+#     users = []
+
+#     if q:
+#         if tab == "users":
+#             users = search_users(q, limit=20)
+#         else:
+#             posts = search_posts(q, limit=20)
+
+#     return render_template("main/search.html", q=q, tab=tab, posts=posts, users=users)
