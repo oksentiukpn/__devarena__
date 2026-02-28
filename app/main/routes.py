@@ -28,8 +28,13 @@ def home():
 
 
 @main.route("/privacy")
-def privacy_policy():
+def privacy():
     return render_template("main/privacy.html")
+
+
+@main.route("/terms")
+def terms():
+    return render_template("main/terms.html")
 
 
 @main.route("/feed")
@@ -282,3 +287,14 @@ def unsubscribe(token):
     current_app.logger.info(f"User with id {user_id} unsubscribed from daily prompts.")
     flash("You have been successfully unsubscribed from daily prompts.", "success")
     return redirect(url_for("main.home"))
+
+
+@main.route("/settings")
+@login_required
+def settings():
+    return "Not implemented yet"
+
+
+@main.route("/authors")
+def authors():
+    return "Not implemented yet"
