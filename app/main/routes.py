@@ -48,6 +48,8 @@ def terms():
 @main.route("/feed")
 @login_required
 def feed_page():
+    current_user = User.query.get(session["user_id"])
+    post_count = Post.query.filter_by(user_id=session["user_id"]).count()
     user_languages = (
         db.session.query(Post.language)
         .filter_by(user_id=session["user_id"])
@@ -65,7 +67,9 @@ def feed_page():
         .all()
     )
 
-    return render_template("feed.html", posts=feed_posts)
+    return render_template(
+        "feed.html", posts=feed_posts, post_count=post_count, current_user=current_user
+    )
 
 @main.route("/post", methods=["GET", "POST"])
 @login_required
@@ -198,7 +202,10 @@ def user_profile(username):
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
-    if post.user_id != session["user_id"]:
+    current_user = User.query.get(session["user_id"])
+
+    # Security Check: Ensure current user is the author
+    if post.user_id != current_user.id and not current_user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
@@ -223,7 +230,10 @@ def view_post(post_id):
 @login_required
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-    if comment.user_id != session["user_id"]:
+    current_user = User.query.get(session["user_id"])
+
+    # Security Check: Ensure current user is the author
+    if comment.user_id != current_user.id and not current_user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
