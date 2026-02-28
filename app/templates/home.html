@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}DevArena - Main{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='main_page.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+    <section class="hero-section">
+        <div class="top-badge">
+            <span class="badge-dot"></span>
+            Join developers from all fields improving their code
+        </div>
+
+        <h1 class="main-title">
+            Level Up Your Code Through <br>
+            <span class="highlight">Peer Review</span>
+        </h1>
+
+        <p class="main-desc">
+            DevArena is the platform where developers grow together. Get your <br>
+            code reviewed, compete in coding battles, and climb the leaderboard.
+        </p>
+
+        <div class="button-container">
+            <a class="btn-green" href="{{ url_for('auth.register') }}">
+                Get Started Free <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a class="btn-outline" href="{{ url_for('main.feed_page') }}">
+                <i class="fa-regular fa-eye"></i> Browse Projects
+            </a>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-num">0+</span>
+                <span class="stat-label">Code Reviews</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-box">
+                <span class="stat-num">1+</span>
+                <span class="stat-label">Developers</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-box">
+                <span class="stat-num">0+</span>
+                <span class="stat-label">Battles</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Three simple steps to start improving your code and helping others grow.</p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Share Your Code</h3>
+                <p>Post your projects, algorithms, or code snippets. Add descriptions and tags to help others find and understand your work.</p>
+                <div class="step-footer"><i class="fa-regular fa-circle-check"></i> Syntax highlighting for 50+ languages</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Get Peer Reviews</h3>
+                <p>Receive constructive feedback from the community. Learn best practices, discover optimizations, and improve code quality.</p>
+                <div class="step-footer"><i class="fa-regular fa-circle-check"></i> Inline comments and suggestions</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Compete & Grow</h3>
+                <p>Join coding battles, earn reputation points, and climb the leaderboard. Showcase your skills and learn from the best.</p>
+                <div class="step-footer"><i class="fa-regular fa-circle-check"></i> Weekly challenges and prizes</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-split">
+    <div class="container">
+        <div class="split-wrapper">
+            <div class="content-side">
+                <h2 class="title">Everything You Need to Grow as a Developer</h2>
+                <p class="description">
+                    DevArena combines code review, gamification, and community to create the ultimate learning environment for developers at any level.
+                </p>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon bg-green-dim"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div>
+                            <h4>Reputation System</h4>
+                            <p>Earn points for quality reviews and code contributions. Build your developer credibility.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon bg-green-dim"><i class="fa-solid fa-bolt"></i></div>
+                        <div>
+                            <h4>Battle Mode</h4>
+                            <p>Compete head-to-head on coding challenges. Community votes for clean code and performance.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon bg-green-dim"><i class="fa-solid fa-users"></i></div>
+                        <div>
+                            <h4>Community Driven</h4>
+                            <p>Connect with developers worldwide. Share knowledge and grow together.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-side">
+                <div class="window-frame">
+                    <div class="window-header">
+                        <div class="dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="file-name">solution.py</span>
+                    </div>
+                    <div class="code-content">
+                        <pre><code><span class="comment"># Optimized binary search</span>
+<span class="keyword">def</span> <span class="func">binary_search</span>(arr, target):
+    left, right = <span class="num">0</span>, <span class="func">len</span>(arr) - <span class="num">1</span>
+    <span class="keyword">while</span> left <= right:
+        mid = (left + right) // <span class="num">2</span>
+        <span class="keyword">if</span> arr[mid] == target:
+            <span class="keyword">return</span> mid
+        <span class="keyword">elif</span> arr[mid] < target:
+            left = mid + <span class="num">1</span>
+        <span class="keyword">else</span>:
+            right = mid - <span class="num">1</span>
+    <span class="keyword">return</span> -<span class="num">1</span></code></pre>
+                    </div>
+                    <div class="window-footer">
+                        <div class="actions">
+                            <span class="action-btn like"><i class="fa-regular fa-heart"></i> 124</span>
+                            <span class="action-btn comment"><i class="fa-regular fa-comment"></i> 18</span>
+                        </div>
+                        <span class="complexity">O(log n)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-content">
+    <h2 class="cta-title">Ready to Improve Your Code?</h2>
+    <p class="cta-subtitle">
+      Join thousands of developers who are leveling up their skills through peer review and friendly competition.
+    </p>
+    <a href="{{ url_for('auth.register') }}" class="cta-button">
+      Create Free Account
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</section>
+{% endblock %}
