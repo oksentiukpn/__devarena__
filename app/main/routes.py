@@ -1,6 +1,7 @@
 from flask import (
     Blueprint,
-    abort,
+    Response,
+    current_app,
     flash,
     jsonify,
     redirect,
@@ -9,13 +10,14 @@ from flask import (
     session,
     url_for,
 )
+from itsdangerous import URLSafeSerializer
 from sqlalchemy import case, desc
 from sqlalchemy.orm import joinedload
 
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
-from app.models import Comment, Post, Reaction, User
+from app.models import Battle, Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
 
@@ -31,11 +33,17 @@ def leaderboard():
 
 @main.route("/")
 def home():
-    return render_template("test_pages/main_test.html")
+    return render_template("home.html")
 
 @main.route("/privacy")
-def privacy_policy():
+def privacy():
     return render_template("main/privacy.html")
+
+
+@main.route("/terms")
+def terms():
+    return render_template("main/terms.html")
+
 
 @main.route("/feed")
 @login_required
@@ -69,7 +77,7 @@ def post():
             for tag in form.tags.data.replace("#", " ").split()
             if tag not in ("", " ")
         ]
-        clean_tags = "".join([tag.strip() for tag in raw_tags])
+        clean_tags = ",".join([tag.strip() for tag in raw_tags])
         feedback_str = ",".join(form.feedback.data)
 
         new_post = Post(
@@ -86,10 +94,14 @@ def post():
         try:
             db.session.add(new_post)
             db.session.commit()
+            current_app.logger.info(
+                f"New post created: '{new_post.title}' by user_id {session['user_id']}"
+            )
             flash("Your project has been posted!", "success")
             return redirect(url_for("main.feed_page"))
         except Exception as e:
             db.session.rollback()
+            current_app.logger.error(f"Error creating post: {e}")
             flash(f"An error occurred saving the post: {e}", "danger")
     return render_template("post.html")
 
@@ -145,6 +157,19 @@ def add_comment(post_id):
 
     comment_author = User.query.get(session["user_id"])
     comment_author.points += 2
+    current_app.logger.info(
+        f"New comment added to post_id {post_id} by user_id {session['user_id']}"
+    )
+
+    return jsonify(
+        {
+            "id": new_comment.id,
+            "content": new_comment.content,
+            "author": new_comment.author.username,
+            "created_at": new_comment.created_at.strftime("%b %d"),
+            "avatar_letter": new_comment.author.username[:2],
+        }
+    )
 
     db.session.commit()
 
@@ -164,7 +189,6 @@ def profile():
     return render_template("main/profile.html", user=user, posts=posts)
 
 @main.route("/user/<username>")
-@login_required
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
@@ -180,10 +204,20 @@ def delete_post(post_id):
     try:
         db.session.delete(post)
         db.session.commit()
+        current_app.logger.info(
+            f"Post with id {post_id} deleted by user_id {session['user_id']}"
+        )
         return jsonify({"success": True})
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@main.route("/post/<int:post_id>", methods=["GET"])
+def view_post(post_id):
+    post = Post.query.options(joinedload(Post.author)).get_or_404(post_id)
+    return render_template("main/view_post.html", post=post)
+
 
 @main.route("/comment/<int:comment_id>", methods=["DELETE"])
 @login_required
@@ -209,5 +243,69 @@ def delete_comment(comment_id):
         return jsonify({"error": str(e)}), 500
 
 @main.route("/battles")
+@login_required
 def battles():
     return redirect(url_for("challenges.create_battle"))
+    feed_battles = (
+        Battle.query.options(joinedload(Battle.author))
+        .filter(Battle.visibility == "public")
+        .order_by(Battle.created_at.desc())
+        .limit(20)
+        .all()
+    )
+    return render_template("battles.html", battles=feed_battles)
+
+
+@main.route("/sitemap.xml")
+def sitemap():
+    users = User.query.all()
+    posts = Post.query.filter_by(visibility="public").all()
+
+    xml_content = render_template("sitemap.xml", users=users, posts=posts)
+
+    return Response(xml_content, mimetype="application/xml")
+
+
+@main.route("/robots.txt")
+def robots():
+    robots_content = """User-agent: *
+Disallow: /login
+Disallow: /register
+Allow: /
+
+Sitemap: https://devarena.pp.ua/sitemap.xml
+"""
+    return Response(robots_content, mimetype="text/plain")
+
+
+@main.route("/unsubscribe/<token>", methods=["GET", "POST"])
+def unsubscribe(token):
+    ser = URLSafeSerializer(current_app.config["SECRET_KEY"])
+    try:
+        user_id = ser.loads(token, salt="unsubscribe-daily-prompt")
+    except Exception:
+        flash("Invalid or corrupted unsubscribe link.", "danger")
+        return redirect(url_for("main.home"))
+
+    user = User.query.get(user_id)
+    if user:
+        user.subscribed_to_daily_prompt = False
+        db.session.commit()
+
+    if request.method == "POST":
+        return "Unsubscribed successfully", 200
+
+    current_app.logger.info(f"User with id {user_id} unsubscribed from daily prompts.")
+    flash("You have been successfully unsubscribed from daily prompts.", "success")
+    return redirect(url_for("main.home"))
+
+
+@main.route("/settings")
+@login_required
+def settings():
+    return "Not implemented yet"
+
+
+@main.route("/authors")
+def authors():
+    return "Not implemented yet"

@@ -53,6 +53,8 @@ class User(db.Model):
     languages = db.Column(db.String(1024), nullable=True)
 
     points = db.Column(db.Integer, default=0, nullable=False)
+    points = db.Column(db.Integer, default=0, server_default="0", nullable=False)
+    subscribed_to_daily_prompt = db.Column(db.Boolean, default=True)
 
     def set_password(self, password: str) -> None:
         """Set password"""
@@ -115,6 +117,15 @@ class Post(db.Model):
             summary[reaction.emoji]["user_ids"].add(reaction.user_id)
         return summary
 
+    def update_popularity_points(self, value_to_add):
+        """
+        Calculates post popularity: 1 reaction = 5 p, 1 comment = 10 p.
+        Updates the author's total points balance.
+        """
+
+        self.author.points += value_to_add
+        db.session.commit()
+
     def __repr__(self):
         return f"Post('{self.title}', '{self.created_at}')"
 
@@ -158,7 +169,61 @@ class Battle(db.Model):
 
     # Relationship
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    author = db.relationship("User", backref="battles", lazy=True)
+    opponent_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    author = db.relationship(
+        "User", foreign_keys=[user_id], backref="battles", lazy=True
+    )
+    status = db.Column(
+        db.String(20), default="waiting"
+    )  # waiting, ready, in_progress, in_review, completed
+
+    creator_ready = db.Column(db.Boolean, default=False)
+    opponent_ready = db.Column(db.Boolean, default=False)
+
+    start_time = db.Column(db.DateTime, nullable=True)
+    end_time = db.Column(db.DateTime, nullable=True)
+
+    creator_code = db.Column(db.Text, nullable=True)
+    opponent_code = db.Column(db.Text, nullable=True)
+
+    opponent = db.relationship(
+        "User", foreign_keys=[opponent_id], backref="joined_battles"
+    )
+    creator_submitted = db.Column(db.Boolean, default=False)
+    opponent_submitted = db.Column(db.Boolean, default=False)
+    review_end_time = db.Column(db.DateTime, nullable=True)
+    winner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    winner = db.relationship("User", foreign_keys=[winner_id])
 
     def __repr__(self):
-        return f"Battle('{self.title}', '{self.difficulty}')"
+        return f"Battle('{self.title}', '{self.status}')"
+
+
+class BattleVote(db.Model):
+    __tablename__ = "battle_votes"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    battle_id = db.Column(db.Integer, db.ForeignKey("battles.id"), nullable=False)
+    voted_for_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Ensure a user can only vote once per battle
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "battle_id", name="unique_user_battle_vote"),
+    )
+
+
+class BattleComment(db.Model):
+    __tablename__ = "battle_comments"
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    battle_id = db.Column(db.Integer, db.ForeignKey("battles.id"), nullable=False)
+
+    author = db.relationship("User", backref="battle_comments", lazy=True)
+    battle = db.relationship(
+        "Battle",
+        backref=db.backref("comments", lazy="dynamic", cascade="all, delete-orphan"),
+    )
