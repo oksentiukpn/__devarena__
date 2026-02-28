@@ -40,6 +40,8 @@ def terms():
 @main.route("/feed")
 @login_required
 def feed_page():
+    current_user = User.query.get(session["user_id"])
+    post_count = Post.query.filter_by(user_id=session["user_id"]).count()
     user_languages = (
         db.session.query(Post.language)
         .filter_by(user_id=session["user_id"])
@@ -57,7 +59,9 @@ def feed_page():
         .all()
     )
 
-    return render_template("feed.html", posts=feed_posts)
+    return render_template(
+        "feed.html", posts=feed_posts, post_count=post_count, current_user=current_user
+    )
 
 
 @main.route("/post", methods=["GET", "POST"])

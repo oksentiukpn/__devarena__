@@ -55,6 +55,9 @@ class User(db.Model):
     points = db.Column(db.Integer, default=0, server_default="0", nullable=False)
     subscribed_to_daily_prompt = db.Column(db.Boolean, default=True)
 
+    streak_days = db.Column(db.Integer, default=0, server_default="0", nullable=False)
+    last_active_date = db.Column(db.Date, nullable=True)
+
     def set_password(self, password: str) -> None:
         """Set password"""
         self.password_hash = generate_password_hash(password)
