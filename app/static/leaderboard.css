@@ -166,3 +166,28 @@ tr:hover {
     background: var(--accent-green);
     color: #ffffff;
 }
+
+@media (max-width: 768px) {
+    thead {
+        display: none;
+    }
+
+
+    td:not([colspan]) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+
+    td:not([colspan])::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--accent-green);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+}
