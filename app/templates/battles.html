@@ -69,7 +69,17 @@
               <div class="w-px h-4 bg-zinc-700"></div>
               <div class="flex items-center gap-2">
                   <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  {% if battle.difficulty == 'Beginner' %}
+                  <span class="font-medium text-green-400">{{ battle.difficulty }}</span>
+                  {% elif battle.difficulty == 'Intermediate' %}
+                  <span class="font-medium text-orange-400">{{ battle.difficulty }}</span>
+                  {% elif battle.difficulty == 'Advanced' %}
+                  <span class="font-medium text-red-400">{{ battle.difficulty }}</span>
+                  {% elif battle.difficulty == 'Expert' %}
+                  <span class="font-medium text-purple-400">{{ battle.difficulty }}</span>
+                  {% else %}
                   <span class="font-medium">{{ battle.difficulty }}</span>
+                  {% endif %}
               </div>
           </div>
 
