@@ -399,11 +399,24 @@ def battles():
         or_(Battle.user_id == user_id, Battle.opponent_id == user_id)
     ).count()
 
+    top_warriors = (
+        db.session.query(
+            User,
+            func.count(Battle.winner_id).label("wins"),
+        )
+        .join(Battle, Battle.winner_id == User.id)
+        .group_by(User.id)
+        .order_by(desc("wins"))
+        .limit(5)
+        .all()
+    )
+
     return render_template(
         "battles.html",
         battles=feed_battles,
         battles_won=battles_won,
         battles_participated=battles_participated,
+        top_warriors=top_warriors,
     )
 
 
