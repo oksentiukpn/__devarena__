@@ -160,7 +160,13 @@ def profile():
     reactions_count = count_reactions(user)
 
 
-    return render_template("main/profile.html", user=user, posts=posts, battles_count = battles_count, reactions_count = reactions_count)
+    return render_template(
+        "main/profile.html",
+        user=user,
+        posts=posts,
+        battles_count=battles_count,
+        reactions_count=reactions_count,
+    )
 
 
 # Other users

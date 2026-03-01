@@ -1,15 +1,7 @@
 from app.models import Battle, Reaction, User
-
+from sqlalchemy import or_
 def count_battles(current_user:User):
-    count = 0
-    user_battles = Battle.query.filter_by(user_id=current_user.id).all()
-    for _ in user_battles:
-        count+=1
-    return count
+    return Battle.query.filter_by(user_id=current_user.id).count()
 
 def count_reactions(current_user:User):
-    user_reactions = Reaction.query.filter_by(user_id = current_user.id)
-    count = 0
-    for _ in user_reactions:
-        count +=1
-    return count
+    return Reaction.query.filter_by(user_id=current_user.id).count()
