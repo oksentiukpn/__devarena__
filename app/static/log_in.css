@@ -1,3 +1,6 @@
+:root {
+    --emerald: #10b981;
+}
 
 body {
     margin: 0;
@@ -7,6 +10,13 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--emerald);
 }
 
 
@@ -55,8 +65,13 @@ body {
 .header-main {
     font-size: 30px;
     font-weight: 700;
-    margin-bottom: 8px;
+    /* margin-bottom: 8px; */
 }
+
+/* .header-main-div {
+    text-align: center;
+    margin-bottom: 32px;
+} */
 
 .subheader-main {
     color: #a1a1aa;
@@ -219,8 +234,12 @@ input:focus {
 }
 
 .svg-header {
+    /* display: flex;
+    justify-content: center; */
     display: flex;
+    align-items: center;
     justify-content: center;
+    gap: 8px;
 }
 
 .svg {
