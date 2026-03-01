@@ -26,9 +26,11 @@
         </p>
 
         <div class="button-container">
+            {% if not session.get('user_id') %}
             <a class="btn-green" href="{{ url_for('auth.register') }}">
                 Get Started Free <i class="fa-solid fa-arrow-right"></i>
             </a>
+            {% endif %}
             <a class="btn-outline" href="{{ url_for('main.feed_page') }}">
                 <i class="fa-regular fa-eye"></i> Browse Projects
             </a>
