@@ -10,7 +10,7 @@
 
             <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-[#5da67d] flex-shrink-0 flex items-center justify-center text-4xl font-bold text-[#121c17] shadow-lg overflow-hidden">
                 {% if user.image_file and user.image_file != 'default.jpg' %}
-                    <img src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}" class="w-full h-full object-cover">
+                    <img src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}" alt="{{ user.username }}'s profile picture" class="w-full h-full object-cover">
                 {% else %}
                     {{ user.username[:1].upper() }}
                 {% endif %}
