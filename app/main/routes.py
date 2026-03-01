@@ -45,6 +45,18 @@ def feed_page():
     current_user = User.query.get(session["user_id"])
     post_count = Post.query.filter_by(user_id=session["user_id"]).count()
 
+    # Active battles for the sidebar
+    active_battles = (
+        Battle.query.options(joinedload(Battle.author))
+        .filter(
+            Battle.visibility == "public",
+            Battle.status.in_(["waiting", "ready", "in_progress", "in_review"]),
+        )
+        .order_by(Battle.created_at.desc())
+        .limit(5)
+        .all()
+    )
+
     sort = request.args.get("sort", "recommended")
     if sort not in ("latest", "top", "recommended"):
         sort = "recommended"
@@ -200,6 +212,7 @@ def feed_page():
         post_count=post_count,
         current_user=current_user,
         sort=sort,
+        active_battles=active_battles,
     )
 
 
