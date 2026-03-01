@@ -2,7 +2,7 @@
 Defining models for database
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -71,6 +71,27 @@ class User(db.Model):
         if not self.password_hash:
             return False
         return check_password_hash(self.password_hash, password)
+
+    def update_streak(self):
+        """
+        Update the user's coding streak based on post activity.
+        Call this when a user creates a post.
+        - Same day: no change (already counted today)
+        - Next day: increment streak
+        - Missed a day or more: reset streak to 1
+        - First ever activity: start streak at 1
+        """
+        today = date.today()
+
+        if self.last_active_date == today:
+            return
+
+        if self.last_active_date and (today - self.last_active_date).days == 1:
+            self.streak_days += 1
+        else:
+            self.streak_days = 1
+
+        self.last_active_date = today
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"

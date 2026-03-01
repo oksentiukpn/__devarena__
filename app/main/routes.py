@@ -242,6 +242,11 @@ def post():
 
         try:
             db.session.add(new_post)
+
+            user = User.query.get(session["user_id"])
+            if user:
+                user.update_streak()
+
             db.session.commit()
             current_app.logger.info(
                 f"New post created: '{new_post.title}' by user_id {session['user_id']}"
@@ -298,18 +303,21 @@ def add_comment(post_id):
     )
 
     db.session.add(new_comment)
+    db.session.commit()
 
     current_app.logger.info(
         f"New comment added to post_id {post_id} by user_id {session['user_id']}"
     )
 
+    author = User.query.get(session["user_id"])
+
     return jsonify(
         {
             "id": new_comment.id,
             "content": new_comment.content,
-            "author": new_comment.author.username,
+            "author": author.username,
             "created_at": new_comment.created_at.strftime("%b %d"),
-            "avatar_letter": new_comment.author.username[:2],
+            "avatar_letter": author.username[:2],
         }
     )
 
