@@ -224,14 +224,14 @@ input:focus {
 }
 
 .svg {
-    width: 10%;
+    width: 9%;
     /* margin-left: 80px; */
 }
 
 .btn-google {
-    padding: 25px;
+    /* padding: 25px; */
     text-align: center;
-    border-radius: 15px;
+    border-radius: 10px;
     font-size: 16px;
 }
 
@@ -262,4 +262,12 @@ input:focus {
 
 .terms-a {
     color: #d2d2d7;
+}
+
+
+@media (max-width: 425px) {
+    .main-div {
+    padding: 40px 20px;
+}
+
 }
