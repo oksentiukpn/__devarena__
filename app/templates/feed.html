@@ -2,8 +2,6 @@
 
 {% block title %}Feed - DevArena{% endblock %}
 
-{% block nav_home_class %}px-4 py-2 rounded-lg bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% endblock %}
-
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -34,8 +32,12 @@
       <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-white">Feed</h1>
         <div class="flex items-center gap-2">
-          <button class="px-4 py-2 bg-emerald-600/10 text-emerald-500 border border-emerald-600/20 rounded-lg text-sm font-medium">Latest</button>
-          <button class="px-4 py-2 text-zinc-400 hover:bg-zinc-800 rounded-lg text-sm font-medium transition-colors">Top</button>
+          <a href="{{ url_for('main.feed_page', sort='recommended') }}"
+             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if sort == 'recommended' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-400 hover:bg-zinc-800{% endif %}">Recommended</a>
+          <a href="{{ url_for('main.feed_page', sort='latest') }}"
+             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if sort == 'latest' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-400 hover:bg-zinc-800{% endif %}">Latest</a>
+          <a href="{{ url_for('main.feed_page', sort='top') }}"
+             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if sort == 'top' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-400 hover:bg-zinc-800{% endif %}">Top</a>
         </div>
       </div>
 

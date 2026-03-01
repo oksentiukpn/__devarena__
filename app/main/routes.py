@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from flask import (
     Blueprint,
     Response,
@@ -11,7 +13,7 @@ from flask import (
     url_for,
 )
 from itsdangerous import URLSafeSerializer
-from sqlalchemy import case, desc
+from sqlalchemy import case, desc, func, or_
 from sqlalchemy.orm import joinedload
 
 from app import db
@@ -42,25 +44,162 @@ def terms():
 def feed_page():
     current_user = User.query.get(session["user_id"])
     post_count = Post.query.filter_by(user_id=session["user_id"]).count()
-    user_languages = (
-        db.session.query(Post.language)
-        .filter_by(user_id=session["user_id"])
-        .distinct()
-        .all()
-    )
-    user_languages = [lang[0] for lang in user_languages]
 
-    score_case = case((Post.language.in_(user_languages), 50), else_=0)
-    feed_posts = (
-        Post.query.options(joinedload(Post.author))
-        .filter(Post.visibility == "public")
-        .order_by(desc(score_case), Post.created_at.desc())
-        .limit(20)
-        .all()
+    sort = request.args.get("sort", "recommended")
+    if sort not in ("latest", "top", "recommended"):
+        sort = "recommended"
+
+    base_query = Post.query.options(joinedload(Post.author)).filter(
+        Post.visibility == "public"
     )
+
+    if sort == "latest":
+        feed_posts = base_query.order_by(Post.created_at.desc()).limit(20).all()
+
+    elif sort == "top":
+        # Rank by total engagement: reactions + comments (all time)
+        reaction_count = (
+            db.session.query(
+                Reaction.post_id,
+                func.count(Reaction.id).label("r_count"),
+            )
+            .group_by(Reaction.post_id)
+            .subquery()
+        )
+        comment_count = (
+            db.session.query(
+                Comment.post_id,
+                func.count(Comment.id).label("c_count"),
+            )
+            .group_by(Comment.post_id)
+            .subquery()
+        )
+
+        engagement = (
+            func.coalesce(reaction_count.c.r_count, 0) * 5
+            + func.coalesce(comment_count.c.c_count, 0) * 10
+        )
+
+        feed_posts = (
+            base_query.outerjoin(reaction_count, Post.id == reaction_count.c.post_id)
+            .outerjoin(comment_count, Post.id == comment_count.c.post_id)
+            .order_by(desc(engagement), Post.created_at.desc())
+            .limit(20)
+            .all()
+        )
+
+    else:
+        # --- Recommended algorithm ---
+        # Signals combined into a single score:
+        #   1. Language affinity  – posts in languages the user writes get +40
+        #   2. Tag overlap        – posts sharing tags with user's posts get +30
+        #   3. Engagement quality – (reactions*5 + comments*10), capped contribution
+        #   4. Recency boost      – posts from the last 3 days get +25, last 7 days +10
+        #   5. Slight penalty for user's own posts so others' work surfaces first
+
+        # Gather user's languages
+        user_languages = (
+            db.session.query(Post.language)
+            .filter_by(user_id=session["user_id"])
+            .distinct()
+            .all()
+        )
+        user_languages = [lang[0] for lang in user_languages]
+
+        # Gather user's tags for tag-overlap signal
+        user_tags_raw = (
+            db.session.query(Post.tags).filter_by(user_id=session["user_id"]).all()
+        )
+        user_tags = set()
+        for (tags_str,) in user_tags_raw:
+            if tags_str:
+                for t in tags_str.split(","):
+                    stripped = t.strip().lower()
+                    if stripped:
+                        user_tags.add(stripped)
+
+        # Language affinity score
+        if user_languages:
+            lang_score = case(
+                (Post.language.in_(user_languages), 40),
+                else_=0,
+            )
+        else:
+            lang_score = 0
+
+        # Tag overlap score – match any of the user's tags
+        if user_tags:
+            tag_conditions = [
+                Post.tags.ilike(f"%{tag}%") for tag in list(user_tags)[:20]
+            ]
+            # OR across all tag patterns; if any match → +30
+            tag_score = case(
+                (or_(*tag_conditions), 30),
+                else_=0,
+            )
+        else:
+            tag_score = 0
+
+        # Engagement sub-queries
+        reaction_count = (
+            db.session.query(
+                Reaction.post_id,
+                func.count(Reaction.id).label("r_count"),
+            )
+            .group_by(Reaction.post_id)
+            .subquery()
+        )
+        comment_count = (
+            db.session.query(
+                Comment.post_id,
+                func.count(Comment.id).label("c_count"),
+            )
+            .group_by(Comment.post_id)
+            .subquery()
+        )
+
+        # Engagement score (cap at 50 so viral posts don't completely dominate)
+        raw_engagement = (
+            func.coalesce(reaction_count.c.r_count, 0) * 5
+            + func.coalesce(comment_count.c.c_count, 0) * 10
+        )
+        engagement_score = case(
+            (raw_engagement > 50, 50),
+            else_=raw_engagement,
+        )
+
+        # Recency boost
+        now = datetime.utcnow()
+        recency_score = case(
+            (Post.created_at >= now - timedelta(days=3), 25),
+            (Post.created_at >= now - timedelta(days=7), 10),
+            else_=0,
+        )
+
+        # Small penalty for own posts so discovery of others is prioritised
+        own_post_penalty = case(
+            (Post.user_id == session["user_id"], -15),
+            else_=0,
+        )
+
+        total_score = (
+            lang_score + tag_score + engagement_score + recency_score + own_post_penalty
+        )
+
+        feed_posts = (
+            base_query.outerjoin(reaction_count, Post.id == reaction_count.c.post_id)
+            .outerjoin(comment_count, Post.id == comment_count.c.post_id)
+            .order_by(desc(total_score), Post.created_at.desc())
+            .limit(20)
+            .all()
+        )
 
     return render_template(
-        "feed.html", posts=feed_posts, post_count=post_count, current_user=current_user
+        "feed.html",
+        posts=feed_posts,
+        post_count=post_count,
+        current_user=current_user,
+        sort=sort,
     )
 
 
