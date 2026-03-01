@@ -166,3 +166,55 @@ tr:hover {
     background: var(--accent-green);
     color: #ffffff;
 }
+
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px 16px;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+        line-height: 1.2;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 30px;
+    }
+
+
+    .leaderboard-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0;
+        border-radius: 12px;
+    }
+
+    table {
+        min-width: 500px;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        font-size: 0.85rem;
+    }
+
+    .avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 0.7rem;
+    }
+}
+
+
+@media (max-width: 375px) {
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .back-link {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+}
