@@ -121,7 +121,26 @@
       <div class="sticky top-24 space-y-6">
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5">
           <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Top Warriors</h3>
-          <div class="text-zinc-500 text-sm">Leaderboard coming soon...</div>
+          {% if top_warriors %}
+          <div class="space-y-3">
+            {% for user, wins in top_warriors %}
+            <div class="flex items-center gap-3">
+              <span class="w-5 text-xs font-bold {% if loop.index == 1 %}text-yellow-400{% elif loop.index == 2 %}text-zinc-300{% elif loop.index == 3 %}text-amber-500{% else %}text-zinc-500{% endif %}">
+                #{{ loop.index }}
+              </span>
+              <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 shrink-0">
+                {{ user.username[:2].upper() }}
+              </div>
+              <div class="flex-1 truncate">
+                <span class="text-sm font-medium text-white truncate block">{{ user.username }}</span>
+              </div>
+              <span class="text-xs font-semibold text-emerald-400">{{ wins }}W</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-zinc-500 text-sm">No warriors yet. Win a battle to claim your spot!</div>
+          {% endif %}
         </div>
       </div>
     </aside>
