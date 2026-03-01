@@ -17,6 +17,7 @@ from app.auth.utils import login_required
 from app.main.form import PostForm
 from app.models import Comment, Post, Reaction, User
 from app.main.utils import save_profile_picture
+from app.main.search import search_post_ids
 import re
 # from app.main.search import search_posts, search_users
 
@@ -45,6 +46,18 @@ def terms_of_service():
 def settings_page():
     user = User.query.get(session["user_id"])
     return render_template("main/settings.html", user=user)
+
+@main.route("/search")
+def search_page():
+    q = (request.args.get("q") or "").strip()
+
+    posts = []
+    post_ids = []
+    if q:
+        post_ids = search_post_ids(q, limit=50)
+    posts = Post.query.filter(Post.id.in_(post_ids)).all()
+    # MVP page: just show ids in order (UI later)
+    return render_template("main/search.html", q=q, posts=posts)
 
 @main.route("/feed")
 @login_required

@@ -26,39 +26,39 @@
     <div id="profile" class="tab-content hidden text-white w-full space-y-6">
       <h2 class="text-xl font-medium text-white mb-4">Profile</h2>
 
-      <div class="flex items-center gap-4 mb-2">
-        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-emerald-900/20 overflow-hidden">
-          {% if u and u.image_file %}
-            {% if u.image_file.startswith('http') %}
-              <img src="{{ u.image_file }}" alt="Profile picture" class="w-full h-full object-cover">
-            {% else %}
-              <img
-                src="{{ url_for('static', filename='profile_pics/' ~ u.image_file) }}"
-                alt="Profile picture"
-                class="w-full h-full object-cover"
-                onerror="this.remove();"
-              >
-              <!-- <span class="fallback-initial">
-                {{ u.username[:1].upper() if u and u.username else 'U' }}
-              </span> -->
-            {% endif %}
-          <!-- {% else %}
-            {{ u.username[:1].upper() if u and u.username else 'U' }}
-          {% endif %} -->
-        </div>
-
-        <label for="profile_picture"
-          class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 rounded-full text-sm font-medium transition-colors border border-zinc-700/50 cursor-pointer">
-          Upload new picture
-        </label>
-      </div>
-
       <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8">
         <form
           action="{{ url_for('main.profile_save_changes') }}"
           method="POST"
           enctype="multipart/form-data"
           id="settings_name_bio">
+
+        <div class="flex items-center gap-4 mb-2">
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-emerald-900/20 overflow-hidden">
+            {% if u and u.image_file %}
+              {% if u.image_file.startswith('http') %}
+                <img src="{{ u.image_file }}" alt="Profile picture" class="w-full h-full object-cover">
+              {% else %}
+                <img
+                  src="{{ url_for('static', filename='profile_pics/' ~ u.image_file) }}"
+                  alt="Profile picture"
+                  class="w-full h-full object-cover"
+                  onerror="this.remove();"
+                >
+                <!-- <span class="fallback-initial">
+                  {{ u.username[:1].upper() if u and u.username else 'U' }}
+                </span> -->
+              {% endif %}
+            <!-- {% else %}
+              {{ u.username[:1].upper() if u and u.username else 'U' }}
+            {% endif %} -->
+          </div>
+
+          <label for="profile_picture"
+            class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 rounded-full text-sm font-medium transition-colors border border-zinc-700/50 cursor-pointer">
+            Upload new picture
+          </label>
+        </div>
 
           <input id="profile_picture" name="profile_picture" type="file" accept="image/*" class="hidden">
 

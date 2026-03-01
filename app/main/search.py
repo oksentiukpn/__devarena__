@@ -1,70 +1,77 @@
-""" Docstring for app.main.search """
+"""
+Helping search service file
+"""
 
-from sqlalchemy import func, desc
-from app import db
-from app.models import Post, User
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Tuple
+from app.models import Post
+from app.main import search_engine
 
-def _post_vector():
-    return func.to_tsvector(
-        "simple",
-        func.coalesce(Post.title, "") + " " +
-        func.coalesce(Post.description, "") + " " +
-        func.coalesce(Post.tags, "")
-    )
 
-def _user_vector():
-    return func.to_tsvector(
-        "simple",
-        func.coalesce(User.username, "") + " " +
-        func.coalesce(User.bio, "")
-    )
-
-def search_posts(query: str, limit: int = 20, include_private_for_user_id: int | None = None):
-
-    """
-    Docstring for search_posts
-    :return: Description
-    :rtype: list
-    """
-
-    if not query or not query.strip():
+def _tags_to_list(tags: str | None) -> list[str]:
+    if not tags:
         return []
+    # DB stores tags as "python, flask, oop"
+    return [t.strip() for t in tags.split(",") if t.strip()]
 
-    tsquery = func.websearch_to_tsquery("simple", query)
 
-    rank = func.ts_rank_cd(_post_vector(), tsquery)
+def _load_posts_for_index() -> dict[str, dict]:
+    """
+    Convert DB posts into the dict format your search_engine expects:
+    {
+      "12": {"title": "...", "description": "...", "tags": ["a","b"]}
+    }
+    """
+    posts = Post.query.filter(Post.visibility == "public").all()
 
-    q = Post.query.filter(_post_vector().op("@@")(tsquery))
+    posts_by_id: dict[str, dict] = {}
+    for p in posts:
+        posts_by_id[str(p.id)] = {
+            "title": p.title or "",
+            "description": p.description or "",
+            "tags": _tags_to_list(p.tags),
+        }
+    return posts_by_id
 
-    # visibility rule (MVP: public only)
-    if include_private_for_user_id is None:
-        q = q.filter(Post.visibility == "public")
-    else:
-        q = q.filter(
-            (Post.visibility == "public") |
-            (Post.user_id == include_private_for_user_id)
-        )
 
-    return (
-        q.order_by(desc(rank), desc(Post.created_at))
-         .limit(limit)
-         .all()
+@dataclass
+class _Index:
+    ids: list[str]
+    posts: list[dict]
+    tag_sets: list[set[str]]
+    bm25: object
+
+
+# Simple module-level
+_INDEX: _Index | None = None
+_INDEX_SIZE: int = -1
+
+
+def get_index(force_rebuild: bool = False) -> _Index:
+    global _INDEX, _INDEX_SIZE
+
+    posts_by_id = _load_posts_for_index()
+    size = len(posts_by_id)
+
+    if force_rebuild or _INDEX is None or size != _INDEX_SIZE:
+        ids, posts, tag_sets, bm25 = search_engine.build_index(posts_by_id)
+        _INDEX = _Index(ids=ids, posts=posts, tag_sets=tag_sets, bm25=bm25)
+        _INDEX_SIZE = size
+
+    return _INDEX
+
+
+def search_post_ids(query: str, limit: int = 30) -> list[int]:
+    idx = get_index()
+    results: list[Tuple[str, float]] = search_engine.search(
+        query=query,
+        ids=idx.ids,
+        posts=idx.posts,
+        tag_sets=idx.tag_sets,
+        bm25=idx.bm25,
+        top_k=limit,
+        detailed=False,
     )
-
-def search_users(query: str, limit: int = 20):
-
-    """
-    Docstring for search_users
-    :return: Description
-    :rtype: list
-    """
-
-    if not query or not query.strip():
-        return []
-
-    tsquery = func.websearch_to_tsquery("simple", query)
-    rank = func.ts_rank_cd(_user_vector(), tsquery)
-
-    q = User.query.filter(_user_vector().op("@@")(tsquery))
-
-    return q.order_by(desc(rank), User.username.asc()).limit(limit).all()
+    # convert "12" -> 12
+    return [int(pid) for pid, _score in results]
