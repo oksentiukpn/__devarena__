@@ -21,10 +21,10 @@
                 <p class="text-zinc-400 text-lg mb-6">Bio*(?)</p>
 
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <a href="/battles" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
+                    <a href="{{ url_for('main.battles') }}" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
                         Join the Battle
                     </a>
-                    <a href="/post" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
+                    <a href="{{ url_for('main.post') }}" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
                         Upload the code
                     </a>
                 </div>
