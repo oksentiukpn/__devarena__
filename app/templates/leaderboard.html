@@ -35,17 +35,17 @@
             <tbody>
                 {% for user in users %}
                 <tr>
-                    <td class="rank {% if loop.index <= 3 %}rank-{{ loop.index }}{% endif %}">
+                    <td data-label="Rank" class="rank {% if loop.index <= 3 %}rank-{{ loop.index }}{% endif %}">
                         #{{ loop.index }}
                     </td>
-                    <td>
+                    <td data-label="Developer">
                         <div class="user-cell">
                             <div class="avatar">{{ user.username[:2].upper() }}</div>
                             <span class="username">{{ user.username }}</span>
                         </div>
                     </td>
-                    <td>{{ user.posts|length }}</td>
-                    <td class="score">{{ user.points }} pts</td>
+                    <td data-label="Projects">{{ user.posts|length }}</td>
+                    <td data-label="Total Score" class="score">{{ user.points }} pts</td>
                 </tr>
                 {% else %}
                 <tr>
