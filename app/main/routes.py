@@ -383,6 +383,8 @@ def delete_comment(comment_id):
 @main.route("/battles")
 @login_required
 def battles():
+    user_id = session.get("user_id")
+
     feed_battles = (
         Battle.query.options(joinedload(Battle.author))
         .filter(Battle.visibility == "public")
@@ -390,7 +392,19 @@ def battles():
         .limit(20)
         .all()
     )
-    return render_template("battles.html", battles=feed_battles)
+
+    battles_won = Battle.query.filter(Battle.winner_id == user_id).count()
+
+    battles_participated = Battle.query.filter(
+        or_(Battle.user_id == user_id, Battle.opponent_id == user_id)
+    ).count()
+
+    return render_template(
+        "battles.html",
+        battles=feed_battles,
+        battles_won=battles_won,
+        battles_participated=battles_participated,
+    )
 
 
 @main.route("/sitemap.xml")
