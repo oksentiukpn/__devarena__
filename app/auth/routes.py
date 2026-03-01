@@ -1,6 +1,15 @@
 import re
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from app import db, oauth
 from app.models import User
@@ -43,11 +52,15 @@ def google_callback():
 
             db.session.add(user)
             db.session.commit()
+            current_app.logger.info(
+                f"New user created: {email} with username {username}"
+            )
 
         session["user_id"] = user.id
         flash("Successfull login with Google.", "success")
         return redirect(url_for("main.home"))
     except Exception as e:
+        current_app.logger.error(f"Google login failed: {e}")
         flash(f"Failed Authentification: {e}", "danger")
         return redirect(url_for("auth.login"))
 
@@ -55,6 +68,7 @@ def google_callback():
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     if "user_id" in session:
+        flash("You are already logged in.", "info")
         return redirect(url_for("main.home"))
 
     if request.method == "POST":
@@ -62,33 +76,35 @@ def register():
         email = request.form.get("email", "").strip()
         if any(letter.isupper() for letter in email):
             flash("Email must be in lowercase.", "danger")
-            return redirect(url_for("auth.register"))
+            return render_template("auth/sign_up.html", username=username, email=email)
         password = request.form.get("password", "")
         # ///
         # data validation
         email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(email_regex, email):
             flash("Invalid email address.", "danger")
-            return redirect(url_for("auth.register"))
+            return render_template("auth/sign_up.html", username=username, email=email)
 
         if not re.match(r"^\w+$", username):
             flash(
                 "Username can only contain letters, numbers and underscores.", "danger"
             )
-            return redirect(url_for("auth.register"))
+            return render_template("auth/sign_up.html", username=username, email=email)
 
         for value in (username, email, password):
             if not value or len(value) < 8:
                 flash("All fields must be at least 8 characters long.", "danger")
-                return redirect(url_for("auth.register"))
+                return render_template(
+                    "auth/sign_up.html", username=username, email=email
+                )
 
         # Check if email or username already exists
         if User.query.filter_by(email=email).first():
             flash("Email already exists. Please choose a different one.", "danger")
-            return redirect(url_for("auth.register"))
+            return render_template("auth/sign_up.html", username=username, email=email)
         if User.query.filter_by(username=username).first():
             flash("Username already exists. Please choose a different one.", "danger")
-            return redirect(url_for("auth.register"))
+            return render_template("auth/sign_up.html", username=username, email=email)
 
         # ///
         user = User(username=username, email=email)
@@ -97,10 +113,13 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        current_app.logger.info(
+            f"New user registered: {email} with username {username}"
+        )
         flash(f"Account with name <{username}> was successfully created!", "success")
         return redirect(url_for("auth.login"))
     # if not sending data, just give html
-    return render_template("auth/register.html")
+    return render_template("auth/sign_up.html", username="", email="")
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -113,13 +132,22 @@ def login():
         password = request.form.get("password")
         user = User.query.filter_by(email=email).first()
 
+        if user and not user.password_hash:
+            flash(
+                "This account has no password and was registered via Google. Please use Google login.",
+                "danger",
+            )
+            return redirect(url_for("auth.login"), email=email)
+
         if user and user.check_password(password):
             session["user_id"] = user.id
             flash("Successfull login!", "success")
+            current_app.logger.info(f"User logged in: {email}")
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("main.home"))
-
+        current_app.logger.warning(f"Failed login attempt for email: {email}")
         flash("Login failed: Invalid password or email", "danger")
+        return redirect(url_for("auth.login"), email=email)
 
     # if not sending data, just give html
     return render_template("auth/login.html")

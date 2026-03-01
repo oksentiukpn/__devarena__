@@ -10,7 +10,7 @@
 
             <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-[#5da67d] flex-shrink-0 flex items-center justify-center text-4xl font-bold text-[#121c17] shadow-lg overflow-hidden">
                 {% if user.image_file and user.image_file != 'default.jpg' %}
-                    <img src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}" class="w-full h-full object-cover">
+                    <img src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}" alt="{{ user.username }}'s profile picture" class="w-full h-full object-cover">
                 {% else %}
                     {{ user.username[:1].upper() }}
                 {% endif %}
@@ -21,10 +21,10 @@
                 <p class="text-zinc-400 text-lg mb-6">Bio*(?)</p>
 
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <a href="/battles" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
+                    <a href="{{ url_for('main.battles') }}" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
                         Join the Battle
                     </a>
-                    <a href="/post" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
+                    <a href="{{ url_for('main.post') }}" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
                         Upload the code
                     </a>
                 </div>
