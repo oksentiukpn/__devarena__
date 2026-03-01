@@ -193,18 +193,18 @@
           {% if active_battles %}
           <div class="space-y-3">
             {% for battle in active_battles %}
-            <div class="bg-zinc-950/50 border border-zinc-800 rounded-xl p-3 hover:border-zinc-700 transition-colors">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-white text-sm font-semibold truncate mr-2">{{ battle.title }}</span>
+            <div class="bg-zinc-950/50 border border-zinc-800 rounded-xl p-3 hover:border-zinc-700 transition-colors overflow-hidden">
+              <div class="mb-2">
                 {% if battle.status == 'waiting' %}
-                  <span class="shrink-0 px-1.5 py-0.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-[10px] rounded font-medium uppercase">Waiting</span>
+                  <span class="inline-block px-1.5 py-0.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Waiting</span>
                 {% elif battle.status == 'ready' %}
-                  <span class="shrink-0 px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] rounded font-medium uppercase">Ready</span>
+                  <span class="inline-block px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Ready</span>
                 {% elif battle.status == 'in_progress' %}
-                  <span class="shrink-0 px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] rounded font-medium uppercase">Live</span>
+                  <span class="inline-block px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Live</span>
                 {% elif battle.status == 'in_review' %}
-                  <span class="shrink-0 px-1.5 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[10px] rounded font-medium uppercase">Voting</span>
+                  <span class="inline-block px-1.5 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Voting</span>
                 {% endif %}
+                <p class="text-white text-sm font-semibold truncate">{{ battle.title }}</p>
               </div>
               <div class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-zinc-500 mb-2.5">
                 <span>{{ battle.language }}</span>
