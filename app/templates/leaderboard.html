@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard - DevArena{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='leaderboard.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('main.feed_page') }}" class="back-link" style="text-decoration: none; color: var(--text-gray);">
+            <i class="fas fa-arrow-left"></i> Back to Feed
+        </a>
+    </div>
+
+    <div class="header">
+        <h1>Code Masters <span class="highlight">Leaderboard</span></h1>
+        <p class="subtitle">Join developers from all fields improving their code.</p>
+    </div>
+
+    <div class="leaderboard-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Developer</th>
+                    <th>Projects</th>
+                    <th>Total Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td class="rank {% if loop.index <= 3 %}rank-{{ loop.index }}{% endif %}">
+                        #{{ loop.index }}
+                    </td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar">{{ user.username[:2].upper() }}</div>
+                            <span class="username">{{ user.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ user.posts|length }}</td>
+                    <td class="score">{{ user.points }} pts</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 60px; color: var(--text-gray); font-size: 1.1rem;">
+                        <i class="fa-solid fa-layer-group" style="display: block; font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        No masters found yet. Be the first one!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

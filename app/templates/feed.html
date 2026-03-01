@@ -2,8 +2,6 @@
 
 {% block title %}Feed - DevArena{% endblock %}
 
-{% block nav_home_class %}px-4 py-2 rounded-lg bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% endblock %}
-
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -14,15 +12,19 @@
           <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Your Stats</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-zinc-400 text-sm">Reputation</span>
-              <span class="text-emerald-500 font-semibold">2,450</span>
+              <span class="text-zinc-400 text-sm">Points</span>
+              <span class="text-emerald-500 font-semibold">{{ current_user.points }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-zinc-400 text-sm">Projects</span>
-              <span class="text-white font-semibold">12</span>
-            </div>
+              <span class="text-white font-semibold">{{ post_count }}</span>
           </div>
         </div>
+
+        <a href="{{ url_for('main.leaderboard') }}" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-emerald-600/10 text-emerald-500 border border-emerald-600/20 rounded-xl text-sm font-medium hover:bg-emerald-600/20 transition-colors" style="margin-top: 8%;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          Leaderboard
+        </a>
       </div>
     </aside>
 
@@ -30,8 +32,12 @@
       <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-white">Feed</h1>
         <div class="flex items-center gap-2">
-          <button class="px-4 py-2 bg-emerald-600/10 text-emerald-500 border border-emerald-600/20 rounded-lg text-sm font-medium">Latest</button>
-          <button class="px-4 py-2 text-zinc-400 hover:bg-zinc-800 rounded-lg text-sm font-medium transition-colors">Top</button>
+          <a href="{{ url_for('main.feed_page', sort='recommended') }}"
+             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if sort == 'recommended' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-400 hover:bg-zinc-800{% endif %}">Recommended</a>
+          <a href="{{ url_for('main.feed_page', sort='latest') }}"
+             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if sort == 'latest' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-400 hover:bg-zinc-800{% endif %}">Latest</a>
+          <a href="{{ url_for('main.feed_page', sort='top') }}"
+             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if sort == 'top' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-400 hover:bg-zinc-800{% endif %}">Top</a>
         </div>
       </div>
 
@@ -57,7 +63,7 @@
                     </div>
                 </div>
 
-                {% if session.get('user_id') == post.author.id %}
+                {% if current_user and (current_user.id == post.author.id or current_user.is_admin) %}
                 <button onclick="deletePost({{ post.id }}, this)" class="text-zinc-500 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-zinc-800" title="Delete Project">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -146,7 +152,7 @@
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs text-zinc-500">{{ comment.created_at.strftime('%b %d') }}</span>
 
-                                    {% if session.get('user_id') == comment.author.id %}
+                                    {% if current_user and (current_user.id == comment.author.id or current_user.is_admin) %}
                                     <button onclick="deleteComment({{ comment.id }}, this)" class="text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -184,7 +190,62 @@
       <div class="sticky top-24 space-y-6">
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5">
           <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Active Battles</h3>
+          {% if active_battles %}
+          <div class="space-y-3">
+            {% for battle in active_battles %}
+            <div class="bg-zinc-950/50 border border-zinc-800 rounded-xl p-3 hover:border-zinc-700 transition-colors overflow-hidden">
+              <div class="mb-2">
+                {% if battle.status == 'waiting' %}
+                  <span class="inline-block px-1.5 py-0.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Waiting</span>
+                {% elif battle.status == 'ready' %}
+                  <span class="inline-block px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Ready</span>
+                {% elif battle.status == 'in_progress' %}
+                  <span class="inline-block px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Live</span>
+                {% elif battle.status == 'in_review' %}
+                  <span class="inline-block px-1.5 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[10px] rounded font-medium uppercase mb-1.5">Voting</span>
+                {% endif %}
+                <p class="text-white text-sm font-semibold truncate">{{ battle.title }}</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-zinc-500 mb-2.5">
+                <span>{{ battle.language }}</span>
+                <span>·</span>
+                <span>{{ battle.difficulty }}</span>
+                <span>·</span>
+                <span class="inline-flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  {{ battle.time_limit }}
+                </span>
+              </div>
+              {% if battle.status in ['in_review', 'completed'] %}
+                <a href="{{ url_for('challenges.review', battle_id=battle.id) }}" class="block w-full text-center py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium rounded-lg transition-colors">
+                  Vote & Review
+                </a>
+              {% elif battle.status == 'waiting' and session.get('user_id') == battle.user_id %}
+                <span class="block w-full text-center py-1.5 text-yellow-400/60 text-xs">Waiting for opponent…</span>
+              {% elif battle.status == 'waiting' %}
+                <form action="{{ url_for('challenges.join_battle', battle_id=battle.id) }}" method="POST">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="w-full py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 text-xs font-medium rounded-lg transition-colors">
+                    Join Battle
+                  </button>
+                </form>
+              {% elif session.get('user_id') == battle.user_id or session.get('user_id') == battle.opponent_id %}
+                <a href="{{ url_for('challenges.arena', battle_id=battle.id) }}" class="block w-full text-center py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 text-xs font-medium rounded-lg transition-colors">
+                  Enter Arena
+                </a>
+              {% else %}
+                <span class="block w-full text-center py-1.5 text-zinc-600 text-xs">In progress</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <a href="{{ url_for('main.battles') }}" class="flex items-center justify-center gap-1 mt-3 text-xs text-zinc-500 hover:text-emerald-400 transition-colors">
+            View all battles
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          {% else %}
           <div class="text-zinc-500 text-sm">No active battles right now.</div>
+          {% endif %}
         </div>
       </div>
     </aside>
@@ -195,10 +256,14 @@
 <script>
 // --- Reaction Logic ---
 async function toggleReaction(postId, emoji, btnElement) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     try {
         const response = await fetch(`/post/${postId}/react`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ emoji: emoji })
         });
 
@@ -265,10 +330,15 @@ async function postComment(postId) {
 
     if (!content.trim()) return;
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     try {
         const response = await fetch(`/post/${postId}/comment`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ content: content })
         });
 
@@ -328,10 +398,15 @@ async function postComment(postId) {
 async function deletePost(postId, btnElement) {
     if (!confirm("Are you sure you want to delete this project? This cannot be undone.")) return;
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     try {
         const response = await fetch(`/post/${postId}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
         });
 
         if (response.ok) {
@@ -350,10 +425,15 @@ async function deletePost(postId, btnElement) {
 async function deleteComment(commentId, btnElement) {
     if (!confirm("Delete this comment?")) return;
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     try {
         const response = await fetch(`/comment/${commentId}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
         });
 
         if (response.ok) {
