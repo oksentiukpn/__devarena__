@@ -73,6 +73,7 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
+        """Returns repr variant"""
         return f"User('{self.username}', '{self.email}')"
 
 
@@ -133,6 +134,7 @@ class Post(db.Model):
         db.session.commit()
 
     def __repr__(self):
+        """Returns repr variant"""
         return f"Post('{self.title}', '{self.created_at}')"
 
 
@@ -202,10 +204,14 @@ class Battle(db.Model):
     winner = db.relationship("User", foreign_keys=[winner_id])
 
     def __repr__(self):
+        """Returns repr variant"""
         return f"Battle('{self.title}', '{self.status}')"
 
 
 class BattleVote(db.Model):
+    """BattleVote Class
+    all necessary details connecting with battles
+    """
     __tablename__ = "battle_votes"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -220,6 +226,7 @@ class BattleVote(db.Model):
 
 
 class BattleComment(db.Model):
+    """BattleComment Class"""
     __tablename__ = "battle_comments"
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
