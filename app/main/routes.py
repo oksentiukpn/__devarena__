@@ -21,7 +21,6 @@ import re
 # from app.main.search import search_posts, search_users
 
 main = Blueprint("main", __name__)
-sttgs = Blueprint("settings", __name__)
 
 @main.route("/")
 def home():
@@ -46,26 +45,6 @@ def terms_of_service():
 def settings_page():
     user = User.query.get(session["user_id"])
     return render_template("main/settings.html", user=user)
-
-# @main.route("/settings")
-# @login_required
-# def settings_page():
-    # user_languages = (
-    #     db.session.query(Post.language)
-    #     .filter_by(user_id=session["user_id"])
-    #     .distinct()
-    #     .all()
-    # )
-    # user_languages = [lang[0] for lang in user_languages]
-    # return render_template("main/settings.html")
-
-@sttgs.route("/profile_save_changes")
-@login_required
-def save_changes():
-
-
-    return redirect(url_for("settings.html"))
-    # return render_template("main/settings.html")
 
 @main.route("/feed")
 @login_required
@@ -183,39 +162,6 @@ def add_comment(post_id):
         }
     )
 
-# @sttgs.route("/settings", methods=["GET", "POST"])
-# @login_required
-# def settings():
-#     if request.method == "POST":
-#         new_username = (request.form.get("username") or "").strip()
-#         new_bio = (request.form.get("bio") or "").strip()
-
-#         # basic validation
-#         if not (3 <= len(new_username) <= 20):
-#             flash("Username must be 3–20 characters.", "error")
-#             return redirect(url_for("settings.settings", _anchor="profile"))
-
-#         if len(new_bio) > 1024:
-#             flash("Bio is too long (max 1024 chars).", "error")
-#             return redirect(url_for("settings.settings", _anchor="profile"))
-
-#         username_taken = (
-#             User.query.filter(User.username == new_username, User.id != current_user.id).first()
-#         )
-#         if username_taken:
-#             flash("That username is already taken.", "error")
-#             return redirect(url_for("settings.settings", _anchor="profile"))
-
-#         # save
-#         current_user.username = new_username
-#         current_user.bio = new_bio
-#         db.session.commit()
-
-#         flash("Profile updated.", "success")
-#         return redirect(url_for("settings.settings", _anchor="profile"))
-
-#     return render_template("settings.html")  # current_user is available in template
-
 
 # Current User
 @main.route("/profile")
@@ -290,11 +236,11 @@ def battles():
 def profile_save_changes():
     user = User.query.get(session["user_id"])
 
-    # 1) read inputs
+    # read inputs
     new_username = request.form.get("username", "").strip()
     new_bio = request.form.get("bio", "").strip()
 
-    # 2) validate username if changed
+    # validate username if changed
     if new_username and new_username != user.username:
         if not re.match(r"^\w+$", new_username):
             flash("Username can only contain letters, numbers and underscores.", "danger")
@@ -306,10 +252,10 @@ def profile_save_changes():
 
         user.username = new_username
 
-    # 3) update bio (bio is non-null, so store empty string if blank)
+    # update bio (bio is non-null, so store empty string if blank)
     user.bio = new_bio
 
-    # 4) handle image upload (optional)
+    # handle image upload (optional)
     file = request.files.get("profile_picture")
     if file and file.filename:
         try:
@@ -319,7 +265,7 @@ def profile_save_changes():
             flash(f"Image upload failed: {e}", "danger")
             return redirect(url_for("main.settings_page", _anchor="profile"))
 
-    # 5) commit safely
+    # commit safely
     try:
         db.session.commit()
         flash("Profile updated!", "success")

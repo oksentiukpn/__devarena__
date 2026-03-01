@@ -10,7 +10,7 @@
     <h1 class="text-2xl font-medium text-white tracking-wide">Settings</h1>
   </div>
 
-  <div class="bg-zinc-900/80 rounded-full p-1.5 mb-8 inline-flex flex-wrap items-center gap-1 border border-zinc-800">
+  <div class="bg-zinc-900/80 rounded-[20px] p-1.5 mb-8 inline-flex flex-wrap items-center gap-1 border border-zinc-800">
     <a href="#profile" class="tab-link px-9 py-2 rounded-full bg-zinc-800 text-emerald-500 font-medium text-sm transition-colors">profile</a>
     <a href="#account" class="tab-link px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">account</a>
     <a href="#notifications" class="tab-link px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">notifications</a>
@@ -28,7 +28,6 @@
 
       <div class="flex items-center gap-4 mb-2">
         <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-emerald-900/20 overflow-hidden">
-          {# If image_file is a URL or a local filename, try to show it. If missing, show initial. #}
           {% if u and u.image_file %}
             {% if u.image_file.startswith('http') %}
               <img src="{{ u.image_file }}" alt="Profile picture" class="w-full h-full object-cover">
@@ -59,9 +58,8 @@
           action="{{ url_for('main.profile_save_changes') }}"
           method="POST"
           enctype="multipart/form-data"
-          id="settings_name_bio"
-        >
-          {# hidden input triggered by label above #}
+          id="settings_name_bio">
+
           <input id="profile_picture" name="profile_picture" type="file" accept="image/*" class="hidden">
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
@@ -116,9 +114,60 @@
     </div>
 
     <div id="danger" class="tab-content hidden text-white">
-      <p>danger</p>
-    </div>
+      <h2 class="text-xl font-medium text-white mb-4">Danger</h2>
 
+      <!-- <div class="flex items-center gap-4 mb-2">
+        <p>Delete Account</p>
+      </div> -->
+
+      <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+            <h3 class="text-xl font-medium text-white mb-4">Log Out</h3>
+          </div>
+
+          <p>Log out from this account.<br>You are available to join again whenever you want</p>
+
+          <!-- КОСТИЛЬ -->
+          <a href="/logout" class="mt-8 flex justify-start">
+            <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors">
+              Log Out
+            </button>
+          </a>
+
+      </div>
+
+      <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+            <h3 class="text-xl font-medium text-white mb-4">Suspend Account</h3>
+          </div>
+
+          <p>Not implemented on the conceptual level yet</p>
+
+          <a href="/suspend" class="mt-8 flex justify-start">
+            <button type="submit" class="px-6 py-2.5 bg-yellow-600 hover:bg-yellow-500 text-white font-medium rounded-lg transition-colors">
+              Suspend
+            </button>
+          </a>
+
+      </div>
+
+      <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+            <h3 class="text-xl font-medium text-white mb-4">Delete Account</h3>
+          </div>
+
+          <p>In Development</p>
+
+          <a href="/delete" class="mt-8 flex justify-start">
+            <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium rounded-lg transition-colors">
+              Delete
+            </button>
+          </a>
+      </div>
+    </div>
   </div>
 
   <script>
