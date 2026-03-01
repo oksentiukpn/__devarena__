@@ -263,6 +263,8 @@ def search(query: str, ids, posts, tag_sets, bm25, *, lang: str = "en", top_k: i
             # scale by hit count, but cap
             scores[i] += min(0.8, 0.25 + 0.25 * hit)
 
+    # fdksgfj
+
     # phrase/substr bonus
     q_norm = _normalize_text(query)
     for i, p in enumerate(posts):
