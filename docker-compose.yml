@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
 
@@ -38,5 +38,3 @@ services:
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - web
-
-

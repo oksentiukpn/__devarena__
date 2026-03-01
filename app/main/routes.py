@@ -12,6 +12,8 @@ from flask import (
 from sqlalchemy import case, desc
 from sqlalchemy.orm import joinedload
 
+from app.main.profile import count_battles, count_reactions
+
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
@@ -154,8 +156,11 @@ def profile():
     user = User.query.get(session["user_id"])
 
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
+    battles_count = count_battles(user)
+    reactions_count = count_reactions(user)
 
-    return render_template("main/profile.html", user=user, posts=posts)
+
+    return render_template("main/profile.html", user=user, posts=posts, battles_count = battles_count, reactions_count = reactions_count)
 
 
 # Other users
