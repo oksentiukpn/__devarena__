@@ -35,5 +35,6 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/certs:/etc/nginx/certs:ro
+      # - ./app/static:/usr/share/nginx/html/static:ro
     depends_on:
       - web
