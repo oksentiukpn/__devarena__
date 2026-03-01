@@ -120,14 +120,16 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
                         </button>
-                        <div class="absolute bottom-full left-0 mb-2 p-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl shadow-black/50 hidden group-hover/picker:grid grid-cols-5 gap-1 w-64 z-10">
-                            {% set available_emojis = ['👍', '👎', '🤡','❤️', '🔥', '🚀', '🐛', '👀', '🎉', '🤯', '🧠', '💩', '💯', '🤔', '☕', '🐍', '🍓', '🦔'] %}
-                            {% for emo in available_emojis %}
-                                <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null)"
-                                        class="p-2 hover:bg-zinc-800 rounded-lg text-lg transition-colors text-center">
-                                    {{ emo }}
-                                </button>
-                            {% endfor %}
+                        <div class="absolute bottom-full left-0 pb-2 hidden group-hover/picker:block z-10">
+                            <div class="p-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl shadow-black/50 grid grid-cols-5 gap-1 w-64">
+                                {% set available_emojis = ['👍', '👎', '🤡','❤️', '🔥', '🚀', '🐛', '👀', '🎉', '🤯', '🧠', '💩', '💯', '🤔', '☕', '🐍', '🍓', '🦔'] %}
+                                {% for emo in available_emojis %}
+                                    <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null)"
+                                            class="p-2 hover:bg-zinc-800 rounded-lg text-lg transition-colors text-center">
+                                        {{ emo }}
+                                    </button>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                  </div>
