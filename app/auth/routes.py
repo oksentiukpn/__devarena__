@@ -74,6 +74,9 @@ def register():
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
+        if len(username) > 40:
+            flash("Username must be at most 40 characters long.", "danger")
+            return render_template("auth/sign_up.html", username=username, email="")
         email = request.form.get("email", "").strip()
         if any(letter.isupper() for letter in email):
             flash("Email must be in lowercase.", "danger")
