@@ -112,12 +112,17 @@ def feed_page():
     if sort not in ("latest", "top", "recommended"):
         sort = "recommended"
 
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+
     base_query = Post.query.options(joinedload(Post.author)).filter(
         Post.visibility == "public"
     )
 
     if sort == "latest":
-        feed_posts = base_query.order_by(Post.created_at.desc()).limit(20).all()
+        pagination = base_query.order_by(Post.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
 
     elif sort == "top":
         # Rank by total engagement: reactions + comments (all time)
@@ -143,12 +148,11 @@ def feed_page():
             + func.coalesce(comment_count.c.c_count, 0) * 10
         )
 
-        feed_posts = (
+        pagination = (
             base_query.outerjoin(reaction_count, Post.id == reaction_count.c.post_id)
             .outerjoin(comment_count, Post.id == comment_count.c.post_id)
             .order_by(desc(engagement), Post.created_at.desc())
-            .limit(20)
-            .all()
+            .paginate(page=page, per_page=per_page, error_out=False)
         )
 
     else:
@@ -254,17 +258,17 @@ def feed_page():
             lang_score + tag_score + engagement_score + recency_score + own_post_penalty
         )
 
-        feed_posts = (
+        pagination = (
             base_query.outerjoin(reaction_count, Post.id == reaction_count.c.post_id)
             .outerjoin(comment_count, Post.id == comment_count.c.post_id)
             .order_by(desc(total_score), Post.created_at.desc())
-            .limit(20)
-            .all()
+            .paginate(page=page, per_page=per_page, error_out=False)
         )
 
     return render_template(
         "feed.html",
-        posts=feed_posts,
+        posts=pagination.items,
+        pagination=pagination,
         post_count=post_count,
         current_user=current_user,
         sort=sort,
@@ -492,12 +496,14 @@ def delete_comment(comment_id):
 def battles():
     user_id = session.get("user_id")
 
-    feed_battles = (
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+
+    pagination = (
         Battle.query.options(joinedload(Battle.author))
         .filter(Battle.visibility == "public")
         .order_by(Battle.created_at.desc())
-        .limit(20)
-        .all()
+        .paginate(page=page, per_page=per_page, error_out=False)
     )
 
     battles_won = Battle.query.filter(Battle.winner_id == user_id).count()
@@ -520,7 +526,8 @@ def battles():
 
     return render_template(
         "battles.html",
-        battles=feed_battles,
+        battles=pagination.items,
+        pagination=pagination,
         battles_won=battles_won,
         battles_participated=battles_participated,
         top_warriors=top_warriors,

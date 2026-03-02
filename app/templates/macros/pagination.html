@@ -1,0 +1,66 @@
+{% macro render_pagination(pagination, endpoint, extra_params={}) %}
+{% if pagination.pages > 1 %}
+<nav class="flex items-center justify-center gap-1 mt-8" aria-label="Pagination">
+  {# Previous button #}
+  {% if pagination.has_prev %}
+  <a href="{{ url_for(endpoint, page=pagination.prev_num, **extra_params) }}"
+     class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-400 hover:text-white bg-zinc-900/50 border border-zinc-800 rounded-lg hover:bg-zinc-800 hover:border-zinc-700 transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    Prev
+  </a>
+  {% else %}
+  <span class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-600 bg-zinc-900/30 border border-zinc-800/50 rounded-lg cursor-not-allowed">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    Prev
+  </span>
+  {% endif %}
+
+  {# Page numbers #}
+  {% for p in pagination.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+    {% if p %}
+      {% if p == pagination.page %}
+      <span class="flex items-center justify-center w-10 h-10 text-sm font-semibold text-emerald-400 bg-emerald-600/10 border border-emerald-600/20 rounded-lg">
+        {{ p }}
+      </span>
+      {% else %}
+      <a href="{{ url_for(endpoint, page=p, **extra_params) }}"
+         class="flex items-center justify-center w-10 h-10 text-sm font-medium text-zinc-400 hover:text-white bg-zinc-900/50 border border-zinc-800 rounded-lg hover:bg-zinc-800 hover:border-zinc-700 transition-colors">
+        {{ p }}
+      </a>
+      {% endif %}
+    {% else %}
+      <span class="flex items-center justify-center w-10 h-10 text-sm text-zinc-600">
+        &hellip;
+      </span>
+    {% endif %}
+  {% endfor %}
+
+  {# Next button #}
+  {% if pagination.has_next %}
+  <a href="{{ url_for(endpoint, page=pagination.next_num, **extra_params) }}"
+     class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-400 hover:text-white bg-zinc-900/50 border border-zinc-800 rounded-lg hover:bg-zinc-800 hover:border-zinc-700 transition-colors">
+    Next
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </a>
+  {% else %}
+  <span class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-600 bg-zinc-900/30 border border-zinc-800/50 rounded-lg cursor-not-allowed">
+    Next
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </span>
+  {% endif %}
+</nav>
+
+{# Page info text #}
+<p class="text-center text-xs text-zinc-500 mt-3">
+  Page {{ pagination.page }} of {{ pagination.pages }} &middot; {{ pagination.total }} total
+</p>
+{% endif %}
+{% endmacro %}

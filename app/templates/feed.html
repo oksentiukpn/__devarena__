@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "macros/avatar.html" import avatar %}
+{% from "macros/pagination.html" import render_pagination %}
 
 {% block title %}Feed - DevArena{% endblock %}
 
@@ -218,6 +219,8 @@
         </div>
       </article>
       {% endfor %}
+
+      {{ render_pagination(pagination, 'main.feed_page', extra_params={'sort': sort}) }}
     </main>
 
     <aside class="hidden lg:block lg:col-span-1">
