@@ -51,6 +51,27 @@
     .profile-container:focus-within .profile-dropdown {
       display: block;
     }
+
+    /* Mobile menu */
+    .mobile-menu-overlay {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-menu-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-menu-panel {
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-menu-panel.active {
+      transform: translateX(0);
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
   {% block extra_styles %}{% endblock %}
@@ -138,7 +159,15 @@
           </form>
         </div>
 
-        <div class="profile-container relative">
+        <!-- Mobile hamburger button -->
+        <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors" type="button" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Menu</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <div class="hidden md:block profile-container relative">
           {% if session.get('user_id') %}
           <button class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-800/50 transition-colors" tabindex="0" type="button">
             {{ avatar(nav_user, size="w-9 h-9", text_size="text-sm", extra_cls="ring-2 ring-zinc-800") }}
@@ -197,6 +226,138 @@
       </div>
     </div>
   </nav>
+
+  <!-- Mobile menu overlay -->
+  <div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden"></div>
+
+  <!-- Mobile menu panel -->
+  <div id="mobile-menu-panel" class="mobile-menu-panel fixed top-0 right-0 z-[70] w-72 h-full bg-zinc-900 border-l border-zinc-800 shadow-2xl md:hidden flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 h-16 border-b border-zinc-800">
+      <span class="text-lg font-bold text-white">Menu</span>
+      <button id="mobile-menu-close" class="flex items-center justify-center w-10 h-10 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors" type="button" aria-label="Close menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <title>Close</title>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Search (mobile) -->
+    <div class="px-4 py-3 border-b border-zinc-800">
+      <form method="GET" action="{{ url_for('main.search_page') }}" class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Search</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input
+          type="text"
+          name="q"
+          value="{{ request.args.get('q', '') }}"
+          placeholder="Search..."
+          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 transition-all"
+        >
+      </form>
+    </div>
+
+    <!-- Nav links -->
+    <div class="flex-1 overflow-y-auto py-2">
+      <div class="px-3 flex flex-col gap-1">
+        <a href="/"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors {% if request.endpoint == 'main.home' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-300 hover:text-white hover:bg-zinc-800{% endif %}">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Home</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Home
+        </a>
+        <a href="{{ url_for('main.feed_page') }}"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors {% if request.endpoint == 'main.feed_page' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-300 hover:text-white hover:bg-zinc-800{% endif %}">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Feed</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          </svg>
+          Feed
+        </a>
+        <a href="{{ url_for('main.battles') }}"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors {% if request.endpoint == 'main.battles' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}text-zinc-300 hover:text-white hover:bg-zinc-800{% endif %}">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Battles</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Battles
+        </a>
+        <a href="{{ url_for('main.post') }}"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-colors {% if request.endpoint == 'main.post' %}bg-emerald-600/10 text-emerald-500 border border-emerald-600/20{% else %}bg-emerald-600 hover:bg-emerald-500 text-white{% endif %}">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>New Post</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          New Post
+        </a>
+      </div>
+    </div>
+
+    <!-- User section at bottom -->
+    <div class="border-t border-zinc-800 px-3 py-3">
+      {% if session.get('user_id') %}
+      <div class="flex items-center gap-3 px-3 py-2 mb-2">
+        {{ avatar(nav_user, size="w-9 h-9", text_size="text-sm", extra_cls="ring-2 ring-zinc-700") }}
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-white truncate">{{ nav_user.username if nav_user else 'User' }}</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1">
+        <a href="{{ url_for('main.profile') }}"
+          class="flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Profile</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          View Profile
+        </a>
+        <a href="{{ url_for('main.settings_page') }}"
+          class="flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Settings</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Settings
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+          class="flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:bg-zinc-800 hover:text-red-300 rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <title>Logout</title>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
+        </a>
+      </div>
+      {% else %}
+      <div class="flex flex-col gap-2">
+        <a href="{{ url_for('auth.login') }}"
+          class="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors">
+          Sign In
+        </a>
+        <a href="{{ url_for('auth.register') }}"
+          class="flex items-center justify-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors">
+          Sign Up
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
 
   <div id="flash-container" class="fixed top-20 right-4 z-100 flex flex-col gap-3 w-full max-w-sm pointer-events-none">
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -265,6 +426,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Flash messages
       const messages = document.querySelectorAll('.flash-message');
 
       messages.forEach((msg, index) => {
@@ -278,6 +440,28 @@
           dismissFlash(msg);
         }, 5000 + (index * 500));
       });
+
+      // Mobile menu
+      const menuBtn = document.getElementById('mobile-menu-btn');
+      const menuClose = document.getElementById('mobile-menu-close');
+      const menuOverlay = document.getElementById('mobile-menu-overlay');
+      const menuPanel = document.getElementById('mobile-menu-panel');
+
+      function openMobileMenu() {
+        menuOverlay.classList.add('active');
+        menuPanel.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileMenu() {
+        menuOverlay.classList.remove('active');
+        menuPanel.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      if (menuBtn) menuBtn.addEventListener('click', openMobileMenu);
+      if (menuClose) menuClose.addEventListener('click', closeMobileMenu);
+      if (menuOverlay) menuOverlay.addEventListener('click', closeMobileMenu);
     });
 
     function dismissFlash(element) {
