@@ -38,17 +38,17 @@
 
         <div class="stats-container">
             <div class="stat-box">
-                <span class="stat-num">{{ stats.code_reviews }}+</span>
+                <span class="stat-num">{{ stats.code_reviews }}</span>
                 <span class="stat-label">Code Reviews</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-box">
-                <span class="stat-num">{{ stats.developers }}+</span>
+                <span class="stat-num">{{ stats.developers }}</span>
                 <span class="stat-label">Developers</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-box">
-                <span class="stat-num">{{ stats.battles }}+</span>
+                <span class="stat-num">{{ stats.battles }}</span>
                 <span class="stat-label">Battles</span>
             </div>
         </div>
@@ -163,10 +163,12 @@
     <p class="cta-subtitle">
       Join thousands of developers who are leveling up their skills through peer review and friendly competition.
     </p>
+    {% if not session.get('user_id') %}
     <a href="{{ url_for('auth.register') }}" class="cta-button">
       Create Free Account
       <span class="arrow">→</span>
     </a>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
