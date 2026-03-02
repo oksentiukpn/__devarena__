@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/avatar.html" import avatar %}
 
 {% block title %}Search Results{% endblock %}
 
@@ -24,9 +25,7 @@
         <div class="p-5 pb-0">
             <div class="flex items-start justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold">
-                        {{ post.author.username[:2].upper() }}
-                    </div>
+                    {{ avatar(post.author, size="w-10 h-10", text_size="text-sm") }}
                     <div>
                         <span class="font-semibold text-white block">{{ post.author.username }}</span>
                         <span class="text-zinc-500 text-sm">@{{ post.author.username }} · {{ post.created_at.strftime('%b %d') }}</span>

@@ -301,6 +301,17 @@ def vote_battle(battle_id):
     return jsonify({"success": True})
 
 
+def _battle_user_image_url(user):
+    """Return the URL for a user's profile image, or None for default."""
+    if not user or not user.image_file or user.image_file == "default.jpg":
+        return None
+    if user.image_file.startswith("http://") or user.image_file.startswith("https://"):
+        return user.image_file
+    return url_for(
+        "static", filename="profile_pics/" + user.image_file, _external=False
+    )
+
+
 @challenges.route("/battle/<int:battle_id>/comment", methods=["POST"])
 @login_required
 def add_battle_comment(battle_id):
@@ -322,5 +333,6 @@ def add_battle_comment(battle_id):
             "author": new_comment.author.username,
             "created_at": "Just now",
             "avatar_letter": new_comment.author.username[:2].upper(),
+            "image_url": _battle_user_image_url(new_comment.author),
         }
     )

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/avatar.html" import avatar %}
 
 {% block title %}Settings{% endblock %}
 
@@ -35,33 +36,21 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div class="flex items-center gap-4 mb-2">
-          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-emerald-900/20 overflow-hidden">
-            {% if u and u.image_file %}
-              {% if u.image_file.startswith('http') %}
-                <img src="{{ u.image_file }}" alt="Profile picture" class="w-full h-full object-cover">
-              {% else %}
-                <img
-                  src="{{ url_for('static', filename='profile_pics/' ~ u.image_file) }}"
-                  alt="Profile picture"
-                  class="w-full h-full object-cover"
-                  onerror="this.remove();"
-                >
-                <!-- <span class="fallback-initial">
-                  {{ u.username[:1].upper() if u and u.username else 'U' }}
-                </span> -->
-              {% endif %}
-            <!-- {% else %}
-              {{ u.username[:1].upper() if u and u.username else 'U' }}
-            {% endif %} -->
+          <div id="avatar-wrapper" class="relative">
+            {{ avatar(u, size="w-12 h-12", text_size="text-xl") }}
+            <img id="avatar-preview" src="" alt="Preview" class="hidden w-12 h-12 rounded-full object-cover absolute inset-0 shadow-lg shadow-emerald-900/20 ring-2 ring-emerald-500/50">
           </div>
 
-          <label for="profile_picture"
-            class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 rounded-full text-sm font-medium transition-colors border border-zinc-700/50 cursor-pointer">
-            Upload new picture
-          </label>
+          <div class="flex flex-col gap-1">
+            <label for="profile_picture"
+              class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 rounded-full text-sm font-medium transition-colors border border-zinc-700/50 cursor-pointer">
+              Upload new picture
+            </label>
+            <span id="file-info" class="text-xs text-zinc-500 hidden"></span>
+          </div>
         </div>
 
-          <input id="profile_picture" name="profile_picture" type="file" accept="image/*" class="hidden">
+          <input id="profile_picture" name="profile_picture" type="file" accept="image/png,image/jpeg,image/jpg,image/webp" class="hidden">
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
             <div>
@@ -203,6 +192,55 @@
 
     window.addEventListener('DOMContentLoaded', updateTabs);
     window.addEventListener('hashchange', updateTabs);
+  </script>
+
+  <script>
+    const fileInput = document.getElementById('profile_picture');
+    const preview = document.getElementById('avatar-preview');
+    const fileInfo = document.getElementById('file-info');
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+
+    fileInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) {
+        preview.classList.add('hidden');
+        fileInfo.classList.add('hidden');
+        return;
+      }
+
+      const allowed = ['image/png', 'image/jpeg', 'image/webp'];
+      if (!allowed.includes(file.type)) {
+        fileInfo.textContent = 'Unsupported format. Use PNG, JPG or WebP.';
+        fileInfo.classList.remove('hidden', 'text-zinc-500');
+        fileInfo.classList.add('text-red-400');
+        preview.classList.add('hidden');
+        this.value = '';
+        return;
+      }
+
+      if (file.size > maxSize) {
+        fileInfo.textContent = 'File too large. Max 5 MB.';
+        fileInfo.classList.remove('hidden', 'text-zinc-500');
+        fileInfo.classList.add('text-red-400');
+        preview.classList.add('hidden');
+        this.value = '';
+        return;
+      }
+
+      // Show file info
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+      fileInfo.textContent = `${file.name} (${sizeMB} MB)`;
+      fileInfo.classList.remove('hidden', 'text-red-400');
+      fileInfo.classList.add('text-zinc-500');
+
+      // Show live preview
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
   </script>
 
 </main>

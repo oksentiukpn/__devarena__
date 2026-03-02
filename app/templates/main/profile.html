@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/avatar.html" import avatar %}
 
 {% block title %}{{ user.username }} - Profile{% endblock %}
 
@@ -8,17 +9,11 @@
     <div class="bg-[#121c17] border border-[#1e2d26] rounded-[2rem] p-8 mb-6 relative">
         <div class="flex flex-col md:flex-row items-start gap-8 relative z-10">
 
-            <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-[#5da67d] flex-shrink-0 flex items-center justify-center text-4xl font-bold text-[#121c17] shadow-lg overflow-hidden">
-                {% if user.image_file and user.image_file != 'default.jpg' %}
-                    <img src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}" alt="{{ user.username }}'s profile picture" class="w-full h-full object-cover">
-                {% else %}
-                    {{ user.username[:1].upper() }}
-                {% endif %}
-            </div>
+            {{ avatar(user, size="w-24 h-24 md:w-32 md:h-32", text_size="text-4xl") }}
 
             <div class="flex-1">
                 <h1 class="text-3xl font-medium text-white mb-1">{{ user.username }}</h1>
-                <p class="text-zinc-400 text-lg mb-6">Bio*(?)</p>
+                <p class="text-zinc-400 text-lg mb-6">{{ user.bio if user.bio else 'No bio yet.' }}</p>
 
                 <div class="flex flex-col sm:flex-row gap-3">
                     <a href="{{ url_for('main.battles') }}" class="px-8 py-2 bg-[#5da67d] hover:bg-[#4e8c69] text-[#121c17] font-bold rounded-full transition-all text-sm text-center">
@@ -173,10 +168,7 @@
     <div class="p-5 pb-0">
         <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
-            <div
-            class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-sm font-semibold uppercase text-white">
-            {{ post.author.username[:2] }}
-            </div>
+    {{ avatar(post.author, size="w-10 h-10", text_size="text-sm") }}
             <div>
             <span class="font-semibold text-white block">{{ post.author.username }}</span>
             <span class="text-zinc-500 text-sm">@{{ post.author.username }} · {{ post.created_at.strftime('%b %d')

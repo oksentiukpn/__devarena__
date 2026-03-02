@@ -15,3 +15,4 @@ auto_backup.sh
 
 app/static/css/output.css
 node_modules/
+app/static/profile_pics/

@@ -6,7 +6,7 @@ import logging
 
 from authlib.integrations.flask_client import OAuth
 from config import Config
-from flask import Flask
+from flask import Flask, session
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
@@ -70,5 +70,16 @@ def create_app(config_class=Config):
     app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(challenges)
+
+    @app.context_processor
+    def inject_nav_user():
+        """Make the current user available in every template as `nav_user`."""
+        from app.models import User
+
+        nav_user = None
+        user_id = session.get("user_id")
+        if user_id:
+            nav_user = User.query.get(user_id)
+        return dict(nav_user=nav_user)
 
     return app

@@ -1,0 +1,29 @@
+{#
+  Reusable avatar macro.
+
+  Usage:
+    {% from "macros/avatar.html" import avatar %}
+    {{ avatar(user, size="w-10 h-10", text_size="text-sm") }}
+
+  Parameters:
+    user       – a User model instance (must have .image_file and .username)
+    size       – Tailwind width/height classes  (default: "w-10 h-10")
+    text_size  – Tailwind text-size class for the fallback initial (default: "text-sm")
+    extra_cls  – any additional classes to add to the outer wrapper
+#}
+
+{% macro avatar(user, size="w-10 h-10", text_size="text-sm", extra_cls="") %}
+<div class="{{ size }} rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex-shrink-0 flex items-center justify-center {{ text_size }} font-bold text-white shadow-lg shadow-emerald-900/20 overflow-hidden {{ extra_cls }}">
+  {%- if user and user.image_file and user.image_file != 'default.jpg' -%}
+    {%- if user.image_file.startswith('http://') or user.image_file.startswith('https://') -%}
+      <img src="{{ user.image_file }}" alt="{{ user.username }}'s avatar" class="w-full h-full object-cover" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='';">
+      <span style="display:none;">{{ user.username[:1].upper() if user.username else 'U' }}</span>
+    {%- else -%}
+      <img src="{{ url_for('static', filename='profile_pics/' ~ user.image_file) }}" alt="{{ user.username }}'s avatar" class="w-full h-full object-cover" onerror="this.style.display='none';this.nextElementSibling.style.display='';">
+      <span style="display:none;">{{ user.username[:1].upper() if user.username else 'U' }}</span>
+    {%- endif -%}
+  {%- else -%}
+    {{ user.username[:1].upper() if user and user.username else 'U' }}
+  {%- endif -%}
+</div>
+{% endmacro %}

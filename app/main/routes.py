@@ -13,6 +13,19 @@ from flask import (
     session,
     url_for,
 )
+
+
+def _user_image_url(user):
+    """Return the absolute URL for a user's profile image."""
+    if not user or not user.image_file or user.image_file == "default.jpg":
+        return None
+    if user.image_file.startswith("http://") or user.image_file.startswith("https://"):
+        return user.image_file
+    return url_for(
+        "static", filename="profile_pics/" + user.image_file, _external=False
+    )
+
+
 from itsdangerous import URLSafeSerializer
 from sqlalchemy import case, desc, func, or_
 from sqlalchemy.orm import joinedload
@@ -356,6 +369,7 @@ def add_comment(post_id):
             "author": author.username,
             "created_at": new_comment.created_at.strftime("%b %d"),
             "avatar_letter": author.username[:2],
+            "image_url": _user_image_url(author),
         }
     )
 
@@ -554,8 +568,13 @@ def profile_save_changes():
         flash("Profile updated!", "success")
     except Exception as e:
         db.session.rollback()
-        current_app.logger.exception("Error committing profile changes to the database.")
-        flash("An error occurred while saving your profile. Please try again later.", "danger")
+        current_app.logger.exception(
+            "Error committing profile changes to the database."
+        )
+        flash(
+            "An error occurred while saving your profile. Please try again later.",
+            "danger",
+        )
 
     return redirect(url_for("main.settings_page", _anchor="profile"))
 

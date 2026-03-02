@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/avatar.html" import avatar %}
 
 {% block title %}Battles - DevArena{% endblock %}
 
@@ -44,9 +45,7 @@
         <div class="p-5">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold">
-                {{ battle.author.username[:2].upper() }}
-              </div>
+              {{ avatar(battle.author, size="w-10 h-10", text_size="text-sm") }}
               <div>
                 <span class="font-semibold text-white block">{{ battle.author.username }}</span>
                 <span class="text-zinc-500 text-sm">@{{ battle.author.username }} · {{ battle.created_at.strftime('%b %d') }}</span>
@@ -128,9 +127,7 @@
               <span class="w-5 text-xs font-bold {% if loop.index == 1 %}text-yellow-400{% elif loop.index == 2 %}text-zinc-300{% elif loop.index == 3 %}text-amber-500{% else %}text-zinc-500{% endif %}">
                 #{{ loop.index }}
               </span>
-              <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 shrink-0">
-                {{ user.username[:2].upper() }}
-              </div>
+              {{ avatar(user, size="w-8 h-8", text_size="text-xs") }}
               <div class="flex-1 truncate">
                 <span class="text-sm font-medium text-white truncate block">{{ user.username }}</span>
               </div>

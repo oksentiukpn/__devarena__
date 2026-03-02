@@ -1,3 +1,4 @@
+{% from "macros/avatar.html" import avatar %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -137,10 +138,7 @@
         <div class="profile-container relative">
           {% if session.get('user_id') %}
           <button class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-800/50 transition-colors" tabindex="0" type="button">
-            <div
-              class="w-9 h-9 rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-sm font-semibold ring-2 ring-zinc-800">
-              U
-            </div>
+            {{ avatar(nav_user, size="w-9 h-9", text_size="text-sm", extra_cls="ring-2 ring-zinc-800") }}
           </button>
           <div
             class="profile-dropdown absolute right-0 top-full w-56 pt-2 z-50">

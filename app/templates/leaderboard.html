@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/avatar.html" import avatar %}
 
 {% block title %}Leaderboard - DevArena{% endblock %}
 
@@ -40,7 +41,7 @@
                     </td>
                     <td data-label="Developer">
                         <div class="user-cell">
-                            <div class="avatar">{{ user.username[:2].upper() }}</div>
+                            {{ avatar(user, size="w-9 h-9", text_size="text-xs") }}
                             <span class="username">{{ user.username }}</span>
                         </div>
                     </td>

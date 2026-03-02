@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/avatar.html" import avatar %}
 
 {% block title %}Feed - DevArena{% endblock %}
 
@@ -54,9 +55,7 @@
         <div class="p-5 pb-0">
             <div class="flex items-start justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold">
-                        {{ post.author.username[:2].upper() }}
-                    </div>
+                    {{ avatar(post.author, size="w-10 h-10", text_size="text-sm") }}
                     <div>
                         <span class="font-semibold text-white block">{{ post.author.username }}</span>
                         <span class="text-zinc-500 text-sm">@{{ post.author.username }} · {{ post.created_at.strftime('%b %d') }}</span>
@@ -145,9 +144,7 @@
                 <div id="comments-list-{{ post.id }}" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin">
                     {% for comment in post.comments %}
                     <div class="flex gap-3 text-sm group" id="comment-{{ comment.id }}">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-400">
-                            {{ comment.author.username[:2].upper() }}
-                        </div>
+                        {{ avatar(comment.author, size="w-8 h-8", text_size="text-xs") }}
                         <div class="flex-1 space-y-1">
                             <div class="flex items-center justify-between">
                                 <span class="font-medium text-zinc-300">{{ comment.author.username }}</span>
@@ -363,8 +360,12 @@ async function postComment(postId) {
             // Note: We include the delete button because the user who just posted it definitely owns it
             const commentHtml = `
                 <div class="flex gap-3 text-sm animate-fade-in group" id="comment-${parseInt(data.id)}">
-                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-400">
-                        ${escapeHtml(data.avatar_letter)}
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-emerald-900/20 overflow-hidden">
+                        ${data.image_url
+                            ? `<img src="${escapeHtml(data.image_url)}" alt="${escapeHtml(data.author)}'s avatar" class="w-full h-full object-cover" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='';">
+                               <span style="display:none;">${escapeHtml(data.avatar_letter).charAt(0).toUpperCase()}</span>`
+                            : escapeHtml(data.avatar_letter).charAt(0).toUpperCase()
+                        }
                     </div>
                     <div class="flex-1 space-y-1">
                         <div class="flex items-center justify-between">

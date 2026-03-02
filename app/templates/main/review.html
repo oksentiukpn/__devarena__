@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/avatar.html" import avatar %}
 
 {% block title %}Review Battle: {{ battle.title }} - DevArena{% endblock %}
 
@@ -36,9 +37,7 @@
         <div class="flex flex-col bg-[#0d1117] border {% if battle.winner_id == battle.user_id %}border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.1)]{% else %}border-zinc-800{% endif %} rounded-2xl overflow-hidden">
             <div class="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400">
-                        {{ battle.author.username[:2].upper() }}
-                    </div>
+                    {{ avatar(battle.author, size="w-8 h-8", text_size="text-xs") }}
                     <span class="font-medium text-white">{{ battle.author.username }}</span>
                 </div>
                 <div class="flex items-center gap-2">
@@ -61,9 +60,7 @@
         <div class="flex flex-col bg-[#0d1117] border {% if battle.winner_id == battle.opponent_id %}border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.1)]{% else %}border-zinc-800{% endif %} rounded-2xl overflow-hidden">
             <div class="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400">
-                        {{ battle.opponent.username[:2].upper() }}
-                    </div>
+                    {{ avatar(battle.opponent, size="w-8 h-8", text_size="text-xs") }}
                     <span class="font-medium text-white">{{ battle.opponent.username }}</span>
                 </div>
                 <div class="flex items-center gap-2">
@@ -88,9 +85,7 @@
         <h3 class="text-lg font-semibold text-white mb-6">Discussion</h3>
 
         <div class="flex gap-4 mb-8">
-            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white">
-                {{ session.get('user_name', 'U')[:2].upper() }}
-            </div>
+            {{ avatar(nav_user, size="w-10 h-10", text_size="text-sm") }}
             <div class="flex-1">
                 <textarea id="comment-input" rows="2" placeholder="Analyze the code, suggest improvements..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-600/50 focus:ring-1 focus:ring-emerald-600/50 resize-none"></textarea>
                 <div class="mt-2 flex justify-end">
@@ -102,9 +97,7 @@
         <div id="comments-list" class="space-y-6">
             {% for comment in comments %}
             <div class="flex gap-4 group">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-400">
-                    {{ comment.author.username[:2].upper() }}
-                </div>
+                {{ avatar(comment.author, size="w-10 h-10", text_size="text-sm") }}
                 <div class="flex-1">
                     <div class="flex items-baseline justify-between mb-1">
                         <span class="font-medium text-white">{{ comment.author.username }}</span>
@@ -219,8 +212,12 @@
 
                 const commentHtml = `
                     <div class="flex gap-4 group animate-fade-in">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-400">
-                            ${escapeHtml(data.avatar_letter)}
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex-shrink-0 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-emerald-900/20 overflow-hidden">
+                            ${data.image_url
+                                ? `<img src="${escapeHtml(data.image_url)}" alt="${escapeHtml(data.author)}'s avatar" class="w-full h-full object-cover" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='';">
+                                   <span style="display:none;">${escapeHtml(data.avatar_letter).charAt(0).toUpperCase()}</span>`
+                                : escapeHtml(data.avatar_letter).charAt(0).toUpperCase()
+                            }
                         </div>
                         <div class="flex-1">
                             <div class="flex items-baseline justify-between mb-1">
