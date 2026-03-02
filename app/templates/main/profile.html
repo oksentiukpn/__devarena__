@@ -91,38 +91,38 @@
                     transition-colors cursor-default">
 
                     <!-- Battle name -->
-                    <span class="text-zinc-300 font-medium">
+                    <span class="text-zinc-300 font-medium min-w-0 break-words mr-3">
                         {{ battle.title }}
                     </span>
 
                     <!-- Result / Status badge -->
                     {% if battle.status == 'waiting' %}
-                    <span class="flex items-center gap-2 px-3 py-1 bg-blue-500/10 rounded-full text-xs text-blue-400 border border-blue-500/20">
+                    <span class="flex items-center gap-2 px-3 py-1 bg-blue-500/10 rounded-full text-xs text-blue-400 border border-blue-500/20 shrink-0 whitespace-nowrap">
                         <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
                         Waiting
                     </span>
                     {% elif battle.status in ['ready', 'in_progress'] %}
-                    <span class="flex items-center gap-2 px-3 py-1 bg-orange-400/10 rounded-full text-xs text-orange-400 border border-orange-400/20">
+                    <span class="flex items-center gap-2 px-3 py-1 bg-orange-400/10 rounded-full text-xs text-orange-400 border border-orange-400/20 shrink-0 whitespace-nowrap">
                         <span class="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></span>
                         In Progress
                     </span>
                     {% elif battle.status == 'in_review' %}
-                    <span class="flex items-center gap-2 px-3 py-1 bg-purple-500/10 rounded-full text-xs text-purple-400 border border-purple-500/20">
+                    <span class="flex items-center gap-2 px-3 py-1 bg-purple-500/10 rounded-full text-xs text-purple-400 border border-purple-500/20 shrink-0 whitespace-nowrap">
                         <span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
                         In Review
                     </span>
                     {% elif battle.winner_id == user.id %}
-                    <span class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full text-xs text-emerald-400 border border-emerald-500/20">
+                    <span class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full text-xs text-emerald-400 border border-emerald-500/20 shrink-0 whitespace-nowrap">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                         Win
                     </span>
                     {% elif battle.winner_id is none %}
-                    <span class="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 rounded-full text-xs text-yellow-400 border border-yellow-500/20">
+                    <span class="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 rounded-full text-xs text-yellow-400 border border-yellow-500/20 shrink-0 whitespace-nowrap">
                         <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
                         Draw
                     </span>
                     {% else %}
-                    <span class="flex items-center gap-2 px-3 py-1 bg-red-500/10 rounded-full text-xs text-red-400 border border-red-500/20">
+                    <span class="flex items-center gap-2 px-3 py-1 bg-red-500/10 rounded-full text-xs text-red-400 border border-red-500/20 shrink-0 whitespace-nowrap">
                         <span class="w-2 h-2 bg-red-500 rounded-full"></span>
                         Lose
                     </span>
