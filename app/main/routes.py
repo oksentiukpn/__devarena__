@@ -545,8 +545,12 @@ def profile_save_changes():
         try:
             filename = save_profile_picture(file)
             user.image_file = filename
-        except Exception as e:
-            flash(f"Image upload failed: {e}", "danger")
+        except Exception:
+            current_app.logger.exception(
+                "Image upload failed for user_id=%s during profile update",
+                getattr(user, "id", None),
+            )
+            flash("Image upload failed. Please try again later.", "danger")
             return redirect(url_for("main.settings_page", _anchor="profile"))
 
     # commit safely
