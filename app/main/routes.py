@@ -627,11 +627,6 @@ def settings():
     return "Not implemented yet"
 
 
-@main.route("/authors")
-def authors():
-    return "Not implemented yet"
-
-
 @main.route("/leaderboard")
 def leaderboard():
     users_list = User.query.order_by(User.points.desc()).limit(10).all()

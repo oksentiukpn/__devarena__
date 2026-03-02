@@ -5,7 +5,6 @@ Helping search service file
 from __future__ import annotations
 
 from dataclasses import dataclass
-from turtle import pos
 from typing import Tuple
 
 from app.main import search_engine

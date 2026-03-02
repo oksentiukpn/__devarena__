@@ -4,9 +4,9 @@ Docstring for SearchEngine
 
 import re
 import unicodedata
+
 import numpy as np
 from rank_bm25 import BM25Okapi
-
 
 # import numpy as np
 # from transform import write_data
@@ -135,9 +135,45 @@ from rank_bm25 import BM25Okapi
 # --- stopwords per language (small starter sets; extend later) ---
 STOPWORDS = {
     "en": {
-        "a","an","the","of","to","in","on","for","and","or","but","is","are","was","were",
-        "be","been","being","with","as","at","by","from","that","this","these","those",
-        "it","its","into","about","over","under","than","then","so","such","not","no",
+        "a",
+        "an",
+        "the",
+        "of",
+        "to",
+        "in",
+        "on",
+        "for",
+        "and",
+        "or",
+        "but",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "with",
+        "as",
+        "at",
+        "by",
+        "from",
+        "that",
+        "this",
+        "these",
+        "those",
+        "it",
+        "its",
+        "into",
+        "about",
+        "over",
+        "under",
+        "than",
+        "then",
+        "so",
+        "such",
+        "not",
+        "no",
     }
 }
 
@@ -207,7 +243,9 @@ def tokenize_tag(tag: str, lang: str = "en") -> list[str]:
     return tokenize(tag, lang=lang)
 
 
-def build_index(posts_by_id: dict, *, lang: str = "en", title_weight: int = 3, tag_weight: int = 4):
+def build_index(
+    posts_by_id: dict, *, lang: str = "en", title_weight: int = 3, tag_weight: int = 4
+):
     ids = []
     posts = []
     tag_sets = []
@@ -232,7 +270,9 @@ def build_index(posts_by_id: dict, *, lang: str = "en", title_weight: int = 3, t
             ts.update(toks)
 
         # field weighting
-        doc_tokens = (title_tokens * title_weight) + desc_tokens + (tag_tokens * tag_weight)
+        doc_tokens = (
+            (title_tokens * title_weight) + desc_tokens + (tag_tokens * tag_weight)
+        )
 
         if not doc_tokens:
             continue
@@ -242,11 +282,28 @@ def build_index(posts_by_id: dict, *, lang: str = "en", title_weight: int = 3, t
         corpus.append(doc_tokens)
         tag_sets.append(ts)
 
+    if not corpus:
+        bm25 = None
+        return ids, posts, tag_sets, bm25
+
     bm25 = BM25Okapi(corpus)
     return ids, posts, tag_sets, bm25
 
 
-def search(query: str, ids, posts, tag_sets, bm25, *, lang: str = "en", top_k: int = 10, detailed: bool = False):
+def search(
+    query: str,
+    ids,
+    posts,
+    tag_sets,
+    bm25,
+    *,
+    lang: str = "en",
+    top_k: int = 10,
+    detailed: bool = False,
+):
+    if bm25 is None or not ids:
+        return []
+
     q_tokens = tokenize(query, lang=lang)
     if not q_tokens:
         return []
