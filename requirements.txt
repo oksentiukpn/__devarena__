@@ -7,3 +7,4 @@ python-dotenv
 authlib
 requests
 rank_bm25
+gunicorn

@@ -38,6 +38,7 @@
 
     <!-- Form -->
     <form action="/post" method="POST" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <!-- Project Name -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
             <label for="project-name" class="block text-sm font-medium text-zinc-300 mb-2">

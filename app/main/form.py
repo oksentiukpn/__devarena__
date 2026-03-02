@@ -4,6 +4,7 @@ This module contains the form classes for the feed.
 
 from flask_wtf import FlaskForm
 from wtforms import (
+    IntegerField,
     RadioField,
     SelectMultipleField,
     StringField,
@@ -11,7 +12,7 @@ from wtforms import (
     TextAreaField,
     widgets,
 )
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -104,6 +105,13 @@ class BattleForm(FlaskForm):
         ],
         default="1 hour",
         validators=[DataRequired()],
+    )
+    custom_time = IntegerField(
+        "Custom Time (minutes)",
+        validators=[
+            Optional(),
+            NumberRange(min=1, max=10000, message="Must be at least 1 minute"),
+        ],
     )
 
     language = RadioField(

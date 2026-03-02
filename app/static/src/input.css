@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Point Tailwind to your HTML files so it knows which classes to compile */
+@source "../../templates/**/*.html";
+
+/* Add your custom CSS below */

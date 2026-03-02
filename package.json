@@ -1,0 +1,25 @@
+{
+  "name": "__devarena__",
+  "version": "1.0.0",
+  "description": "A quick and practical reference for managing your containerized application using **Docker Compose**. Use this guide to start, stop, rebuild, and manage your database with confidence. 🚀",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx @tailwindcss/cli -i ./app/static/src/input.css -o ./app/static/css/output.css --watch",
+    "build": "npx @tailwindcss/cli -i ./app/static/src/input.css -o ./app/static/css/output.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oksentiukpn/__devarena__.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oksentiukpn/__devarena__/issues"
+  },
+  "homepage": "https://github.com/oksentiukpn/__devarena__#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.0",
+    "tailwindcss": "^4.2.0"
+  }
+}
