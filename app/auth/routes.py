@@ -45,6 +45,8 @@ def google_callback():
             while User.query.filter_by(username=username).first():
                 username = f"{base_username}_{counter}"
                 counter += 1
+            if len(username) > 40:
+                username = username[:40]
             user = User(
                 username=username,
                 email=email,
