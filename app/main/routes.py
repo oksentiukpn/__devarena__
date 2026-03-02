@@ -45,11 +45,6 @@ def authors():
     return render_template("main/authors.html")
 
 
-@main.route("/terms")
-def terms_of_service():
-    return render_template("main/terms.html")
-
-
 @main.route("/settings")
 @login_required
 def settings_page():
@@ -624,12 +619,6 @@ def unsubscribe(token):
     current_app.logger.info(f"User with id {user_id} unsubscribed from daily prompts.")
     flash("You have been successfully unsubscribed from daily prompts.", "success")
     return redirect(url_for("main.home"))
-
-
-@main.route("/settings")
-@login_required
-def settings():
-    return "Not implemented yet"
 
 
 @main.route("/leaderboard")
