@@ -1,0 +1,561 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Server Error | DevArena{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .error-container {
+    min-height: calc(100vh - 10rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle grid background */
+  .error-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(249, 115, 22, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(249, 115, 22, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+
+  /* Spark particles flying outward from center */
+  .spark {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    animation: spark-fly linear infinite;
+  }
+
+  .spark.orange { background: rgba(249, 115, 22, 0.7); box-shadow: 0 0 4px rgba(249, 115, 22, 0.4); }
+  .spark.red { background: rgba(239, 68, 68, 0.7); box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+  .spark.yellow { background: rgba(234, 179, 8, 0.6); box-shadow: 0 0 4px rgba(234, 179, 8, 0.3); }
+
+  @keyframes spark-fly {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0;
+    }
+    5% { opacity: 1; }
+    100% {
+      transform: translate(var(--dx), var(--dy)) scale(0);
+      opacity: 0;
+    }
+  }
+
+  /* Falling debris particles */
+  .debris {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(249, 115, 22, 0.3);
+    border-radius: 50%;
+    animation: fall linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Glitching error code */
+  .glitch-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .glitch-code {
+    font-size: clamp(6rem, 15vw, 12rem);
+    font-weight: 800;
+    line-height: 1;
+    color: transparent;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 40%, #ef4444 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    position: relative;
+    letter-spacing: -0.04em;
+  }
+
+  .glitch-code::before,
+  .glitch-code::after {
+    content: '500';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 40%, #ef4444 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .glitch-code::before {
+    animation: glitch-hard 2.5s ease-in-out infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  }
+
+  .glitch-code::after {
+    animation: glitch-hard-reverse 2.5s ease-in-out infinite;
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  }
+
+  /* More aggressive glitch for 500 — server is broken! */
+  @keyframes glitch-hard {
+    0%, 78%, 100% { transform: translate(0); }
+    80% { transform: translate(-6px, -2px); }
+    82% { transform: translate(4px, 1px); }
+    84% { transform: translate(-3px, 2px); }
+    86% { transform: translate(5px, -1px); }
+    88% { transform: translate(-2px, 0); }
+    90% { transform: translate(0); }
+    95% { transform: translate(3px, -1px); }
+    97% { transform: translate(-1px, 1px); }
+  }
+
+  @keyframes glitch-hard-reverse {
+    0%, 78%, 100% { transform: translate(0); }
+    79% { transform: translate(5px, 2px); }
+    81% { transform: translate(-6px, -1px); }
+    83% { transform: translate(3px, -2px); }
+    85% { transform: translate(-4px, 1px); }
+    87% { transform: translate(2px, 0); }
+    91% { transform: translate(-3px, 1px); }
+    96% { transform: translate(1px, -1px); }
+  }
+
+  /* Scan line */
+  .scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.12), transparent);
+    animation: scan 3s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes scan {
+    0% { top: -2px; }
+    100% { top: 100%; }
+  }
+
+  /* Glow ring behind the 500 */
+  .glow-ring {
+    position: absolute;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+    filter: blur(40px);
+    animation: pulse-glow 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  /* Crash icon */
+  .crash-icon-container {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .crash-icon {
+    width: 64px;
+    height: 64px;
+    position: relative;
+  }
+
+  /* The "explosion" burst ring */
+  .burst-ring {
+    position: absolute;
+    inset: -16px;
+    border: 2px solid rgba(249, 115, 22, 0.12);
+    border-radius: 50%;
+    animation: burst 2.5s ease-out infinite;
+  }
+
+  .burst-ring:nth-child(2) { animation-delay: 0.8s; }
+  .burst-ring:nth-child(3) { animation-delay: 1.6s; }
+
+  @keyframes burst {
+    0% { transform: scale(0.7); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* The bolt/crash SVG in the center */
+  .crash-bolt {
+    position: relative;
+    z-index: 2;
+    animation: bolt-flicker 3s ease-in-out infinite;
+  }
+
+  @keyframes bolt-flicker {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.5)); }
+    50% { opacity: 0.85; filter: drop-shadow(0 0 12px rgba(249, 115, 22, 0.8)); }
+    85% { opacity: 1; }
+    87% { opacity: 0.4; }
+    89% { opacity: 1; }
+  }
+
+  /* Terminal window */
+  .terminal-window {
+    background: rgba(9, 9, 11, 0.8);
+    border: 1px solid rgba(39, 39, 42, 0.8);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    box-shadow:
+      0 0 0 1px rgba(249, 115, 22, 0.05),
+      0 25px 50px -12px rgba(0, 0, 0, 0.6),
+      0 0 80px -20px rgba(249, 115, 22, 0.06);
+    max-width: 560px;
+    width: 100%;
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    background: rgba(24, 24, 27, 0.6);
+    border-bottom: 1px solid rgba(39, 39, 42, 0.6);
+  }
+
+  .terminal-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .terminal-dot.red { background: #ef4444; }
+  .terminal-dot.yellow { background: #eab308; }
+  .terminal-dot.green { background: #22c55e; }
+
+  .terminal-title {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #71717a;
+    font-family: 'JetBrains Mono', monospace;
+    margin-right: 44px;
+  }
+
+  .terminal-body {
+    padding: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+  }
+
+  .terminal-line {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    animation: line-appear 0.3s ease forwards;
+    flex-wrap: wrap;
+  }
+
+  .terminal-line:nth-child(1) { animation-delay: 0.2s; }
+  .terminal-line:nth-child(2) { animation-delay: 0.6s; }
+  .terminal-line:nth-child(3) { animation-delay: 1.0s; }
+  .terminal-line:nth-child(4) { animation-delay: 1.4s; }
+  .terminal-line:nth-child(5) { animation-delay: 1.8s; }
+  .terminal-line:nth-child(6) { animation-delay: 2.2s; }
+  .terminal-line:nth-child(7) { animation-delay: 2.6s; }
+  .terminal-line:nth-child(8) { animation-delay: 3.0s; }
+  .terminal-line:nth-child(9) { animation-delay: 3.4s; }
+
+  @keyframes line-appear {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .prompt { color: #f97316; user-select: none; flex-shrink: 0; }
+  .cmd { color: #e4e4e7; }
+  .flag { color: #a78bfa; }
+  .string { color: #fbbf24; }
+  .error-text { color: #ef4444; }
+  .warn-text { color: #f97316; }
+  .comment { color: #52525b; }
+  .success { color: #10b981; }
+  .path { color: #38bdf8; }
+  .dim { color: #3f3f46; }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: #f97316;
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Progress bar animation */
+  .progress-bar {
+    display: inline-block;
+    min-width: 160px;
+  }
+
+  .progress-inner {
+    display: inline-block;
+    overflow: hidden;
+    animation: progress-fill 1.5s steps(20) forwards;
+    animation-delay: 2.4s;
+    white-space: nowrap;
+    width: 0;
+  }
+
+  @keyframes progress-fill {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  /* Action buttons */
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 2rem;
+    opacity: 0;
+    animation: line-appear 0.4s ease forwards;
+    animation-delay: 4.0s;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: #10b981;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn-home:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: transparent;
+    color: #f97316;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-retry:hover {
+    background: rgba(249, 115, 22, 0.08);
+    border-color: rgba(249, 115, 22, 0.5);
+    transform: translateY(-1px);
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: transparent;
+    color: #a1a1aa;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    border: 1px solid #27272a;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-back:hover {
+    color: #e4e4e7;
+    border-color: #3f3f46;
+    background: rgba(39, 39, 42, 0.3);
+  }
+
+  /* Screen flicker on load */
+  .flicker-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(249, 115, 22, 0.03);
+    pointer-events: none;
+    animation: screen-flicker 0.15s linear 3;
+    animation-delay: 0.1s;
+    opacity: 0;
+  }
+
+  @keyframes screen-flicker {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    40% { opacity: 0; }
+    60% { opacity: 0.6; }
+    80% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+  <!-- Screen flicker effect -->
+  <div class="flicker-overlay"></div>
+
+  <!-- Spark particles radiating from center -->
+  <div class="spark orange" style="--dx: -180px; --dy: -120px; animation-duration: 3s; animation-delay: 0s; width: 2px; height: 2px;"></div>
+  <div class="spark red" style="--dx: 200px; --dy: -90px; animation-duration: 2.5s; animation-delay: 0.4s;"></div>
+  <div class="spark yellow" style="--dx: -140px; --dy: 150px; animation-duration: 3.2s; animation-delay: 0.8s; width: 4px; height: 4px;"></div>
+  <div class="spark orange" style="--dx: 170px; --dy: 110px; animation-duration: 2.8s; animation-delay: 1.2s;"></div>
+  <div class="spark red" style="--dx: -50px; --dy: -180px; animation-duration: 2.2s; animation-delay: 1.6s; width: 2px; height: 2px;"></div>
+  <div class="spark yellow" style="--dx: 90px; --dy: 170px; animation-duration: 3.5s; animation-delay: 0.2s;"></div>
+  <div class="spark orange" style="--dx: -200px; --dy: 40px; animation-duration: 2.7s; animation-delay: 0.6s; width: 3px; height: 3px;"></div>
+  <div class="spark red" style="--dx: 160px; --dy: -160px; animation-duration: 3.1s; animation-delay: 1.0s;"></div>
+  <div class="spark yellow" style="--dx: -120px; --dy: -60px; animation-duration: 2.4s; animation-delay: 1.4s; width: 2px; height: 2px;"></div>
+  <div class="spark orange" style="--dx: 60px; --dy: -200px; animation-duration: 2.9s; animation-delay: 1.8s;"></div>
+  <div class="spark red" style="--dx: -80px; --dy: 190px; animation-duration: 3.3s; animation-delay: 2.0s; width: 3px; height: 3px;"></div>
+  <div class="spark yellow" style="--dx: 220px; --dy: 30px; animation-duration: 2.6s; animation-delay: 0.3s;"></div>
+
+  <!-- Falling debris -->
+  <div class="debris" style="left: 8%; animation-duration: 6s; animation-delay: 0.5s; width: 3px; height: 3px;"></div>
+  <div class="debris" style="left: 22%; animation-duration: 8s; animation-delay: 1.5s;"></div>
+  <div class="debris" style="left: 37%; animation-duration: 7s; animation-delay: 3s; width: 4px; height: 4px;"></div>
+  <div class="debris" style="left: 52%; animation-duration: 9s; animation-delay: 0s;"></div>
+  <div class="debris" style="left: 68%; animation-duration: 6.5s; animation-delay: 2s; width: 3px; height: 3px;"></div>
+  <div class="debris" style="left: 80%; animation-duration: 8.5s; animation-delay: 4s;"></div>
+  <div class="debris" style="left: 93%; animation-duration: 7.5s; animation-delay: 1s;"></div>
+  <div class="debris" style="left: 45%; animation-duration: 10s; animation-delay: 5s; width: 3px; height: 3px;"></div>
+
+  <!-- Scan line -->
+  <div class="scan-line"></div>
+
+  <div class="flex flex-col items-center text-center px-4 relative z-10">
+    <!-- Crash icon with burst rings -->
+    <div class="crash-icon-container">
+      <div class="crash-icon">
+        <div class="burst-ring"></div>
+        <div class="burst-ring"></div>
+        <div class="burst-ring"></div>
+        <svg class="crash-bolt" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="24" stroke="#f97316" stroke-width="2" fill="none" opacity="0.2"/>
+          <circle cx="32" cy="32" r="18" fill="rgba(249, 115, 22, 0.08)"/>
+          <!-- Explosion / crash symbol -->
+          <path d="M34 18L26 33h8l-4 14 14-17H34l4-12z" fill="#f97316"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Glitching 500 -->
+    <div class="glitch-wrapper mb-4">
+      <div class="glow-ring" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+      <div class="glitch-code" aria-hidden="true">500</div>
+    </div>
+
+    <h1 class="text-xl sm:text-2xl font-bold text-zinc-100 mb-2">Internal Server Error</h1>
+    <p class="text-zinc-500 text-sm mb-8 max-w-md">
+      Something broke on our end. Our servers hit an unexpected exception and couldn't complete your request.
+    </p>
+
+    <!-- Terminal window -->
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+        <span class="terminal-title">devarena — crash report</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line">
+          <span class="prompt">❯</span>
+          <span><span class="cmd">python</span> <span class="flag">-m</span> <span class="string">gunicorn</span> <span class="flag">run:app</span></span>
+        </div>
+        <div class="terminal-line">
+          <span class="error-text">Traceback (most recent call last):</span>
+        </div>
+        <div class="terminal-line">
+          <span class="dim">&nbsp;&nbsp;File</span> <span class="path">"server.py"</span><span class="dim">, line</span> <span class="string">42</span>
+        </div>
+        <div class="terminal-line">
+          <span class="error-text">RuntimeError:</span> <span class="cmd">an unexpected error occurred</span>
+        </div>
+        <div class="terminal-line">
+          <span class="comment"># The team has been notified</span>
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">❯</span>
+          <span><span class="cmd">systemctl</span> <span class="flag">restart</span> <span class="string">devarena</span></span>
+        </div>
+        <div class="terminal-line">
+          <span class="warn-text">Restarting...</span>
+          <span class="progress-bar"><span class="progress-inner"><span class="dim">████████████████████</span></span></span>
+        </div>
+        <div class="terminal-line">
+          <span class="success">✓ Service recovered. All systems nominal.</span>
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">❯</span>
+          <span class="cursor"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-buttons">
+      <a href="{{ url_for('main.home') }}" class="btn-home">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        Go Home
+      </a>
+      <button onclick="location.reload()" class="btn-retry">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Try Again
+      </button>
+      <button onclick="history.back()" class="btn-back">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Go Back
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

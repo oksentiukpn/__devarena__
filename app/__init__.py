@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from authlib.integrations.flask_client import OAuth
 from config import Config
-from flask import Flask, session
+from flask import Flask, render_template, session
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -94,6 +94,19 @@ def create_app(config_class=Config):
     app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(challenges)
+
+    # --- Custom error pages ---
+    @app.errorhandler(403)
+    def forbidden(e):
+        return render_template("errors/403.html"), 403
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template("errors/404.html"), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template("errors/500.html"), 500
 
     @app.context_processor
     def inject_nav_user():

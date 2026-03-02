@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found | DevArena{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .error-container {
+    min-height: calc(100vh - 10rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle grid background */
+  .error-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+
+  /* Floating particles */
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(16, 185, 129, 0.4);
+    border-radius: 50%;
+    animation: float-up linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes float-up {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* Glitching error code */
+  .glitch-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .glitch-code {
+    font-size: clamp(6rem, 15vw, 12rem);
+    font-weight: 800;
+    line-height: 1;
+    color: transparent;
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    position: relative;
+    letter-spacing: -0.04em;
+  }
+
+  .glitch-code::before,
+  .glitch-code::after {
+    content: '404';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .glitch-code::before {
+    animation: glitch-shift 4s ease-in-out infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  }
+
+  .glitch-code::after {
+    animation: glitch-shift-reverse 4s ease-in-out infinite;
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  }
+
+  @keyframes glitch-shift {
+    0%, 85%, 100% { transform: translate(0); }
+    88% { transform: translate(-4px, -1px); }
+    91% { transform: translate(3px, 1px); }
+    94% { transform: translate(-2px, 0); }
+    97% { transform: translate(1px, -1px); }
+  }
+
+  @keyframes glitch-shift-reverse {
+    0%, 85%, 100% { transform: translate(0); }
+    87% { transform: translate(3px, 1px); }
+    90% { transform: translate(-4px, -1px); }
+    93% { transform: translate(2px, 0); }
+    96% { transform: translate(-1px, 1px); }
+  }
+
+  /* Scan line */
+  .scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.15), transparent);
+    animation: scan 4s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes scan {
+    0% { top: -2px; }
+    100% { top: 100%; }
+  }
+
+  /* Terminal window */
+  .terminal-window {
+    background: rgba(9, 9, 11, 0.8);
+    border: 1px solid rgba(39, 39, 42, 0.8);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    box-shadow:
+      0 0 0 1px rgba(16, 185, 129, 0.05),
+      0 25px 50px -12px rgba(0, 0, 0, 0.6),
+      0 0 80px -20px rgba(16, 185, 129, 0.08);
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    background: rgba(24, 24, 27, 0.6);
+    border-bottom: 1px solid rgba(39, 39, 42, 0.6);
+  }
+
+  .terminal-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .terminal-dot.red { background: #ef4444; }
+  .terminal-dot.yellow { background: #eab308; }
+  .terminal-dot.green { background: #22c55e; }
+
+  .terminal-title {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #71717a;
+    font-family: 'JetBrains Mono', monospace;
+    margin-right: 44px;
+  }
+
+  .terminal-body {
+    padding: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+  }
+
+  .terminal-line {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    animation: line-appear 0.3s ease forwards;
+  }
+
+  .terminal-line:nth-child(1) { animation-delay: 0.3s; }
+  .terminal-line:nth-child(2) { animation-delay: 0.8s; }
+  .terminal-line:nth-child(3) { animation-delay: 1.3s; }
+  .terminal-line:nth-child(4) { animation-delay: 1.8s; }
+  .terminal-line:nth-child(5) { animation-delay: 2.3s; }
+  .terminal-line:nth-child(6) { animation-delay: 2.8s; }
+
+  @keyframes line-appear {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .prompt {
+    color: #10b981;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .cmd { color: #e4e4e7; }
+  .flag { color: #a78bfa; }
+  .string { color: #fbbf24; }
+  .error-text { color: #ef4444; }
+  .comment { color: #52525b; }
+  .success { color: #10b981; }
+  .path { color: #38bdf8; }
+
+  /* Typing cursor on last line */
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: #10b981;
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Action buttons */
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 2rem;
+    opacity: 0;
+    animation: line-appear 0.4s ease forwards;
+    animation-delay: 3.4s;
+  }
+
+  .btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: #10b981;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn-home:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: transparent;
+    color: #a1a1aa;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    border: 1px solid #27272a;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-back:hover {
+    color: #e4e4e7;
+    border-color: #3f3f46;
+    background: rgba(39, 39, 42, 0.3);
+  }
+
+  /* Glow ring behind the 404 */
+  .glow-ring {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
+    filter: blur(40px);
+    animation: pulse-glow 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+  <!-- Floating particles -->
+  <div class="particle" style="left: 10%; animation-duration: 8s; animation-delay: 0s; width: 3px; height: 3px;"></div>
+  <div class="particle" style="left: 25%; animation-duration: 12s; animation-delay: 2s;"></div>
+  <div class="particle" style="left: 40%; animation-duration: 10s; animation-delay: 4s; width: 3px; height: 3px;"></div>
+  <div class="particle" style="left: 55%; animation-duration: 9s; animation-delay: 1s;"></div>
+  <div class="particle" style="left: 70%; animation-duration: 11s; animation-delay: 3s; width: 4px; height: 4px;"></div>
+  <div class="particle" style="left: 85%; animation-duration: 7s; animation-delay: 5s;"></div>
+  <div class="particle" style="left: 15%; animation-duration: 13s; animation-delay: 6s;"></div>
+  <div class="particle" style="left: 60%; animation-duration: 8s; animation-delay: 7s; width: 3px; height: 3px;"></div>
+  <div class="particle" style="left: 90%; animation-duration: 10s; animation-delay: 2s;"></div>
+  <div class="particle" style="left: 35%; animation-duration: 14s; animation-delay: 4s;"></div>
+
+  <!-- Scan line -->
+  <div class="scan-line"></div>
+
+  <div class="flex flex-col items-center text-center px-4 relative z-10">
+    <!-- Glitching 404 -->
+    <div class="glitch-wrapper mb-4">
+      <div class="glow-ring" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+      <div class="glitch-code" aria-hidden="true">404</div>
+    </div>
+
+    <h1 class="text-xl sm:text-2xl font-bold text-zinc-100 mb-2">Page Not Found</h1>
+    <p class="text-zinc-500 text-sm mb-8 max-w-md">
+      The page you're looking for doesn't exist, was moved, or got lost in a merge conflict.
+    </p>
+
+    <!-- Terminal window -->
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+        <span class="terminal-title">devarena — zsh</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line">
+          <span class="prompt">❯</span>
+          <span><span class="cmd">curl</span> <span class="flag">-I</span> <span class="string">"{{ request.url|e }}"</span></span>
+        </div>
+        <div class="terminal-line">
+          <span class="error-text">HTTP/1.1 404 Not Found</span>
+        </div>
+        <div class="terminal-line">
+          <span class="comment"># Hmm, that route doesn't exist...</span>
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">❯</span>
+          <span><span class="cmd">git</span> <span class="flag">log</span> <span class="flag">--oneline</span> <span class="string">-- this-page</span></span>
+        </div>
+        <div class="terminal-line">
+          <span class="error-text">fatal:</span> <span class="cmd">no commits found</span>
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">❯</span>
+          <span class="success">cd /home</span><span class="cursor"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-buttons">
+      <a href="{{ url_for('main.home') }}" class="btn-home">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        Go Home
+      </a>
+      <button onclick="history.back()" class="btn-back">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Go Back
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
