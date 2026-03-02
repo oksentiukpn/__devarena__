@@ -149,17 +149,17 @@
                        </button>
                     {% endfor %}
 
-                    <div class="relative group/picker">
-                        <button class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg text-zinc-400 text-sm transition-colors border border-transparent">
+                    <div class="relative emoji-picker-wrapper">
+                        <button onclick="toggleEmojiPicker(this)" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg text-zinc-400 text-sm transition-colors border border-transparent">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
                         </button>
-                        <div class="absolute bottom-full left-0 pb-2 hidden group-hover/picker:block z-10">
+                        <div class="emoji-picker-panel absolute bottom-full left-0 pb-2 hidden z-10">
                             <div class="p-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl shadow-black/50 grid grid-cols-5 gap-1 w-64">
                                 {% set available_emojis = ['👍', '👎', '🤡','❤️', '🔥', '🚀', '🐛', '👀', '🎉', '🤯', '🧠', '💩', '💯', '🤔', '☕', '🐍', '🍓', '🦔'] %}
                                 {% for emo in available_emojis %}
-                                    <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null)"
+                                    <button onclick="toggleReaction({{ post.id }}, '{{ emo }}', null); closeAllEmojiPickers();"
                                             class="p-2 hover:bg-zinc-800 rounded-lg text-lg transition-colors text-center">
                                         {{ emo }}
                                     </button>
@@ -291,6 +291,33 @@
 </div>
 
 <script>
+// --- Emoji Picker Toggle (mobile-friendly) ---
+function toggleEmojiPicker(btn) {
+    const wrapper = btn.closest('.emoji-picker-wrapper');
+    const panel = wrapper.querySelector('.emoji-picker-panel');
+    const isOpen = !panel.classList.contains('hidden');
+
+    // Close all other open pickers first
+    closeAllEmojiPickers();
+
+    if (!isOpen) {
+        panel.classList.remove('hidden');
+    }
+}
+
+function closeAllEmojiPickers() {
+    document.querySelectorAll('.emoji-picker-panel').forEach(function(panel) {
+        panel.classList.add('hidden');
+    });
+}
+
+// Close pickers when tapping/clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.emoji-picker-wrapper')) {
+        closeAllEmojiPickers();
+    }
+});
+
 // --- XSS Protection Helper ---
 function escapeHtml(str) {
     const div = document.createElement('div');
