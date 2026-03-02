@@ -130,12 +130,9 @@
           <p>Log out from this account.<br>You are available to join again whenever you want</p>
 
           <!-- КОСТИЛЬ -->
-          <a href="/logout" class="mt-8 flex justify-start">
-            <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors">
-              Log Out
-            </button>
+          <a href="{{ url_for('auth.logout') }}" class="mt-8 flex justify-start px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors">
+            Log Out
           </a>
-
       </div>
 
       <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8">
