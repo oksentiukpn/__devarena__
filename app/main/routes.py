@@ -16,11 +16,10 @@ from itsdangerous import URLSafeSerializer
 from sqlalchemy import case, desc, func, or_
 from sqlalchemy.orm import joinedload
 
-from app.main.profile import count_battles, count_reactions
-
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
+from app.main.profile import count_battles, count_reactions
 from app.models import Battle, Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
@@ -319,11 +318,23 @@ def add_comment(post_id):
 @main.route("/profile")
 @login_required
 def profile():
-    user = User.query.get(session["user_id"])
+    user = User.query.get(session.get("user_id"))
+    if not user:
+        session.clear()
+        flash("Session expired. Please log in again.", "danger")
+        return redirect(url_for("auth.login"))
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
     battles_count = count_battles(user)
     reactions_count = count_reactions(user)
 
+    battles = (
+        Battle.query.filter(
+            or_(Battle.user_id == user.id, Battle.opponent_id == user.id),
+        )
+        .order_by(Battle.created_at.desc())
+        .limit(10)
+        .all()
+    )
 
     return render_template(
         "main/profile.html",
@@ -331,6 +342,7 @@ def profile():
         posts=posts,
         battles_count=battles_count,
         reactions_count=reactions_count,
+        battles=battles,
     )
 
 
@@ -338,7 +350,26 @@ def profile():
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
-    return render_template("main/profile.html", user=user, posts=posts)
+    battles_count = count_battles(user)
+    reactions_count = count_reactions(user)
+
+    battles = (
+        Battle.query.filter(
+            or_(Battle.user_id == user.id, Battle.opponent_id == user.id),
+        )
+        .order_by(Battle.created_at.desc())
+        .limit(10)
+        .all()
+    )
+
+    return render_template(
+        "main/profile.html",
+        user=user,
+        posts=posts,
+        battles_count=battles_count,
+        reactions_count=reactions_count,
+        battles=battles,
+    )
 
 
 @main.route("/post/<int:post_id>", methods=["DELETE"])
