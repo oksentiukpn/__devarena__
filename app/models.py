@@ -51,6 +51,7 @@ class User(db.Model):
     image_file = db.Column(db.String(255), nullable=False, default="default.jpg")
     password_hash = db.Column(db.String(256), nullable=True)  # hashed of course
     languages = db.Column(db.String(1024), nullable=True)
+    bio = db.Column(db.String(1024), nullable=False, default="", server_default="") # bio
 
     points = db.Column(db.Integer, default=0, server_default="0", nullable=False)
     subscribed_to_daily_prompt = db.Column(db.Boolean, default=True)

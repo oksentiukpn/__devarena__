@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 
 from flask import (
@@ -19,7 +20,11 @@ from sqlalchemy.orm import joinedload
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
+
+# from app.main.search import search_posts, search_users
 from app.main.profile import count_battles, count_reactions
+from app.main.search import search_post_ids
+from app.main.utils import save_profile_picture
 from app.models import Battle, Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
@@ -33,6 +38,38 @@ def home():
 @main.route("/privacy")
 def privacy():
     return render_template("main/privacy.html")
+
+
+@main.route("/authors")
+def authors():
+    return render_template("main/authors.html")
+
+
+@main.route("/settings")
+@login_required
+def settings_page():
+    user = User.query.get(session["user_id"])
+    return render_template("main/settings.html", user=user)
+
+
+@main.route("/search")
+def search_page():
+    q = (request.args.get("q") or "").strip()
+
+    posts = []
+    post_ids = []
+    if q:
+        post_ids = search_post_ids(q, limit=50)
+    if post_ids:
+        fetch_posts = (
+            Post.query.filter(Post.id.in_(post_ids))
+            .options(joinedload(Post.author))
+            .all()
+        )
+        posts_by_id = {post.id: post for post in fetch_posts}
+        posts = [posts_by_id[pid] for pid in post_ids if pid in posts_by_id]
+    # MVP page: just show ids in order (UI later)
+    return render_template("main/search.html", q=q, posts=posts)
 
 
 @main.route("/terms")
@@ -471,6 +508,75 @@ def battles():
     )
 
 
+@main.route("/profile_save_changes", methods=["POST"])
+@login_required
+def profile_save_changes():
+    user = User.query.get(session["user_id"])
+
+    # read inputs
+    new_username = request.form.get("username", "").strip()
+    new_bio = request.form.get("bio", "").strip()
+
+    # validate username if changed
+    if new_username and new_username != user.username:
+        if not re.match(r"^\w+$", new_username):
+            flash(
+                "Username can only contain letters, numbers and underscores.", "danger"
+            )
+            return redirect(url_for("main.settings_page", _anchor="profile"))
+
+        if User.query.filter_by(username=new_username).first():
+            flash("Username already exists.", "danger")
+            return redirect(url_for("main.settings_page", _anchor="profile"))
+
+        user.username = new_username
+
+    # update bio (bio is non-null, so store empty string if blank)
+    user.bio = new_bio
+
+    # handle image upload (optional)
+    file = request.files.get("profile_picture")
+    if file and file.filename:
+        try:
+            filename = save_profile_picture(file)
+            user.image_file = filename
+        except Exception:
+            current_app.logger.exception(
+                "Image upload failed for user_id=%s during profile update",
+                getattr(user, "id", None),
+            )
+            flash("Image upload failed. Please try again later.", "danger")
+            return redirect(url_for("main.settings_page", _anchor="profile"))
+
+    # commit safely
+    try:
+        db.session.commit()
+        flash("Profile updated!", "success")
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception("Error committing profile changes to the database.")
+        flash("An error occurred while saving your profile. Please try again later.", "danger")
+
+    return redirect(url_for("main.settings_page", _anchor="profile"))
+
+
+# @main.route("/search")
+# def search_page():
+#     q = (request.args.get("q") or "").strip()
+#     tab = (request.args.get("tab") or "posts").strip()  # "posts" or "users"
+
+#     posts = []
+#     users = []
+
+#     if q:
+#         if tab == "users":
+#             users = search_users(q, limit=20)
+#         else:
+#             posts = search_posts(q, limit=20)
+
+#     return render_template("main/search.html", q=q, tab=tab, posts=posts, users=users)
+
+
 @main.route("/sitemap.xml")
 def sitemap():
     users = User.query.all()
@@ -513,17 +619,6 @@ def unsubscribe(token):
     current_app.logger.info(f"User with id {user_id} unsubscribed from daily prompts.")
     flash("You have been successfully unsubscribed from daily prompts.", "success")
     return redirect(url_for("main.home"))
-
-
-@main.route("/settings")
-@login_required
-def settings():
-    return "Not implemented yet"
-
-
-@main.route("/authors")
-def authors():
-    return "Not implemented yet"
 
 
 @main.route("/leaderboard")
