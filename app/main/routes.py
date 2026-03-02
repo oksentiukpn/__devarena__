@@ -45,7 +45,12 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def home():
-    return render_template("home.html")
+    stats = {
+        "code_reviews": Comment.query.count(),
+        "developers": User.query.count(),
+        "battles": Battle.query.count(),
+    }
+    return render_template("home.html", stats=stats)
 
 
 @main.route("/privacy")
