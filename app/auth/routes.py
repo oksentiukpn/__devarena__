@@ -138,7 +138,7 @@ def login():
                 "This account has no password and was registered via Google. Please use Google login.",
                 "danger",
             )
-            return redirect(url_for("auth.login"), email=email)
+            return redirect(url_for("auth.login"))
 
         if user and user.check_password(password):
             session["user_id"] = user.id
@@ -146,14 +146,17 @@ def login():
             current_app.logger.info(f"User logged in: {email}")
             next_page = request.args.get("next")
             if next_page:
-                parsed = urlparse(next_page)
-                # Only allow relative paths (no scheme or netloc) to prevent open redirect
-                if parsed.scheme or parsed.netloc:
+                # Only allow safe relative paths to prevent open redirect
+                if not next_page.startswith("/") or next_page.startswith("//"):
                     next_page = None
+                else:
+                    parsed = urlparse(next_page)
+                    if parsed.scheme or parsed.netloc:
+                        next_page = None
             return redirect(next_page) if next_page else redirect(url_for("main.home"))
         current_app.logger.warning(f"Failed login attempt for email: {email}")
         flash("Login failed: Invalid password or email", "danger")
-        return redirect(url_for("auth.login"), email=email)
+        return redirect(url_for("auth.login"))
 
     # if not sending data, just give html
     return render_template("auth/login.html")

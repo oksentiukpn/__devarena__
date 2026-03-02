@@ -126,6 +126,10 @@ def arena(battle_id):
 def battle_status(battle_id):
     battle = Battle.query.get_or_404(battle_id)
 
+    # Only participants can view battle status
+    if session["user_id"] not in [battle.user_id, battle.opponent_id]:
+        return jsonify({"error": "You are not a participant in this battle."}), 403
+
     # Calculate remaining time if in progress
     time_left = 0
     if battle.status == "in_progress" and battle.end_time:
@@ -158,10 +162,14 @@ def battle_status(battle_id):
 def toggle_ready(battle_id):
     battle = Battle.query.get_or_404(battle_id)
 
+    # Reject non-participants
+    if session["user_id"] not in [battle.user_id, battle.opponent_id]:
+        return jsonify({"error": "You are not a participant in this battle."}), 403
+
     is_creator = session["user_id"] == battle.user_id
     if is_creator:
         battle.creator_ready = not battle.creator_ready
-    elif session["user_id"] == battle.opponent_id:
+    else:
         battle.opponent_ready = not battle.opponent_ready
 
     # Start battle if both are ready
@@ -180,6 +188,10 @@ def toggle_ready(battle_id):
 def submit_code(battle_id):
     battle = Battle.query.get_or_404(battle_id)
 
+    # Reject non-participants
+    if session["user_id"] not in [battle.user_id, battle.opponent_id]:
+        return jsonify({"error": "You are not a participant in this battle."}), 403
+
     if battle.status != "in_progress":
         return jsonify({"error": "Battle is not in progress"}), 400
 
@@ -191,7 +203,7 @@ def submit_code(battle_id):
     if is_creator:
         battle.creator_code = code
         battle.creator_submitted = True
-    elif session["user_id"] == battle.opponent_id:
+    else:
         battle.opponent_code = code
         battle.opponent_submitted = True
 
@@ -206,6 +218,7 @@ def submit_code(battle_id):
 
 
 @challenges.route("/battle/<int:battle_id>/review")
+@login_required
 def review(battle_id):
     """Battle review route"""
     battle = Battle.query.get_or_404(battle_id)
@@ -214,9 +227,13 @@ def review(battle_id):
         flash("This battle is not ready for review yet.", "warning")
         return redirect(url_for("main.battles"))
 
-    # Check if review time is up and we need to declare a winner
+    # Check if review time is up and we need to declare a winner.
+    # Only allow participants to trigger the finalization to prevent
+    # anonymous visitors from prematurely completing battles.
+    is_participant = session.get("user_id") in [battle.user_id, battle.opponent_id]
     if (
-        battle.status == "in_review"
+        is_participant
+        and battle.status == "in_review"
         and battle.review_end_time
         and datetime.utcnow() > battle.review_end_time
     ):

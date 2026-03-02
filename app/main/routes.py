@@ -192,8 +192,13 @@ def feed_page():
 
         # Tag overlap score – match any of the user's tags
         if user_tags:
+            # Escape LIKE wildcards so user-controlled tag values are matched literally
+            def _escape_like(s: str) -> str:
+                return s.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
             tag_conditions = [
-                Post.tags.ilike(f"%{tag}%") for tag in list(user_tags)[:20]
+                Post.tags.ilike(f"%{_escape_like(tag)}%", escape="\\")
+                for tag in list(user_tags)[:20]
             ]
             # OR across all tag patterns; if any match → +30
             tag_score = case(
