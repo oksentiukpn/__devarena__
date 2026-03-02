@@ -12,6 +12,9 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Ensure Python output is never buffered so logs appear in `docker logs` immediately
+ENV PYTHONUNBUFFERED=1
+
 RUN apt-get update && apt-get install -y libpq-dev gcc netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .

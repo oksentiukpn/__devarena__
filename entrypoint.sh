@@ -3,6 +3,9 @@
 # Stop if error occurs
 set -e
 
+# Disable Python output buffering so logs appear immediately in `docker logs`
+export PYTHONUNBUFFERED=1
+
 export DATABASE_URL
 
 echo "Extracting database config..."
@@ -19,4 +22,4 @@ done
 flask db upgrade
 
 echo "Starting Flask..."
-exec gunicorn --workers 5 --bind 0.0.0.0:5000 --access-logfile - run:app
+exec gunicorn --workers 5 --bind 0.0.0.0:5000 --access-logfile - --error-logfile - --log-level info run:app
