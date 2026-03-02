@@ -172,7 +172,7 @@
             });
 
             if (res.status === 401) {
-                window.location.href = "/login";
+                window.location.href = "{{ url_for('auth.login') }}";
                 return;
             }
 
@@ -203,7 +203,7 @@
             });
 
             if (res.status === 401) {
-                window.location.href = "/login";
+                window.location.href = "{{ url_for('auth.login') }}";
                 return;
             }
 

@@ -37,7 +37,7 @@
     </div>
 
     <!-- Form -->
-    <form action="/post" method="POST" class="space-y-6">
+    <form action="{{ url_for('main.post') }}" method="POST" class="space-y-6">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <!-- Project Name -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
@@ -291,7 +291,7 @@
 
         <!-- Submit Buttons -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
-            <a href="/feed" class="text-sm text-zinc-400 hover:text-white transition-colors">
+            <a href="{{ url_for('main.feed_page') }}" class="text-sm text-zinc-400 hover:text-white transition-colors">
                 Cancel and return to feed
             </a>
             <div class="flex items-center gap-3">

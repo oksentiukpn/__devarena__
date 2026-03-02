@@ -271,7 +271,7 @@ async function toggleReaction(postId, emoji, btnElement) {
 
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") === -1) {
-             window.location.href = "/login";
+             window.location.href = "{{ url_for('auth.login') }}";
              return;
         }
 
@@ -345,7 +345,7 @@ async function postComment(postId) {
         });
 
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.href = "{{ url_for('auth.login') }}";
             return;
         }
 

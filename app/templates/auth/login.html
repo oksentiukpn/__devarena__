@@ -28,7 +28,7 @@
         <h2 class="sign-h2">Sign in to your account</h2>
 
         <div class="btn-div-google">
-            <a href="/login/google" class="btn-google">
+            <a href="{{ url_for('auth.google_login') }}" class="btn-google">
                 <svg class="svg" viewBox="0 0 24 24">
                     <title>Google</title>
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <form method="POST" action="/login">
+        <form method="POST" action="{{ url_for('auth.login') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <label for="email">Email address</label>
             <input placeholder="you@example.com" type="email" id="email" name="email" value="{{ email }}"required>
