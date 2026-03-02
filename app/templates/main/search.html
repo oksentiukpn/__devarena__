@@ -160,12 +160,23 @@
 </div>
 
 <script>
+// --- XSS Protection: Escape dynamic strings before inserting into HTML ---
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
 // --- Reaction Logic ---
 async function toggleReaction(postId, emoji, btnElement) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     try {
         const response = await fetch(`/post/${postId}/react`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ emoji: emoji })
         });
 
@@ -232,10 +243,15 @@ async function postComment(postId) {
 
     if (!content.trim()) return;
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     try {
         const response = await fetch(`/post/${postId}/comment`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ content: content })
         });
 
@@ -249,14 +265,18 @@ async function postComment(postId) {
 
             // Build HTML for new comment
             // Note: We include the delete button because the user who just posted it definitely owns it
+            const safeAuthor = escapeHtml(data.author);
+            const safeAvatar = escapeHtml(data.avatar_letter);
+            const safeContent = escapeHtml(data.content);
+
             const commentHtml = `
                 <div class="flex gap-3 text-sm animate-fade-in group" id="comment-${data.id}">
                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-zinc-400">
-                        ${data.avatar_letter}
+                        ${safeAvatar}
                     </div>
                     <div class="flex-1 space-y-1">
                         <div class="flex items-center justify-between">
-                            <span class="font-medium text-zinc-300">${data.author}</span>
+                            <span class="font-medium text-zinc-300">${safeAuthor}</span>
                             <div class="flex items-center gap-2">
                                 <span class="text-xs text-zinc-500">Just now</span>
                                 <button onclick="deleteComment(${data.id}, this)" class="text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
@@ -266,7 +286,7 @@ async function postComment(postId) {
                                 </button>
                             </div>
                         </div>
-                        <p class="text-zinc-400 leading-relaxed">${data.content}</p>
+                        <p class="text-zinc-400 leading-relaxed">${safeContent}</p>
                     </div>
                 </div>
             `;
@@ -295,10 +315,15 @@ async function postComment(postId) {
 async function deletePost(postId, btnElement) {
     if (!confirm("Are you sure you want to delete this project? This cannot be undone.")) return;
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     try {
         const response = await fetch(`/post/${postId}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
         });
 
         if (response.ok) {
@@ -317,10 +342,15 @@ async function deletePost(postId, btnElement) {
 async function deleteComment(commentId, btnElement) {
     if (!confirm("Delete this comment?")) return;
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     try {
         const response = await fetch(`/comment/${commentId}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
         });
 
         if (response.ok) {
