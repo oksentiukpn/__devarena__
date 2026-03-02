@@ -555,7 +555,8 @@ def profile_save_changes():
         flash("Profile updated!", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"Database error: {e}", "danger")
+        current_app.logger.exception("Error committing profile changes to the database.")
+        flash("An error occurred while saving your profile. Please try again later.", "danger")
 
     return redirect(url_for("main.settings_page", _anchor="profile"))
 
