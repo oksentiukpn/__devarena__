@@ -3,10 +3,13 @@ Helping search service file
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass
+from turtle import pos
 from typing import Tuple
-from app.models import Post
+
 from app.main import search_engine
+from app.models import Post
 
 
 def _tags_to_list(tags: str | None) -> list[str]:
@@ -51,13 +54,20 @@ _INDEX_SIZE: int = -1
 def get_index(force_rebuild: bool = False) -> _Index:
     global _INDEX, _INDEX_SIZE
 
-    posts_by_id = _load_posts_for_index()
-    size = len(posts_by_id)
-
-    if force_rebuild or _INDEX is None or size != _INDEX_SIZE:
+    if force_rebuild or _INDEX is None:
+        posts_by_id = _load_posts_for_index()
+        size = len(posts_by_id)
         ids, posts, tag_sets, bm25 = search_engine.build_index(posts_by_id)
         _INDEX = _Index(ids=ids, posts=posts, tag_sets=tag_sets, bm25=bm25)
         _INDEX_SIZE = size
+    else:
+        current_size = Post.query.filter(Post.visibility == "public").count()
+        if current_size != _INDEX_SIZE:
+            posts_by_id = _load_posts_for_index()
+            size = len(posts_by_id)
+            ids, posts, tag_sets, bm25 = search_engine.build_index(posts_by_id)
+            _INDEX = _Index(ids=ids, posts=posts, tag_sets=tag_sets, bm25=bm25)
+            _INDEX_SIZE = size
 
     return _INDEX
 

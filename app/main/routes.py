@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 
 from flask import (
@@ -19,14 +20,15 @@ from sqlalchemy.orm import joinedload
 from app import db
 from app.auth.utils import login_required
 from app.main.form import PostForm
-from app.models import Battle, Comment, Post, Reaction, User
-from app.main.utils import save_profile_picture
-from app.main.search import search_post_ids
-import re
+
 # from app.main.search import search_posts, search_users
 from app.main.profile import count_battles, count_reactions
+from app.main.search import search_post_ids
+from app.main.utils import save_profile_picture
+from app.models import Battle, Comment, Post, Reaction, User
 
 main = Blueprint("main", __name__)
+
 
 @main.route("/")
 def home():
@@ -37,9 +39,11 @@ def home():
 def privacy():
     return render_template("main/privacy.html")
 
+
 @main.route("/authors")
 def authors():
     return render_template("main/authors.html")
+
 
 @main.route("/terms")
 def terms_of_service():
@@ -52,6 +56,7 @@ def settings_page():
     user = User.query.get(session["user_id"])
     return render_template("main/settings.html", user=user)
 
+
 @main.route("/search")
 def search_page():
     q = (request.args.get("q") or "").strip()
@@ -60,9 +65,17 @@ def search_page():
     post_ids = []
     if q:
         post_ids = search_post_ids(q, limit=50)
-    posts = Post.query.filter(Post.id.in_(post_ids)).all()
+    if post_ids:
+        fetch_posts = (
+            Post.query.filter(Post.id.in_(post_ids))
+            .options(joinedload(Post.author))
+            .all()
+        )
+        posts_by_id = {post.id: post for post in fetch_posts}
+        posts = [posts_by_id[pid] for pid in post_ids if pid in posts_by_id]
     # MVP page: just show ids in order (UI later)
     return render_template("main/search.html", q=q, posts=posts)
+
 
 @main.route("/terms")
 def terms():
@@ -512,7 +525,9 @@ def profile_save_changes():
     # validate username if changed
     if new_username and new_username != user.username:
         if not re.match(r"^\w+$", new_username):
-            flash("Username can only contain letters, numbers and underscores.", "danger")
+            flash(
+                "Username can only contain letters, numbers and underscores.", "danger"
+            )
             return redirect(url_for("main.settings_page", _anchor="profile"))
 
         if User.query.filter_by(username=new_username).first():
@@ -560,7 +575,6 @@ def profile_save_changes():
 #             posts = search_posts(q, limit=20)
 
 #     return render_template("main/search.html", q=q, tab=tab, posts=posts, users=users)
-
 
 
 @main.route("/sitemap.xml")
