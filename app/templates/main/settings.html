@@ -50,7 +50,7 @@
           </div>
         </div>
 
-          <input id="profile_picture" name="profile_picture" type="file" accept="image/png,image/jpeg,image/jpg,image/webp" class="hidden">
+          <input id="profile_picture" name="profile_picture" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" class="hidden">
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
             <div>
@@ -208,9 +208,9 @@
         return;
       }
 
-      const allowed = ['image/png', 'image/jpeg', 'image/webp'];
+      const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
       if (!allowed.includes(file.type)) {
-        fileInfo.textContent = 'Unsupported format. Use PNG, JPG or WebP.';
+        fileInfo.textContent = 'Unsupported format. Use PNG, JPG, WebP or GIF.';
         fileInfo.classList.remove('hidden', 'text-zinc-500');
         fileInfo.classList.add('text-red-400');
         preview.classList.add('hidden');

@@ -4,10 +4,12 @@ Docstring for app.main.utils
 
 import os
 import secrets
-from werkzeug.utils import secure_filename
-from flask import current_app
 
-ALLOWED_EXT = {"png", "jpg", "jpeg", "webp"}
+from flask import current_app
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXT = {"png", "jpg", "jpeg", "webp", "gif"}
+
 
 def save_profile_picture(file_storage) -> str:
     # file_storage = request.files["profile_picture"]
