@@ -135,6 +135,22 @@ def recalculate_points():
             comments_count = Comment.query.filter_by(post_id=post.id).count()
             total_points += comments_count * 10
 
+        # Add battle outcome bonus points (only for completed battles):
+        # - 40 points for each winning battle
+        # - 20 points for each losing battle
+        for battle in user.battles:
+            if battle.status != "completed":
+                continue
+            if battle.winner_id == user.id:
+                total_points += 40
+
+        for battle in user.joined_battles:
+            if battle.status != "completed":
+                continue
+            # If the winner exists and it's not this user, then this user lost
+            if battle.winner_id is not None and battle.winner_id != user.id:
+                total_points += 20
+
         user.points = total_points
 
     from app import db
