@@ -4,7 +4,7 @@
 
 {% block content %}
 <main class="flex-1 flex flex-col items-center justify-center min-h-[80vh] py-12 px-4 sm:px-6 lg:px-8">
-  <div class="w-full max-w-4xl bg-zinc-900/80 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col relative min-h-[500px]">
+  <div class="w-full max-w-8xl bg-zinc-900/80 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col relative min-h-[700px]">
 
     <!-- Slide Progress Bar -->
     <div class="w-full bg-zinc-800 h-1.5">
@@ -14,19 +14,29 @@
     <!-- Slide Content Area -->
     <div class="flex-1 p-10 sm:p-16 flex flex-col justify-center items-center text-center">
 
-      {% if slide_number == 1 %}
-      <!-- Slide 1: Title -->
-      <div class="space-y-6 animate-fade-in-up">
-        <div class="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
-          <svg class="w-12 h-12 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-        </div>
-        <h1 class="text-6xl font-extrabold text-white tracking-tight">Dev<span class="text-emerald-500">Arena</span></h1>
-        <p class="text-2xl font-medium text-emerald-400">Level Up Your Code</p>
-        <div class="w-16 h-1 bg-zinc-800 mx-auto my-8"></div>
-        <p class="text-xl text-zinc-400">Презентація проєкту</p>
-      </div>
 
+      {% if slide_number == 1 %}
+        <!-- Slide 1: Title -->
+        <div class="space-y-6 animate-fade-in-up">
+            <div class="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
+            <svg class="w-12 h-12 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            </div>
+            <h1 class="text-6xl font-extrabold text-white tracking-tight">Dev<span class="text-emerald-500">Arena</span></h1>
+            <p class="text-2xl font-medium text-emerald-400">Level Up Your Code</p>
+            <div class="w-16 h-1 bg-zinc-800 mx-auto my-8"></div>
+            <p class="text-xl text-zinc-400">Презентація проєкту</p>
+        </div>
       {% elif slide_number == 2 %}
+        <!-- Slide 2: qrcode -->
+        <div class="space-y-6 animate-fade-in-up">
+          <div class="bg-white p-4 rounded-2xl shadow-xl shadow-emerald-900/20 mb-6 inline-block">
+            <!-- Placeholder for QR Code, using a simple icon for now -->
+            <img src="{{ url_for('static', filename='qrcode.png') }}" class="w-100 h-100 rounded-xl" alt="QR Code">
+          </div>
+          <!-- <div class="w-16 h-1 bg-zinc-800 mx-auto my-8"></div> -->
+          <p class="text-xl text-zinc-400">devarena.pp.ua</p>
+        </div>
+      {% elif slide_number == 3 %}
       <!-- Slide 2: Problem -->
       <div class="space-y-8 w-full max-w-3xl animate-fade-in-up">
         <h2 class="text-4xl font-bold text-white mb-8">Проблема: <span class="text-rose-500">Bubble of Isolation</span></h2>
@@ -46,7 +56,7 @@
         </div>
       </div>
 
-      {% elif slide_number == 3 %}
+      {% elif slide_number == 4 %}
       <!-- Slide 3: Solution -->
       <div class="space-y-8 w-full max-w-3xl animate-fade-in-up">
         <h2 class="text-4xl font-bold text-white mb-6">Рішення: <span class="text-emerald-500">DevArena</span></h2>
@@ -66,14 +76,14 @@
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-white">Constructive Peer Review</h3>
-              <p class="text-zinc-400">Запит на конкретний фідбек (безпека, швидкодія). Коментарі прямо в коді.</p>
+              <h3 class="text-lg font-bold text-white">Community-Driven Reviews</h3>
+              <p class="text-zinc-400">Справжня допомога від справжніх людей. Сьогодні ти поміг новачку пофіксити код. Завтра тобі добрі люди знайшли критичну помилку в тебе в проєкті.</p>
             </div>
           </div>
         </div>
       </div>
 
-      {% elif slide_number == 4 %}
+      {% elif slide_number == 5 %}
       <!-- Slide 4: Battles -->
       <div class="space-y-6 w-full max-w-2xl animate-fade-in-up">
         <div class="w-20 h-20 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20 rotate-12">
@@ -82,14 +92,14 @@
         <h2 class="text-5xl font-extrabold text-white">Coding <span class="text-amber-500">Battles</span></h2>
         <p class="text-xl text-zinc-300">Дуелі розробників у реальному часі.</p>
         <ul class="text-left space-y-3 mt-8 text-zinc-400 bg-zinc-800/40 p-8 rounded-2xl border border-zinc-700/50">
-          <li class="flex items-center"><span class="text-amber-500 mr-3">⚔️</span> Head-to-head змагання з реальними людьми.</li>
-          <li class="flex items-center"><span class="text-amber-500 mr-3">⏱️</span> Налаштування мови, часу та складності.</li>
-          <li class="flex items-center"><span class="text-amber-500 mr-3">⚖️</span> Перемога визначається не лише автотестами.</li>
-          <li class="flex items-center"><span class="text-amber-500 mr-3">🏆</span> Голосування спільноти за чистоту та якість рішення.</li>
+          <li class="flex items-center"><span class="text-amber-500 mr-3">⚔️</span> Змагання 1 на 1 - бийся з реальними людьми, а не з тестами.</li>
+          <li class="flex items-center"><span class="text-amber-500 mr-3">⏱️</span> Все під контролем - сам обирай мову, складність та час.</li>
+          <li class="flex items-center"><span class="text-amber-500 mr-3">⚖️</span> Якість понад усе - перемагає той, хто пише найчистіший код.</li>
+          <li class="flex items-center"><span class="text-amber-500 mr-3">🏆</span> Різний профіт - Juniors вчаться на практиці, а Seniors качають авторитет.</li>
         </ul>
       </div>
 
-      {% elif slide_number == 5 %}
+      {% elif slide_number == 6 %}
       <!-- Slide 5: Tech Stack -->
       <div class="space-y-8 w-full max-w-4xl animate-fade-in-up">
         <h2 class="text-4xl font-bold text-white mb-8">Технічний <span class="text-blue-400">Стек</span></h2>
@@ -104,7 +114,7 @@
           </div>
           <div class="bg-zinc-800/50 py-6 px-4 rounded-xl border border-zinc-700/50 flex flex-col items-center">
             <span class="text-3xl mb-2">🎨</span>
-            <span class="font-semibold text-zinc-200">Tailwind CSS v4</span>
+            <span class="font-semibold text-zinc-200">HTML/CSS</span>
           </div>
           <div class="bg-zinc-800/50 py-6 px-4 rounded-xl border border-zinc-700/50 flex flex-col items-center">
             <span class="text-3xl mb-2">🐳</span>
@@ -119,15 +129,14 @@
         </div>
       </div>
 
-      {% elif slide_number == 6 %}
+      {% elif slide_number == 7 %}
       <!-- Slide 6: Audience and Goal -->
       <div class="space-y-10 w-full max-w-3xl animate-fade-in-up">
         <div class="text-left">
           <h2 class="text-3xl font-bold text-white mb-4">Для <span class="text-emerald-500">кого?</span></h2>
           <div class="bg-zinc-800/40 p-6 rounded-2xl border-l-4 border-emerald-500">
             <p class="text-zinc-300 text-lg">
-              Для студентів та Junior-розробників, які хочуть вийти за рамки "Hello World" та навчитися писати production-ready код, аналізуючи помилки та успіхи інших.
-            </p>
+              Для Juniors, які вчаться на реальних кейсах, Seniors качають репутацію та просувають свої проєкти, а ентузіасти знаходять драйв у батлах.
           </div>
         </div>
         <div class="text-left">
@@ -140,26 +149,7 @@
         </div>
       </div>
 
-      {% elif slide_number == 7 %}
-      <!-- Slide 7: Conclusion -->
-      <div class="space-y-8 animate-fade-in-up flex flex-col items-center">
-        <h2 class="text-5xl font-extrabold text-white mb-4">Готові <span class="text-emerald-500">до бою?</span></h2>
-        <p class="text-xl text-zinc-400 max-w-lg mx-auto mb-8">
-          Проєкт вже живий. Зареєструйтесь через Google та викличте нас на код-батл!
-        </p>
 
-        <div class="bg-white p-4 rounded-2xl shadow-xl shadow-emerald-900/20 mb-6 inline-block">
-          <!-- Placeholder for QR Code, using a simple icon for now -->
-          <div class="w-48 h-48 border-4 border-zinc-900 rounded-xl flex items-center justify-center bg-zinc-100">
-            <svg class="w-24 h-24 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-          </div>
-        </div>
-
-        <a href="{{ url_for('main.home') }}" class="inline-flex items-center px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-900/30">
-          Перейти на devarena.pp.ua
-          <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-        </a>
-      </div>
       {% endif %}
 
     </div>
