@@ -667,7 +667,7 @@ def leaderboard():
 
 @main.route("/presentation/<int:slide_number>")
 def presentation(slide_number):
-    total_slides = 6
+    total_slides = 7
     if slide_number < 1:
         return redirect(url_for("main.presentation", slide_number=1))
     if slide_number > total_slides:
