@@ -660,3 +660,16 @@ def unsubscribe(token):
 def leaderboard():
     users_list = User.query.order_by(User.points.desc()).limit(10).all()
     return render_template("leaderboard.html", users=users_list)
+
+
+@main.route("/presentation/<int:slide_number>")
+def presentation(slide_number):
+    total_slides = 7
+    if slide_number < 1:
+        return redirect(url_for("main.presentation", slide_number=1))
+    if slide_number > total_slides:
+        return redirect(url_for("main.presentation", slide_number=total_slides))
+
+    return render_template(
+        "main/presentation.html", slide_number=slide_number, total_slides=total_slides
+    )
