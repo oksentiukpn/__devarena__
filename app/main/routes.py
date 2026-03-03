@@ -582,6 +582,9 @@ def profile_save_changes():
     try:
         db.session.commit()
         flash("Profile updated!", "success")
+        current_app.logger.info(
+            f"User_id {user.id}<{user.username}> updated their profile."
+        )
     except Exception as e:
         db.session.rollback()
         current_app.logger.exception(
