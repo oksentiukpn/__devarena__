@@ -13,19 +13,6 @@ from flask import (
     session,
     url_for,
 )
-
-
-def _user_image_url(user):
-    """Return the absolute URL for a user's profile image."""
-    if not user or not user.image_file or user.image_file == "default.jpg":
-        return None
-    if user.image_file.startswith("http://") or user.image_file.startswith("https://"):
-        return user.image_file
-    return url_for(
-        "static", filename="profile_pics/" + user.image_file, _external=False
-    )
-
-
 from itsdangerous import URLSafeSerializer
 from sqlalchemy import case, desc, func, or_
 from sqlalchemy.orm import joinedload
@@ -39,6 +26,18 @@ from app.main.profile import count_battles, count_reactions
 from app.main.search import search_post_ids
 from app.main.utils import save_profile_picture
 from app.models import Battle, Comment, Post, Reaction, User
+
+
+def _user_image_url(user):
+    """Return the absolute URL for a user's profile image."""
+    if not user or not user.image_file or user.image_file == "default.jpg":
+        return None
+    if user.image_file.startswith("http://") or user.image_file.startswith("https://"):
+        return user.image_file
+    return url_for(
+        "static", filename="profile_pics/" + user.image_file, _external=False
+    )
+
 
 main = Blueprint("main", __name__)
 

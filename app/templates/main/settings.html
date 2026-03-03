@@ -11,15 +11,6 @@
     <h1 class="text-2xl font-medium text-white tracking-wide">Settings</h1>
   </div>
 
-  <div class="bg-zinc-900/80 rounded-[20px] p-1.5 mb-8 inline-flex flex-wrap items-center gap-1 border border-zinc-800">
-    <a href="#profile" class="tab-link px-9 py-2 rounded-full bg-zinc-800 text-emerald-500 font-medium text-sm transition-colors">profile</a>
-    <a href="#account" class="tab-link px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">account</a>
-    <a href="#notifications" class="tab-link px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">notifications</a>
-    <a href="#privacy" class="tab-link px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">privacy</a>
-    <a href="#defaults" class="tab-link px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">defaults</a>
-    <a href="#danger" class="tab-link px-9 py-2 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800/50 font-medium text-sm transition-colors">danger</a>
-  </div>
-
   <div id="tab-contents">
 
     {% set u = user if user is defined else current_user %}
