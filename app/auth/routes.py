@@ -47,10 +47,13 @@ def google_callback():
                 counter += 1
             if len(username) > 40:
                 username = username[:40]
+            image = (user_info.get("picture", "default.jpg"),)
+            if len(image) > 250:
+                image = "default.jpg"
             user = User(
                 username=username,
                 email=email,
-                image_file=user_info.get("picture", "default.jpg"),
+                image_file=image,
             )
 
             db.session.add(user)
