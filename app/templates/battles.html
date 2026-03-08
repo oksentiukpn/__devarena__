@@ -94,20 +94,27 @@
 
           <div class="border-t border-zinc-800 pt-4 mt-2">
               {% if battle.status in ['in_review', 'completed'] %}
-                  <a href="{{ url_for('challenges.review', battle_id=battle.id) }}" class="flex justify-center w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-colors">
-                      View Review & Vote
+                  <a href="{{ url_for('challenges.review', battle_id=battle.id) }}" class="flex justify-center w-full py-2.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 font-medium rounded-lg transition-colors gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      Check Results
                   </a>
+              {% elif session.get('user_id') == battle.user_id or session.get('user_id') == battle.opponent_id %}
+                  <form action="{{ url_for('challenges.join_battle', battle_id=battle.id) }}" method="POST">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <button type="submit" class="w-full py-2.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 font-medium rounded-lg transition-colors">
+                          Enter Arena
+                      </button>
+                  </form>
+              {% elif battle.opponent_id %}
+                  <button type="button" disabled class="w-full py-2.5 bg-zinc-800/50 text-zinc-500 border border-zinc-700/50 font-medium rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m9-7V7a2 2 0 00-2-2H7a2 2 0 00-2 2v3m14 0H5m14 0a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2"/></svg>
+                      Battle in Progress
+                  </button>
               {% else %}
                   <form action="{{ url_for('challenges.join_battle', battle_id=battle.id) }}" method="POST">
                       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                       <button type="submit" class="w-full py-2.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 font-medium rounded-lg transition-colors">
-                          {% if session.get('user_id') == battle.user_id or session.get('user_id') == battle.opponent_id %}
-                              Enter Arena
-                          {% elif battle.opponent_id %}
-                              Spectate (Full)
-                          {% else %}
-                              Join Battle
-                          {% endif %}
+                          Join Battle
                       </button>
                   </form>
               {% endif %}
