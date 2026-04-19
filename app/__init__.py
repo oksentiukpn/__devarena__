@@ -7,10 +7,10 @@ from datetime import timedelta
 
 from authlib.integrations.flask_client import OAuth
 from config import Config
-from flask import Flask, render_template, session
+from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect, generate_csrf
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 db = SQLAlchemy()
@@ -57,27 +57,6 @@ def create_app(config_class=Config):
 
     app.logger.info("DevArena application initialized.")
 
-    # --- Session & CSRF setup ---
-    # Mark every session as permanent so the 14-day lifetime applies.
-    @app.before_request
-    def _make_session_permanent():
-        session.permanent = True
-
-    # Expose the CSRF token in a cookie so JavaScript can read it and
-    # send it back in the X-CSRFToken header for AJAX/JSON requests.
-    # Flask-WTF already checks this header automatically.
-    @app.after_request
-    def _set_csrf_cookie(response):
-        csrf_token = generate_csrf()
-        response.set_cookie(
-            "csrf_token",
-            csrf_token,
-            samesite="Lax",
-            secure=True,
-            httponly=False,  # JS must be able to read it
-        )
-        return response
-
     # Registering OAuth
     oauth.register(
         name="google",
@@ -89,38 +68,18 @@ def create_app(config_class=Config):
 
     from app.auth.routes import auth
     from app.challenges.routes import challenges
+    from app.errors import errors_bp
     from app.main.routes import main
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(challenges)
+    app.register_blueprint(errors_bp)
 
     from app.cli import register_cli_commands
+    from app.context import register_hooks
 
     register_cli_commands(app)
-
-    # --- Custom error pages ---
-    @app.errorhandler(403)
-    def forbidden(e):
-        return render_template("errors/403.html"), 403
-
-    @app.errorhandler(404)
-    def page_not_found(e):
-        return render_template("errors/404.html"), 404
-
-    @app.errorhandler(500)
-    def internal_server_error(e):
-        return render_template("errors/500.html"), 500
-
-    @app.context_processor
-    def inject_nav_user():
-        """Make the current user available in every template as `nav_user`."""
-        from app.models import User
-
-        nav_user = None
-        user_id = session.get("user_id")
-        if user_id:
-            nav_user = User.query.get(user_id)
-        return dict(nav_user=nav_user)
+    register_hooks(app)
 
     return app
