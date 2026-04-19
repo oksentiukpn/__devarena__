@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/oksentiukpn/__devarena__#readme",
   "devDependencies": {
-    "@tailwindcss/cli": "^4.2.0",
-    "tailwindcss": "^4.2.0"
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.2.2"
   }
 }

@@ -1,0 +1,59 @@
+flowchart TD
+    Client((User / Web Browser))
+
+    subgraph "Docker Environment (docker-compose)"
+
+        subgraph "Web Server"
+            Nginx["Nginx<br/>(Reverse Proxy & SSL)"]
+        end
+
+        subgraph "Backend (Flask Application)"
+            AppRouter{"Application Router"}
+
+            Auth["Auth Module<br/>(Login, Registration, Security)"]
+            Main["Main Module<br/>(Profiles, Feed, Search)"]
+            Challenges["Challenges Module<br/>(Coding Arenas, Battles)"]
+
+            Templates["Templates & Static<br/>(HTML, CSS, JS)"]
+
+            ORM["SQLAlchemy ORM<br/>(Data Models)"]
+        end
+
+        subgraph "Database"
+            DB[("PostgreSQL<br/>(Persistent Data)")]
+        end
+    end
+
+    %% External Interactions
+    Client -- "HTTPS Requests" --> Nginx
+    Client -. "Loads assets" .-> Templates
+
+    %% Internal Routing
+    Nginx -- "Forwards requests" --> AppRouter
+
+    AppRouter --> |"/auth"| Auth
+    AppRouter --> |"/"| Main
+    AppRouter --> |"/challenges"| Challenges
+
+    %% App logic returning views
+    Auth -. "Renders" .-> Templates
+    Main -. "Renders" .-> Templates
+    Challenges -. "Renders" .-> Templates
+
+    %% Database Interactions
+    Auth --> |"Reads/Writes User Data"| ORM
+    Main --> |"Reads/Writes Posts/Profiles"| ORM
+    Challenges --> |"Reads/Writes Scores/Battles"| ORM
+
+    ORM <--> |"SQL Queries"| DB
+
+    %% Styling
+    classDef browser fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef server fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef app fill:#cfc,stroke:#333,stroke-width:2px;
+    classDef db fill:#fca,stroke:#333,stroke-width:2px;
+
+    class Client browser;
+    class Nginx server;
+    class Auth,Main,Challenges,Templates,AppRouter,ORM app;
+    class DB db;

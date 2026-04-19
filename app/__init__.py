@@ -95,6 +95,10 @@ def create_app(config_class=Config):
     app.register_blueprint(auth)
     app.register_blueprint(challenges)
 
+    from app.cli import register_cli_commands
+
+    register_cli_commands(app)
+
     # --- Custom error pages ---
     @app.errorhandler(403)
     def forbidden(e):
