@@ -676,3 +676,16 @@ def presentation(slide_number):
     return render_template(
         "main/presentation.html", slide_number=slide_number, total_slides=total_slides
     )
+
+
+from flask import abort
+
+
+@main.route("/test-403")
+def test_403():
+    abort(403)
+
+
+@main.route("/test-500")
+def test_500():
+    abort(500)
