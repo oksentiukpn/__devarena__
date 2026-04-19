@@ -9,11 +9,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
 
 
-def load_user(user_id):
-    """Loading user func"""
-    return User.query.get(int(user_id))
-
-
 class Reaction(db.Model):
     """
     Reaction model
@@ -39,9 +34,6 @@ class Reaction(db.Model):
 class User(db.Model):
     """
     User model
-    This model is used to store users.
-    Example:
-        User(username="John", email="john@example.com", password="password"
     """
 
     __tablename__ = "users"
@@ -120,7 +112,9 @@ class Post(db.Model):
     tags = db.Column(db.String(200))
     feedback_type = db.Column(db.String(200))  # Stored as comma-separated string
     visibility = db.Column(db.String(20), default="public", nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow, index=True
+    )
 
     # Foreign Key linking to User
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -163,7 +157,9 @@ class Comment(db.Model):
     __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow, index=True
+    )
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
@@ -186,7 +182,9 @@ class Battle(db.Model):
     difficulty = db.Column(db.String(20), nullable=False)
     tags = db.Column(db.String(200))
     visibility = db.Column(db.String(20), default="public", nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow, index=True
+    )
 
     # Relationship
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
