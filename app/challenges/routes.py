@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from flask import (
+    Blueprint,
     current_app,
     flash,
     jsonify,
@@ -13,9 +14,10 @@ from flask import (
 
 from app import db
 from app.auth.utils import login_required
-from app.challenges import challenges
 from app.main.form import BattleForm
 from app.models import Battle, BattleComment, BattleVote
+
+challenges = Blueprint("challenges", __name__)
 
 
 def parse_time_limit(limit_str):
