@@ -1,3 +1,4 @@
+[![Orhideya Status](https://orhideya.pp.ua/badge/devarena.svg)](https://orhideya.pp.ua/p/devarena)
 <div align="center">
 
 # ⚔️ DevArena
